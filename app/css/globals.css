@@ -1,0 +1,255 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wdth,wght@0,75..100,100..900;1,75..100,100..900&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --color-digired: #c5283d;
+  --color-digigold: #e9b872;
+  --color-digigold-hover: #df9730;
+  --color-digibrown: #291711;
+  --color-digiblue: #c1dbe3;
+  --color-digiblack: #171717;
+  --color-bg-signin: url('/public/images/signin.jpg');
+  --font-inter: 'Inter', sans-serif;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --font-inter: 'Inter', sans-serif;
+  --font-mono: 'Courier New', monospace;
+}
+
+/* Dark mode colors */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #171717;
+    --foreground: #ffffff;
+  }
+}
+
+/* Global body styles */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter);
+}
+
+/* Digiwhite */
+@layer components {
+  .text-digiwhite4040-bold {
+    @apply text-white text-[40px] leading-[40px] font-bold;
+  }
+
+  .text-digiwhite2025-semibold {
+    @apply text-white text-[20px] leading-[25px] font-semibold;
+  }
+
+  .text-digiwhite2025-normal {
+    @apply text-white text-[20px] leading-[25px] font-normal;
+  }
+
+  .text-digiwhite1624-semibold {
+    @apply text-white text-[16px] leading-[24px] font-semibold;
+  }
+
+  .text-digiwhite1624-normal {
+    @apply !text-white text-[16px] leading-[24px] font-normal;
+  }
+
+  .text-digiwhite1212-semibold {
+    @apply text-white text-[12px] leading-[12px] font-semibold;
+  }
+
+  .text-digiwhite1212-normal {
+    @apply text-white text-[12px] leading-[12px] font-normal;
+  }
+
+  /* Digiblack */
+  .text-digiblack4040-semibold {
+    @apply text-digiblack text-[40px] leading-[40px] font-semibold;
+  }
+
+  .text-digiblack3640-bold {
+    @apply text-digiblack text-[36px] leading-[40px] font-bold;
+  }
+
+  .text-digiblack3240-bold {
+    @apply text-digiblack text-[32px] leading-[40px] font-bold;
+  }
+
+  .text-digiblack3240-semibold {
+    @apply text-digiblack text-[32px] leading-[40px] font-semibold;
+  }
+
+  .text-digiblack2832-semibold {
+    @apply text-digiblack text-[28px] leading-[32px] font-semibold;
+  }
+
+  .text-digiblack2424-bold {
+    @apply text-digiblack text-[24px] leading-[24px] font-bold;
+  }
+
+  .text-digiblack2025-semibold {
+    @apply text-digiblack !text-[20px] !leading-[25px] !font-semibold;
+  }
+
+  .text-digiblack1624-bold {
+    @apply text-digiblack text-[16px] leading-[24px] font-bold;
+  }
+
+  .text-digiblack1624-semibold {
+    @apply text-digiblack !text-[16px] leading-[24px] !font-semibold;
+  }
+
+  .text-digiblack1624-normal {
+    @apply text-digiblack text-[16px] leading-[24px] font-normal;
+  }
+
+  .text-digiblack1420-semibold {
+    @apply text-digiblack text-[14px] leading-[20px] font-semibold;
+  }
+
+  .text-digiblack1420-normal {
+    @apply text-digiblack text-[14px] leading-[20px] font-normal;
+  }
+
+  .text-digiblack1212-bold {
+    @apply text-digiblack text-[12px] leading-[12px] font-bold;
+  }
+
+  .text-digiblack1212-semibold {
+    @apply text-digiblack text-[12px] leading-[12px] font-semibold;
+  }
+
+  /* Digibrown */
+
+  .text-digibrown4040-bold {
+    @apply text-digibrown text-[40px] leading-[40px] font-bold;
+  }
+
+  .text-digibrown4040-semibold {
+    @apply text-digibrown text-[40px] leading-[40px] font-semibold;
+  }
+
+  .text-digibrown3240-bold {
+    @apply text-digibrown text-[32px] leading-[40px] font-bold;
+  }
+
+  .text-digibrown2025-bold {
+    @apply text-digibrown text-[20px] leading-[25px] font-bold;
+  }
+
+  .text-digibrown2025-semibold {
+    @apply text-digibrown text-[20px] leading-[25px] font-semibold;
+  }
+
+  .text-digibrown2025-normal {
+    @apply text-digibrown text-[20px] leading-[25px] font-normal;
+  }
+
+  .text-digibrown1624-bold {
+    @apply text-digibrown text-[16px] leading-[24px] font-bold;
+  }
+
+  .text-digibrown1624-semibold {
+    @apply text-digibrown text-[16px] leading-[24px] font-semibold;
+  }
+
+  .text-digibrown1624-medium {
+    @apply text-digibrown text-[16px] leading-[24px] font-medium;
+  }
+
+  .text-digibrown1624-normal {
+    @apply text-digibrown text-[16px] leading-[24px] font-normal;
+  }
+
+  .text-digibrown1212-bold {
+    @apply text-digibrown text-[12px] leading-[12px] font-bold;
+  }
+
+  /* Digired */
+  .text-digired4040-bold {
+    @apply text-digired text-[40px] leading-[40px] font-bold;
+  }
+
+  .text-digired4040-semibold {
+    @apply text-digired text-[40px] leading-[40px] font-semibold;
+  }
+
+  .text-digired2025-semibold {
+    @apply text-digired text-[20px] leading-[25px] font-semibold;
+  }
+
+  .text-digired1624-semibold {
+    @apply text-digired text-[16px] leading-[24px] font-semibold;
+  }
+
+  .text-digired1624-normal {
+    @apply text-digired text-[16px] leading-[24px] font-normal;
+  }
+
+  .text-digired1212-semibold {
+    @apply text-digired text-[12px] leading-[12px] font-semibold;
+  }
+
+  .text-digired1212-normal {
+    @apply text-digired text-[12px] leading-[12px] font-normal;
+  }
+
+  .text-digired1212-bold {
+    @apply text-digired text-[12px] leading-[12px] font-bold;
+  }
+
+  .text-digired2025-bold {
+    @apply text-digigold text-[20px] leading-[25px] font-bold;
+  }
+
+  /* Digigold hover */
+  .text-digigoldhover4040-bold {
+    @apply text-digigold-hover text-[40px] leading-[40px] font-bold;
+  }
+
+  .text-digigoldhover3240-bold {
+    @apply text-digigold-hover text-[32px] leading-[40px] font-bold;
+  }
+
+  .text-digigoldhover2025-bold {
+    @apply text-digigold-hover text-[20px] leading-[25px] font-bold;
+  }
+
+  /* Digigold */
+  .text-digigold1624-bold {
+    @apply text-digigold text-[16px] leading-[24px] font-bold;
+  }
+
+  .text-digigold1624-semibold {
+    @apply text-digigold text-[16px] leading-[24px] font-semibold;
+  }
+
+  .text-digigold1624-normal {
+    @apply text-digigold text-[16px] leading-[24px] font-normal;
+  }
+
+  /* Gray */
+  .text-gray1624-normal {
+    @apply text-gray-400 text-[16px] leading-[24px] font-normal;
+  }
+
+  .text-error-form {
+    @apply text-red-800 text-[12px] leading-[16px] font-semibold;
+  }
+
+  .text-selected-form {
+    @apply text-green-700 text-[16px] leading-[24px] font-bold;
+  }
+
+  .text-placeholder-form {
+    @apply text-gray-400 text-[16px] leading-[24px] font-normal;
+  }
+}
+
+/* ---------------------- */
