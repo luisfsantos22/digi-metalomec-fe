@@ -83,10 +83,10 @@ const WorkforcesRepairFormScreen = (props: WorkforcesRepairFormScreenProps) => {
             <Table
               striped
               withTableBorder
-              highlightOnHoverColor="bg-digigold-hover/10"
+              highlightOnHoverColor="bg-digiorange/10"
               className="w-full"
             >
-              <Table.Thead className="bg-digigold">
+              <Table.Thead className="bg-digiorange">
                 <Table.Tr>
                   {WORKFORCE_TABLE_LIST.map((text) => (
                     <Table.Th
@@ -107,14 +107,14 @@ const WorkforcesRepairFormScreen = (props: WorkforcesRepairFormScreenProps) => {
                       setSelectedWorkforce(workforce)
                       setShowWorkforceModal(true)
                     }}
-                    className="hover:cursor-pointer hover:!bg-digigold-hover/20"
+                    className="hover:cursor-pointer hover:!bg-digiorange/20"
                   >
                     <TableRow>
                       <Text
                         text={
                           workers?.find(
                             (worker) => worker.uuid === workforce.workerUuid
-                          )?.username || 'Desconhecido'
+                          )?.email || 'Desconhecido'
                         }
                         styles="text-digibrown1624-normal"
                       />
@@ -160,7 +160,7 @@ const WorkforcesRepairFormScreen = (props: WorkforcesRepairFormScreenProps) => {
               </Table.Tbody>
             </Table>
           )}
-          <div className="flex gap-2 items-center p-2 rounded-xl justify-center w-full text-digibrown2025-bold bg-digigold/20">
+          <div className="flex gap-2 items-center p-2 rounded-xl justify-center w-full text-digibrown2025-bold bg-digiorange/20">
             <Text
               text="Valor Total Gasto em Mão de Obra:"
               styles="text-digibrown2025-semibold"

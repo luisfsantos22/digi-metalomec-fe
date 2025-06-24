@@ -24,7 +24,7 @@ const BackButton = (props: BackButtonProps) => {
       id={id}
       className={classNames(
         size,
-        'flex flex-none items-start relative hover:cursor-pointer hover:rounded-full hover:bg-digigold-hover/20'
+        'flex flex-none items-start relative hover:cursor-pointer hover:rounded-full hover:bg-digiorange/20'
       )}
       onClick={onClick}
     >

@@ -18,8 +18,8 @@ export function translateRole(role) {
   switch (role) {
     case 'ADMIN':
       return 'Administrador'
-    case 'WORKSHOP':
-      return 'Mecânico'
+    case 'EMPLOYEE':
+      return 'Colaborador'
     case 'MANAGER':
       return 'Gestor'
     default:

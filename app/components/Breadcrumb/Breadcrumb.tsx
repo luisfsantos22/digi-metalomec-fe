@@ -54,7 +54,7 @@ const Breadcrumb = (props: BreadcrumbProps) => {
               key={index}
               className={classNames(
                 index < paths.length - 1 &&
-                  'hover:underline hover:cursor-pointer hover:text-digigold',
+                  'hover:underline hover:cursor-pointer hover:text-digiorange',
                 ' flex items-center gap-1'
               )}
             >

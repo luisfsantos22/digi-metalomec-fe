@@ -6,13 +6,14 @@
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
-  --color-digired: #c5283d;
-  --color-digigold: #e9b872;
-  --color-digigold-hover: #df9730;
-  --color-digibrown: #291711;
-  --color-digiblue: #c1dbe3;
+  --color-digiblue: #478ac9;
+  --color-digiblue-hover: #357ab8;
+  --color-digired: #ba3b46;
+  --color-digiorange: #fcd0a1;
+  --color-digibrown: #5e4b56;
   --color-digiblack: #171717;
-  --color-bg-signin: url('/public/images/signin.jpg');
+  --color-digigreen: #b1b695;
+  --color-bg-signin: url('/images/signin.png');
   --font-inter: 'Inter', sans-serif;
 }
 
@@ -40,12 +41,20 @@ body {
 
 /* Digiwhite */
 @layer components {
-  .text-digiwhite4040-bold {
-    @apply text-white text-[40px] leading-[40px] font-bold;
+  .text-digiwhite4052-bold {
+    @apply text-white text-[40px] leading-[52px] font-bold;
+  }
+
+  .text-digiwhite2432-semibold {
+    @apply text-white text-[24px] leading-[32px] font-semibold;
+  }
+
+  .text-digiwhite2432-normal {
+    @apply text-white text-[24px] leading-[32px] font-normal;
   }
 
   .text-digiwhite2025-semibold {
-    @apply text-white text-[20px] leading-[25px] font-semibold;
+    @apply text-white !text-[20px] leading-[25px] !font-semibold;
   }
 
   .text-digiwhite2025-normal {
@@ -53,7 +62,7 @@ body {
   }
 
   .text-digiwhite1624-semibold {
-    @apply text-white text-[16px] leading-[24px] font-semibold;
+    @apply text-white !text-[16px] leading-[24px] !font-semibold;
   }
 
   .text-digiwhite1624-normal {
@@ -205,33 +214,33 @@ body {
   }
 
   .text-digired2025-bold {
-    @apply text-digigold text-[20px] leading-[25px] font-bold;
+    @apply text-digiorange text-[20px] leading-[25px] font-bold;
   }
 
-  /* Digigold hover */
-  .text-digigoldhover4040-bold {
-    @apply text-digigold-hover text-[40px] leading-[40px] font-bold;
+  /* Digi-orange  */
+  .text-digiorange4040-bold {
+    @apply text-digiorange text-[40px] leading-[40px] font-bold;
   }
 
-  .text-digigoldhover3240-bold {
-    @apply text-digigold-hover text-[32px] leading-[40px] font-bold;
+  .text-digiorange3240-bold {
+    @apply text-digiorange text-[32px] leading-[40px] font-bold;
   }
 
-  .text-digigoldhover2025-bold {
-    @apply text-digigold-hover text-[20px] leading-[25px] font-bold;
+  .text-digiorange2025-bold {
+    @apply text-digiorange text-[20px] leading-[25px] font-bold;
   }
 
-  /* Digigold */
-  .text-digigold1624-bold {
-    @apply text-digigold text-[16px] leading-[24px] font-bold;
+  /* Digiblue */
+  .text-digiblue1624-bold {
+    @apply text-digiblue text-[16px] leading-[24px] font-bold;
   }
 
-  .text-digigold1624-semibold {
-    @apply text-digigold text-[16px] leading-[24px] font-semibold;
+  .text-digiblue1624-semibold {
+    @apply text-digiblue text-[16px] leading-[24px] font-semibold;
   }
 
-  .text-digigold1624-normal {
-    @apply text-digigold text-[16px] leading-[24px] font-normal;
+  .text-digiblue1624-normal {
+    @apply text-digiblue text-[16px] leading-[24px] font-normal;
   }
 
   /* Gray */
@@ -244,7 +253,7 @@ body {
   }
 
   .text-selected-form {
-    @apply text-green-700 text-[16px] leading-[24px] font-bold;
+    @apply text-digigreen text-[16px] leading-[24px] font-bold;
   }
 
   .text-placeholder-form {

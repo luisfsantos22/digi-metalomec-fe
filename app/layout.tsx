@@ -9,20 +9,6 @@ export const viewport = {
   initialScale: 1,
 }
 
-export const metadata: Metadata = {
-  title: 'Digiauto',
-  description: 'O teu assistente digital para o setor automóvel',
-  keywords:
-    'car;cars;carro;automóveis;veículo;vehicle;assistente;digital;assistente digital',
-  authors: [{ name: 'Digiauto', url: 'https://digiauto.pt/' }],
-  openGraph: {
-    title: 'Digiauto',
-    description: 'O teu assistente digital para o setor automóvel',
-    url: 'https://digiauto.pt/',
-    type: 'website',
-  },
-}
-
 export default function RootLayout({
   children,
 }: {

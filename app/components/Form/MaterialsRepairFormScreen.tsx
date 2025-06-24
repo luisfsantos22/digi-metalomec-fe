@@ -73,10 +73,10 @@ const MaterialsRepairFormScreen = (props: MaterialsRepairFormScreenProps) => {
             <Table
               striped
               withTableBorder
-              highlightOnHoverColor="bg-digigold-hover/10"
+              highlightOnHoverColor="bg-digiorange/10"
               className="w-full"
             >
-              <Table.Thead className="bg-digigold">
+              <Table.Thead className="bg-digiorange">
                 <Table.Tr>
                   {MATERIAL_TABLE_LIST.map((text) => (
                     <Table.Th
@@ -97,7 +97,7 @@ const MaterialsRepairFormScreen = (props: MaterialsRepairFormScreenProps) => {
                       setSelectedMaterial(material)
                       setShowMaterialModal(true)
                     }}
-                    className="hover:cursor-pointer hover:!bg-digigold-hover/20"
+                    className="hover:cursor-pointer hover:!bg-digiorange/20"
                   >
                     <TableRow>
                       <Text
@@ -144,7 +144,7 @@ const MaterialsRepairFormScreen = (props: MaterialsRepairFormScreenProps) => {
               </Table.Tbody>
             </Table>
           )}
-          <div className="flex  lg:flex-row flex-col gap-4 items-center p-2 rounded-xl justify-center w-full text-digibrown2025-bold bg-digigold/20">
+          <div className="flex  lg:flex-row flex-col gap-4 items-center p-2 rounded-xl justify-center w-full text-digibrown2025-bold bg-digiorange/20">
             <div className="flex items-center gap-2">
               <Text
                 text="Total de Despesas:"

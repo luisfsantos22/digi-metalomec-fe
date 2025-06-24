@@ -42,7 +42,7 @@ const PrimaryButton = (props: PrimaryButtonProps) => {
               ? 'px-4 py-2 text-digiblack1624-semibold'
               : size === 'large' && 'px-6 py-3 text-digiblack2025-semibold',
           'disabled:!text-gray-500 disabled:hover:cursor-not-allowed disabled:bg-gray-200',
-          'flex self-center justify-center items-center cursor-pointer rounded-xl bg-digigold hover:bg-digigold-hover'
+          'flex self-center justify-center items-center cursor-pointer rounded-xl bg-digiblue hover:bg-digiblue-hover'
         )}
       >
         {text}

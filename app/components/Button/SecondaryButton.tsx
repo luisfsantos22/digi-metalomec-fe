@@ -38,7 +38,7 @@ const SecondaryButton = (props: SecondaryButtonProps) => {
         className={classNames(
           fullWidth && 'w-full',
           active
-            ? 'bg-digigold-hover'
+            ? 'bg-digiblue'
             : disabled
               ? 'bg-gray-200 hover:cursor-not-allowed'
               : 'bg-neutral-50 hover:bg-gray-200 border border-gray-200',

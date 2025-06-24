@@ -26,7 +26,7 @@ const SignInPage = async () => {
   }
 
   return (
-    <div className="flex items-center justify-center h-screen bg-digigold">
+    <div className="flex items-center justify-center h-screen bg-digiblue">
       <div className="flex lg:grid lg:grid-cols-2 w-full">
         {/* Form to sign in */}
         <div className="col-span-1 flex items-center justify-center max-w-[37.5rem] mx-auto p-4 relative w-full">
@@ -38,10 +38,10 @@ const SignInPage = async () => {
         >
           {/* Overlay */}
           <div className="absolute inset-0 bg-black opacity-70"></div>
-          <div className="flex flex-col gap-20 px-10 z-10">
+          <div className="flex flex-col gap-10 px-10 z-10 justify-center items-center h-full w-3xl">
             <Text
-              text="Guiamos o Seu Stand para a Excelência Digital"
-              styles="text-digiwhite4040-bold"
+              text="A Solução feita à Medida para o Setor Metalomecânico!"
+              styles="text-digiwhite4052-bold text-center"
             />
             <div className="flex justify-center w-lg items-center self-center">
               <TextCarousel listText={CAROUSEL_TEXT_LIST} />

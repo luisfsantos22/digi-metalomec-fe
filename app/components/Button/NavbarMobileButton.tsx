@@ -22,11 +22,11 @@ const NavbarMobileButton = (props: NavbarMobileButtonProps) => {
         disabled={disabled}
         className={classNames(
           isActive
-            ? 'bg-digigold text-digiwhite1624-semibold'
+            ? 'bg-digiorange text-digiwhite1624-semibold'
             : 'bg-white text-digiblack1624-semibold',
           'flex self-center w-full px-4 py-2  justify-center items-center cursor-pointer',
           'disabled:!text-gray-200 disabled:cursor-not-allowed',
-          'rounded-xs bg-digigold hover:bg-digigold-hover'
+          'rounded-xs bg-digiorange hover:bg-digiorange'
         )}
       >
         {text}

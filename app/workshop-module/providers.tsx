@@ -19,11 +19,7 @@ export default function Providers({
 }) {
   return (
     <SessionProvider session={session}>
-      <MantineProvider
-        withGlobalClasses
-        withCssVariables
-        withStaticClasses
-      >
+      <MantineProvider>
         <Notifications />
         {children}
       </MantineProvider>

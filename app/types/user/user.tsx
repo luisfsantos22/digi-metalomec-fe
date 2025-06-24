@@ -1,9 +1,8 @@
 type SimpleUser = {
   uuid: string
   fullName: string
-  username: string
+  email: string
   role?: string
-  companyUuid?: string
 }
 
 export type { SimpleUser }

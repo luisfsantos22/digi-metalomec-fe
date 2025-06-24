@@ -1,65 +1,88 @@
 import CredentialsProvider from 'next-auth/providers/credentials'
 import axiosInstance from '@/app/hooks/axiosInstance'
+import { AUTH_ENDPOINTS } from '@/app/hooks/api/endpoints'
 import { translateRole } from '@/utils'
 import type { AuthOptions } from 'next-auth'
+import jwt from 'jsonwebtoken'
 
 const authOptions: AuthOptions = {
-  providers: [
-    CredentialsProvider({
-      name: 'Credentials',
-      credentials: {
-        username: { label: 'Username', type: 'text' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password) {
-          throw new Error('Username and password are required')
-        }
-
-        try {
-          const { data } = await axiosInstance.post('auth/login', {
-            username: credentials.username,
-            password: credentials.password,
-          })
-
-          if (data && data.token) {
-            return {
-              id: data.user.uuid,
-              username: data.user.username,
-              token: data.token,
-              role: data.user.role,
-              first_name: data.user.firstName,
-              last_name: data.user.lastName,
-              company_uuid: data.user.companyUuid || '',
-            }
-          }
-
-          return null
-        } catch {
-          throw new Error('Invalid username or password')
-        }
-      },
-    }),
-  ],
+  debug: true,
+  // Configure auth pages
   pages: {
     signIn: '/auth/signin',
     error: '/auth/signin',
   },
+  // Configure auth providers
+  providers: [
+    CredentialsProvider({
+      id: 'credentials',
+      name: 'Credentials',
+      credentials: {
+        email: { label: 'Email', type: 'text' },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error('Email and password are required')
+        }
+
+        try {
+          const { data } = await axiosInstance.post(AUTH_ENDPOINTS.login, {
+            email: credentials.email,
+            password: credentials.password,
+          })
+
+          if (data && data.access && data.refresh) {
+            const token = data.access
+            const userData = jwt.decode(token)
+
+            return {
+              id: userData.user_id,
+              email: userData.user.email,
+              access: token,
+              role: userData.user.groups[0] || '',
+              first_name: userData.user.first_name,
+              last_name: userData.user.last_name,
+              refresh: data.refresh,
+            }
+          }
+
+          throw new Error('Invalid response from server')
+        } catch (error: any) {
+          console.error('Login error:', error.response?.data || error)
+          if (error.response?.status === 401) {
+            throw new Error('Credenciais inválidas')
+          }
+          throw new Error(
+            error.response?.data?.detail || 'An error occurred during login'
+          )
+        }
+      },
+    }),
+  ],
+  // Set secret for JWT encryption
   secret: process.env.NEXTAUTH_SECRET,
-  session: { strategy: 'jwt' as const },
+  session: {
+    strategy: 'jwt' as const,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  jwt: {
+    secret: process.env.NEXTAUTH_SECRET,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         return {
           ...token,
           id: user.id,
-          username: user.username,
+          email: user.email,
           firstName: user.first_name,
           lastName: user.last_name,
-          role: translateRole(user.role),
-          companyUuid: user.company_uuid || '',
-          accessToken: user.token,
-          refreshToken: user.refresh_token || '',
+          fullName: `${user.first_name} ${user.last_name}`,
+          role: user.role,
+          accessToken: user.access,
+          refreshToken: user.refresh || '',
         }
       }
 
@@ -71,11 +94,11 @@ const authOptions: AuthOptions = {
         user: {
           ...session.user,
           id: token.id,
-          username: token.username,
+          email: token.email,
           firstName: token.firstName,
           lastName: token.lastName,
+          fullName: token.fullName,
           role: token.role,
-          companyUuid: token.companyUuid || '',
         },
         accessToken: token.accessToken,
         refreshToken: token.refreshToken,

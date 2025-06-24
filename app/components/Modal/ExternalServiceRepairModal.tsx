@@ -222,7 +222,7 @@ const ExternalServiceRepairModal = (
                 tempWorkshopExternalService.iva >= 0
               )
             }
-            extraStyles="!bg-digigold hover:!bg-digigold-hover"
+            extraStyles="!bg-digiorange hover:!bg-digiorange"
             textDisabled="Preencher todos os campos"
           />
         </div>

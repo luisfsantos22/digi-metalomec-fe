@@ -27,7 +27,7 @@ export default async function WorkshopModuleLayout({
             <Text
               header="h1"
               text="Módulo de Oficina"
-              styles="lg:text-[40px] text-[32px] leading-[40px] font-bold text-digigold-hover lg:text-left text-center"
+              styles="lg:text-[40px] text-[32px] leading-[40px] font-bold text-digiorange lg:text-left text-center"
             />
             <Divider size="sm" />
             <div className="flex-1">{children}</div>

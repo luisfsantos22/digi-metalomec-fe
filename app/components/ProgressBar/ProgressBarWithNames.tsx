@@ -23,7 +23,7 @@ const ProgressBarWithNames = (props: ProgressBarWithNamesProps) => {
     <div className="flex items-center self-center gap-1 w-full lg:w-2/4 flex-wrap">
       {isDesktop && currentStep > 1 && (
         <div
-          className="flex items-center justify-center py-2 px-2 bg-digigold rounded-2xl hover:cursor-pointer"
+          className="flex items-center justify-center py-2 px-2 bg-digiorange rounded-2xl hover:cursor-pointer"
           onClick={() => setCurrentStep(currentStep - 1)}
         >
           <div className="flex flex-none h-4 w-4 items-start relative">
@@ -47,7 +47,7 @@ const ProgressBarWithNames = (props: ProgressBarWithNamesProps) => {
                 }
               }}
               className={classNames(
-                index == currentStep - 1 ? 'bg-digigold' : 'bg-gray-200',
+                index == currentStep - 1 ? 'bg-digiorange' : 'bg-gray-200',
                 onClick && 'hover:cursor-pointer',
                 'h-8 w-auto px-4  rounded-2xl flex items-center justify-center'
               )}
@@ -65,7 +65,7 @@ const ProgressBarWithNames = (props: ProgressBarWithNamesProps) => {
       })}
       {isDesktop && currentStep < totalSteps.length && (
         <div
-          className="flex items-center justify-center py-2 px-2 bg-digigold rounded-2xl hover:cursor-pointer"
+          className="flex items-center justify-center py-2 px-2 bg-digiorange rounded-2xl hover:cursor-pointer"
           onClick={() => setCurrentStep(currentStep + 1)}
         >
           <div className="flex flex-none h-4 w-4 items-start relative">

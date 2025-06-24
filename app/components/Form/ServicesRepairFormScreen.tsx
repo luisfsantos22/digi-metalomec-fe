@@ -61,10 +61,10 @@ const ServicesRepairFormScreen = (props: ServicesRepairFormScreenProps) => {
             <Table
               striped
               withTableBorder
-              highlightOnHoverColor="bg-digigold-hover/10"
+              highlightOnHoverColor="bg-digiorange/10"
               className="w-full"
             >
-              <Table.Thead className="bg-digigold">
+              <Table.Thead className="bg-digiorange">
                 <Table.Tr>
                   {SERVICE_TABLE_LIST.map((text) => (
                     <Table.Th
@@ -85,7 +85,7 @@ const ServicesRepairFormScreen = (props: ServicesRepairFormScreenProps) => {
                       setSelectedService(service)
                       setShowServiceModal(true)
                     }}
-                    className="hover:cursor-pointer hover:!bg-digigold-hover/20"
+                    className="hover:cursor-pointer hover:!bg-digiorange/20"
                   >
                     <TableRow>
                       <Text

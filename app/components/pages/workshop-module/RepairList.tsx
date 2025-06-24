@@ -1,6 +1,5 @@
 'use client'
 
-import { WORKSHOP_TABLE_DASHBOARD_LIST } from '@/app/constants'
 import { useDeleteRepair } from '@/app/hooks/workshop/useDeleteRepair'
 import { useRepairsWorkshop } from '@/app/hooks/workshop/useRepairsWorkshop'
 import { WorkshopFilters, WorkshopObj } from '@/app/types/workshop/workshop'
@@ -147,18 +146,18 @@ export default function RepairList() {
           <Table
             striped
             withTableBorder
-            highlightOnHoverColor="bg-digigold-hover/10"
+            highlightOnHoverColor="bg-digiorange/10"
           >
-            <Table.Thead className="bg-digigold">
+            <Table.Thead className="bg-digiorange">
               <Table.Tr>
-                {WORKSHOP_TABLE_DASHBOARD_LIST.map((text) => (
+                {/* {WORKSHOP_TABLE_DASHBOARD_LIST.map((text) => (
                   <Table.Th
                     className="text-digibrown1624-bold"
                     key={text}
                   >
                     {text}
                   </Table.Th>
-                ))}
+                ))} */}
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -170,7 +169,7 @@ export default function RepairList() {
                       `/workshop-module/repair/edit?uuid=${item.uuid}`
                     )
                   }
-                  className="hover:cursor-pointer hover:!bg-digigold-hover/20"
+                  className="hover:cursor-pointer hover:!bg-digiorange/20"
                 >
                   <TableRow>
                     <Text

@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: gic2luis/digiauto-fe-v2:staging
+    image: gic2luis/digi-metalomec-fe:staging
     build:
       context: .
       dockerfile: Dockerfile
@@ -12,7 +12,7 @@ services:
         NEXTAUTH_URL: ${NEXTAUTH_URL}
         NEXT_PUBLIC_DESKTOP_WIDTH: 1024
     ports:
-      - '8085:80'
+      - '8088:80'
       - '3000'
     environment:
       - NODE_ENV=staging
@@ -22,4 +22,4 @@ services:
       - NEXT_PUBLIC_DESKTOP_WIDTH=1024
       - NEXTAUTH_URL=${NEXTAUTH_URL}
     restart: always
-    container_name: digiauto-fe-v2-staging
+    container_name: digi-metalomec-fe-staging

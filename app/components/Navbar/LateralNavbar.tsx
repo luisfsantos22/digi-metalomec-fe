@@ -70,7 +70,7 @@ export default function LateralNavbar() {
             {isCollapsed ? (
               <div
                 onClick={() => setIsCollapsed(false)}
-                className="flex flex-none items-center justify-center relative mb-2 h-6 w-6 rounded-lg hover:cursor-pointer hover:bg-digigold hover:bg-opacity-10"
+                className="flex flex-none items-center justify-center relative mb-2 h-6 w-6 rounded-lg hover:cursor-pointer hover:bg-digiorange hover:bg-opacity-10"
               >
                 <Image
                   src="/icons/double-arrow-right.svg"
@@ -83,7 +83,7 @@ export default function LateralNavbar() {
             ) : (
               <div
                 onClick={() => setIsCollapsed(true)}
-                className="flex flex-none items-center justify-center relative h-6 w-6 rounded-lg hover:cursor-pointer hover:bg-digigold hover:bg-opacity-10"
+                className="flex flex-none items-center justify-center relative h-6 w-6 rounded-lg hover:cursor-pointer hover:bg-digiorange hover:bg-opacity-10"
               >
                 <Image
                   src="/icons/double-arrow-left.svg"
@@ -113,7 +113,7 @@ export default function LateralNavbar() {
                       id={`nav-${item.name}`}
                       className={classNames(
                         isCollapsed ? 'justify-center' : 'justify-start',
-                        `flex items-center gap-2 p-2 rounded-lg hover:bg-digigold hover:bg-opacity-10 relative group`
+                        `flex items-center gap-2 p-2 rounded-lg hover:bg-digiorange hover:bg-opacity-10 relative group`
                       )}
                     >
                       <div className="h-6 w-6 relative transition-transform duration-300">
@@ -161,7 +161,7 @@ export default function LateralNavbar() {
               </div>
               {!isCollapsed && (
                 <Text
-                  text={session?.user?.username || ''}
+                  text={session?.user?.email || ''}
                   styles="text-digiblack1624-semibold line-clamp-1"
                 />
               )}

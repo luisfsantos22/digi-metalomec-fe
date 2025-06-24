@@ -37,7 +37,7 @@ export default function RepairFilters(props: RepairFiltersProps) {
   return (
     <div className="flex flex-col gap-4 items-center w-full bg-white p-4 rounded-xl">
       <p
-        className="lg:hidden w-full text-center text-digigold1624-semibold"
+        className="lg:hidden w-full text-center text-digiorange1624-semibold"
         onClick={toggleCollapse}
       >
         {isCollapsed ? 'Ver Filtros' : 'Esconder Filtros'}

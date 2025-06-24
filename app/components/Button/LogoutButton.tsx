@@ -15,7 +15,7 @@ const LogoutButton = (props: LogoutButtonProps) => {
     <div
       id={id}
       onClick={() => signOut()}
-      className="flex gap-1 w-full justify-center items-center border-2 border-digibrown hover:cursor-pointer rounded-xl px-3 py-2 hover:bg-digigold"
+      className="flex gap-1 w-full justify-center items-center border-2 border-digibrown hover:cursor-pointer rounded-xl px-3 py-2 hover:bg-digiorange"
     >
       <div className="flex flex-none hover:cursor-pointer items-center justify-center relative w-6 h-6">
         <Image

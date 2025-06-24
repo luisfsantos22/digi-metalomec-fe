@@ -1,3 +1,9 @@
+.root {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
 .indicator {
   width: 50px;
   height: 4px;
@@ -6,8 +12,31 @@
   margin-right: 8px;
   border-radius: 4px;
   margin-top: 24px;
+}
 
-  &[data-active] {
-    width: 100px;
+.indicator[data-active] {
+  width: 100px;
+}
+
+.control {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  height: 100%;
+
+  @media (max-width: 768px) {
+    padding: 0 16px;
   }
 }

@@ -12,8 +12,8 @@ export default function DashboardContent() {
 
   return (
     <>
-      {tabActive === 'overview' ? (
-        <div onClick={() => handleTabChange('overview')}>Overview group</div>
+      {tabActive === 'home' ? (
+        <div onClick={() => handleTabChange('home')}>Overview group</div>
       ) : null}
       {/* Add tab switchers or other UI controls here */}
     </>

@@ -55,7 +55,7 @@ const WorkforceModal = (props: WorkforceModalProps) => {
     )
 
   const hasWorkersOptions = workers?.map((worker) => ({
-    label: worker.username,
+    label: worker.email,
     value: worker.uuid,
   }))
 
@@ -188,7 +188,7 @@ const WorkforceModal = (props: WorkforceModalProps) => {
                 tempWorkforce.hourPrice > 0
               )
             }
-            extraStyles="!bg-digigold hover:!bg-digigold-hover"
+            extraStyles="!bg-digiorange hover:!bg-digiorange"
             textDisabled="Preencher todos os campos"
           />
         </div>

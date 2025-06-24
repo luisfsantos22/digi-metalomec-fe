@@ -77,10 +77,10 @@ const ExternalServicesRepairFormScreen = (
             <Table
               striped
               withTableBorder
-              highlightOnHoverColor="bg-digigold-hover/10"
+              highlightOnHoverColor="bg-digiorange/10"
               className="w-full"
             >
-              <Table.Thead className="bg-digigold">
+              <Table.Thead className="bg-digiorange">
                 <Table.Tr>
                   {EXTERNAL_SERVICE_TABLE_LIST.map((text) => (
                     <Table.Th
@@ -102,7 +102,7 @@ const ExternalServicesRepairFormScreen = (
                       setAction('edit')
                     }}
                     className={classNames(
-                      index % 2 === 0 ? 'bg-white' : 'bg-digigold/10',
+                      index % 2 === 0 ? 'bg-white' : 'bg-digiorange/10',
                       'cursor-pointer'
                     )}
                   >
@@ -173,7 +173,7 @@ const ExternalServicesRepairFormScreen = (
               </Table.Tbody>
             </Table>
           )}
-          <div className="flex  lg:flex-row flex-col gap-4 items-center p-2 rounded-xl justify-center w-full text-digibrown2025-bold bg-digigold/20">
+          <div className="flex  lg:flex-row flex-col gap-4 items-center p-2 rounded-xl justify-center w-full text-digibrown2025-bold bg-digiorange/20">
             <div className="flex items-center gap-2">
               <Text
                 text="Total de Despesas:"

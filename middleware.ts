@@ -2,46 +2,72 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
+// Auth cookie names that need to be cleared on session reset
+const AUTH_COOKIES = [
+  'next-auth.session-token',
+  'next-auth.csrf-token',
+  '__Secure-next-auth.session-token',
+]
+
+/**
+ * Creates a redirect response with cleared auth cookies
+ * @param request - The incoming request
+ * @param destination - The URL to redirect to
+ */
+const createAuthRedirect = (request: NextRequest, destination: string) => {
+  const response = NextResponse.redirect(new URL(destination, request.url))
+
+  // Clear all auth cookies
+  AUTH_COOKIES.forEach((cookie) => response.cookies.delete(cookie))
+
+  return response
+}
+
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request })
-  const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
-  const allowedRoles = ['Gestor', 'Administrador', 'Mecânico']
+  try {
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    })
 
-  if (!token && (request.nextUrl.pathname === '/' || !isAuthPage)) {
-    // Redirect to login if not authenticated and accessing root or non-auth pages
-    return NextResponse.redirect(new URL('/auth/signin', request.url))
-  }
+    const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
+    const allowedRoles = ['ADMIN', 'EMPLOYEE', 'MANAGER']
 
-  if (token) {
-    try {
-      const userRole = token.role
-      if (!allowedRoles.includes(userRole)) {
-        return NextResponse.redirect(new URL('/auth/signin', request.url))
+    // Case 1: User is not authenticated
+    if (!token) {
+      // Allow access to auth pages
+      if (isAuthPage) {
+        return NextResponse.next()
       }
-    } catch (error) {
-      console.error('Token verification failed:', error)
 
-      return NextResponse.redirect(new URL('/auth/signin', request.url))
+      // Redirect to login for non-auth pages
+      return createAuthRedirect(request, '/auth/signin')
     }
 
-    if (request.nextUrl.pathname === '/' || isAuthPage) {
-      // Redirect to dashboard if authenticated and accessing root or auth pages
+    // Case 2: User is authenticated
+    // Verify token and role
+    const userRole = token.role
+    if (!allowedRoles.includes(userRole)) {
+      // Redirect to login - invalid role
+      return createAuthRedirect(request, '/auth/signin')
+    }
+
+    // Don't allow authenticated users to access auth pages
+    if (isAuthPage || request.nextUrl.pathname === '/') {
       return NextResponse.redirect(
-        new URL('/workshop-module/repair', request.url)
+        new URL('/dashboard/?module=home', request.url)
       )
     }
-  }
 
-  return NextResponse.next()
+    return NextResponse.next()
+  } catch (error) {
+    console.error('Middleware error:', error)
+
+    return createAuthRedirect(request, '/auth/signin')
+  }
 }
 
 // Apply middleware to specific routes
 export const config = {
-  matcher: [
-    '/',
-    '/dashboard/:path*',
-    '/profile/:path*',
-    '/auth/:path*',
-    '/workshop-module/:path*',
-  ],
+  matcher: ['/', '/dashboard/:path*', '/profile/:path*', '/auth/:path*'],
 }

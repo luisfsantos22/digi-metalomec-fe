@@ -8,12 +8,13 @@ import PrimaryButton from '../Button/PrimaryButton'
 import Image from 'next/image'
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useGlobalLoading } from '@/app/hooks/utils/useGlobalLoading'
 
 const SignInForm = () => {
   const [error, setError] = useState<string>('')
   const { startLoading, stopLoading } = useGlobalLoading()
+  const router = useRouter()
 
   const {
     setValue,
@@ -21,38 +22,37 @@ const SignInForm = () => {
     formState: { errors },
   } = useForm<UserCredentials>({
     defaultValues: {
-      username: '',
+      email: '',
       password: '',
     },
   })
 
   // Watch values dynamically
-  const username = watch('username')
+  const email = watch('email')
   const password = watch('password')
 
   const handleLogin = async (e) => {
     e.preventDefault()
-    let redirectPath: string = ''
+    setError('')
     try {
       startLoading()
       const result = await signIn('credentials', {
-        redirect: false, // Prevent automatic redirect
-        username,
+        redirect: false,
+        email,
         password,
       })
 
-      if (result?.error) {
+      if (!result?.error && result?.ok) {
+        router.push('/dashboard/?module=home')
+        stopLoading()
+      } else {
         setError('Credenciais inválidas')
-      } else if (result?.ok) {
-        redirectPath = '/workshop-module/repair'
+        stopLoading()
       }
-    } catch {
-      setError('Credenciais inválidas')
-    } finally {
+    } catch (err) {
+      console.error('Login error:', err)
+      setError('Ocorreu um erro. Por favor, tente novamente.')
       stopLoading()
-      if (redirectPath) {
-        redirect(redirectPath)
-      }
     }
   }
 
@@ -63,6 +63,7 @@ const SignInForm = () => {
         alt="Logo Image"
         width={600}
         height={200}
+        priority
       />
       <Text
         text="Por favor, preencha todos os dados para aceder à plataforma"
@@ -75,14 +76,14 @@ const SignInForm = () => {
         <div className="flex flex-col gap-8 w-full">
           <div className="flex flex-col gap-1 items-start w-full">
             <Text
-              text="Username"
+              text="Email"
               styles="text-digiblack1624-semibold"
             />
             <PrimaryInput
-              query={username}
-              setQuery={(e) => setValue('username', e)}
-              error={errors.username?.message || error}
-              placeholder="Username"
+              query={email}
+              setQuery={(e) => setValue('email', e)}
+              error={errors.email?.message || error}
+              placeholder="Email"
               inputType="text"
               mandatory
             />

@@ -157,7 +157,7 @@ const ServicesRepairModal = (props: ServicesRepairModallProps) => {
                 tempWorkshopService.typeService
               )
             }
-            extraStyles="!bg-digigold hover:!bg-digigold-hover"
+            extraStyles="!bg-digiorange hover:!bg-digiorange"
             textDisabled="Preencher todos os campos"
           />
         </div>

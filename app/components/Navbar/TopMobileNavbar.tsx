@@ -53,7 +53,7 @@ export default function TopMobileNavbar({ children }: TopMobileNavbarProps) {
               />
             </div>
             <Text
-              text={session?.user?.username || ''}
+              text={session?.user?.email || ''}
               styles="text-digiblack1624-semibold"
             />
           </div>
