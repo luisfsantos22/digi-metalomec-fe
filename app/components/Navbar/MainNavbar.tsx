@@ -115,7 +115,6 @@ export default function MainNavbar() {
                   ? '/icons/employee-white.svg'
                   : '/icons/employee.svg'
               }
-              disabled={true}
             />
           </div>
         </ContainerCard>
@@ -206,31 +205,22 @@ export default function MainNavbar() {
           ref={contentRef}
         >
           <NavbarMobileButton
-            id="overview"
+            id="home"
             text="Visão Geral"
-            isActive={tabActive === 'overview'}
+            isActive={tabActive === 'home'}
             type="button"
             onClick={() => {
-              setTabActive('overview')
-              redirect('/workshop-module/repair')
+              setTabActive('home')
+              redirect('/dashboard?module=home')
             }}
           />
           <Divider />
           <NavbarMobileButton
-            id="sales"
-            text="Vendas"
-            isActive={tabActive === 'sales'}
+            id="analytics"
+            text="Analytics"
+            isActive={tabActive === 'analytics'}
             type="button"
-            onClick={() => setTabActive('sales')}
-            disabled
-          />
-          <Divider />
-          <NavbarMobileButton
-            id="vehicles"
-            text="Veículos"
-            isActive={tabActive === 'vehicles'}
-            type="button"
-            onClick={() => setTabActive('vehicles')}
+            onClick={() => setTabActive('analytics')}
             disabled
           />
           <Divider />
@@ -244,20 +234,11 @@ export default function MainNavbar() {
           />
           <Divider />
           <NavbarMobileButton
-            id="analytics"
-            text="Analytics"
-            isActive={tabActive === 'analytics'}
+            id="employees"
+            text="Colaboradores"
+            isActive={tabActive === 'employees'}
             type="button"
-            onClick={() => setTabActive('analytics')}
-            disabled
-          />
-          <Divider />
-          <NavbarMobileButton
-            id="workshop"
-            text="Oficina"
-            isActive={tabActive === 'workshop'}
-            type="button"
-            onClick={() => setTabActive('workshop')}
+            onClick={() => setTabActive('employees')}
           />
         </div>
       )}

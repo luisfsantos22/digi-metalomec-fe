@@ -28,7 +28,7 @@ const Price = (props: TextProps) => {
           ? (value as number) < 0
             ? 'text-digired1624-semibold'
             : (value as number) > 0 && 'text-green-800'
-          : 'text-digiblack1624-normal'
+          : ''
       )}
     />
   )

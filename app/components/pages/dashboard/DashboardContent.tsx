@@ -2,20 +2,20 @@
 
 import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
+import MetricsSection from './Section/MetricsSection'
+import ChartsSection from './Section/ChartsSection'
+import EmployeesSection from './Section/EmployeesSection'
 
 export default function DashboardContent() {
   const [tabActive, setTabActive] = useAtom(mainPageActiveTab)
 
-  const handleTabChange = (tab: string) => {
-    setTabActive(tab)
-  }
+  return tabActive === 'home' ? (
+    <div className="flex flex-col gap-4 w-full">
+      <MetricsSection />
 
-  return (
-    <>
-      {tabActive === 'home' ? (
-        <div onClick={() => handleTabChange('home')}>Overview group</div>
-      ) : null}
-      {/* Add tab switchers or other UI controls here */}
-    </>
-  )
+      <ChartsSection />
+    </div>
+  ) : tabActive === 'employees' ? (
+    <EmployeesSection />
+  ) : null
 }

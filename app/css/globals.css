@@ -12,7 +12,7 @@
   --color-digiorange: #fcd0a1;
   --color-digibrown: #5e4b56;
   --color-digiblack: #171717;
-  --color-digigreen: #b1b695;
+  --color-digigreen: #008000;
   --color-bg-signin: url('/images/signin.png');
   --font-inter: 'Inter', sans-serif;
 }
@@ -98,12 +98,27 @@ body {
     @apply text-digiblack text-[28px] leading-[32px] font-semibold;
   }
 
-  .text-digiblack2424-bold {
-    @apply text-digiblack text-[24px] leading-[24px] font-bold;
+  .text-digiblack2432-bold {
+    @apply text-digiblack text-[24px] leading-[32px] font-bold;
+  }
+  .text-digiblack2432-semibold {
+    @apply text-digiblack text-[24px] leading-[32px] font-semibold;
   }
 
   .text-digiblack2025-semibold {
     @apply text-digiblack !text-[20px] !leading-[25px] !font-semibold;
+  }
+
+  .text-digiblack1825-bold {
+    @apply text-digiblack text-[18px] leading-[25px] font-bold;
+  }
+
+  .text-digiblack1825-semibold {
+    @apply text-digiblack text-[18px] leading-[25px] font-semibold;
+  }
+
+  .text-digiblack1825-normal {
+    @apply text-digiblack text-[18px] leading-[25px] font-normal;
   }
 
   .text-digiblack1624-bold {
@@ -201,6 +216,10 @@ body {
     @apply text-digired text-[16px] leading-[24px] font-normal;
   }
 
+  .text-digired1420-normal {
+    @apply text-digired text-[14px] leading-[20px] font-normal;
+  }
+
   .text-digired1212-semibold {
     @apply text-digired text-[12px] leading-[12px] font-semibold;
   }
@@ -243,9 +262,18 @@ body {
     @apply text-digiblue text-[16px] leading-[24px] font-normal;
   }
 
+  /* Digigreen */
+  .text-digigreen1420-normal {
+    @apply text-digigreen text-[14px] leading-[20px] font-normal;
+  }
+
   /* Gray */
   .text-gray1624-normal {
     @apply text-gray-400 text-[16px] leading-[24px] font-normal;
+  }
+
+  .text-gray1420-normal {
+    @apply text-gray-400 text-[14px] leading-[20px] font-normal;
   }
 
   .text-error-form {
