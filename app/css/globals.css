@@ -61,6 +61,10 @@ body {
     @apply text-white text-[20px] leading-[25px] font-normal;
   }
 
+  .text-digiwhite1624-bold {
+    @apply text-white text-[16px] leading-[24px] font-bold;
+  }
+
   .text-digiwhite1624-semibold {
     @apply text-white !text-[16px] leading-[24px] !font-semibold;
   }
@@ -107,6 +111,9 @@ body {
 
   .text-digiblack2025-semibold {
     @apply text-digiblack !text-[20px] !leading-[25px] !font-semibold;
+  }
+  .text-digiblack2025-normal {
+    @apply text-digiblack text-[20px] leading-[25px] font-normal;
   }
 
   .text-digiblack1825-bold {

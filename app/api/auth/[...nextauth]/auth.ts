@@ -44,6 +44,7 @@ const authOptions: AuthOptions = {
               first_name: userData.user.first_name,
               last_name: userData.user.last_name,
               refresh: data.refresh,
+              company_name: userData.user.company_name || '',
             }
           }
 
@@ -83,6 +84,7 @@ const authOptions: AuthOptions = {
           role: user.role,
           accessToken: user.access,
           refreshToken: user.refresh || '',
+          companyName: user.company_name || '',
         }
       }
 
@@ -99,6 +101,7 @@ const authOptions: AuthOptions = {
           lastName: token.lastName,
           fullName: token.fullName,
           role: token.role,
+          companyName: token.companyName || '',
         },
         accessToken: token.accessToken,
         refreshToken: token.refreshToken,

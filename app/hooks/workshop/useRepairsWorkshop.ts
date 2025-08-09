@@ -8,7 +8,7 @@ export function useRepairsWorkshop(
   refreshKey: number,
   filters: WorkshopFilters
 ) {
-  const [workshopItems, setWorkshopItems] = useState<WorkshopObj[]>([])
+  const [employeeItems, setEmployeeItems] = useState<WorkshopObj[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -33,8 +33,8 @@ export function useRepairsWorkshop(
             state: filters?.state,
           },
         })
-        const mapped = response.data.repairs.map(mapWorkshopItems)
-        setWorkshopItems(mapped)
+        const mappedResults = response.data.repairs.map(mapWorkshopItems)
+        setWorkshopItems(mappedResults)
       } catch (err) {
         console.log(err)
         setError('Failed to load workshop items.')

@@ -23,7 +23,7 @@ export default function MetricCard({
 
   return (
     <ContainerCard
-      styles="flex flex-1"
+      styles="flex flex-1 w-full lg:w-auto"
       padding="p-5"
     >
       <div className="flex flex-col gap-2">

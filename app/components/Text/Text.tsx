@@ -1,8 +1,8 @@
 import { requiredSpan } from '@/utils'
-import { RefObject } from 'react'
+import { JSX, RefObject } from 'react'
 
 type TextProps = {
-  text: string
+  text: string | JSX.Element
   styles?: string
   header?: string
   required?: boolean

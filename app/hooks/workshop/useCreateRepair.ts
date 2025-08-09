@@ -2,27 +2,26 @@ import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import axiosInstance from '../axiosInstance'
 import { notifications } from '@mantine/notifications'
-import { WorkshopFormData } from '@/app/types/workshop/workshop'
 import { useRouter } from 'next/navigation'
 
-interface UseCreateRepairResult {
-  createRepair: (repairData: WorkshopFormData) => Promise<void>
+interface UseCreateEmployeeResult {
+  createEmployee: (employeeData: any) => Promise<void>
   loading: boolean
   error: string | null
 }
 
-const useCreateRepair = (): UseCreateRepairResult => {
+const useCreateEmployee = (): UseCreateEmployeeResult => {
   const { data: session } = useSession()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  const createRepair = async (repairData: any) => {
+  const createEmployee = async (employeeData: any) => {
     setLoading(true)
     setError(null)
 
     try {
-      await axiosInstance.post('/repairs/', repairData, {
+      await axiosInstance.post('/employees/', employeeData, {
         headers: {
           Authorization: `Bearer ${session?.accessToken}`,
         },
@@ -30,16 +29,16 @@ const useCreateRepair = (): UseCreateRepairResult => {
       notifications.show({
         title: 'Sucesso',
         color: 'green',
-        message: 'Reparação criada com sucesso!',
+        message: 'Colaborador criado com sucesso!',
         position: 'top-right',
       })
-      router.push('/workshop-module/repair')
+      router.push('/dashboard?module=employees')
     } catch {
-      setError('Failed to create repair')
+      setError('Failed to create employee')
       notifications.show({
         title: 'Erro',
         color: 'red',
-        message: 'Falha ao criar a reparação. Tente novamente.',
+        message: 'Falha ao criar o colaborador. Tente novamente.',
         position: 'top-right',
       })
     } finally {
@@ -47,7 +46,7 @@ const useCreateRepair = (): UseCreateRepairResult => {
     }
   }
 
-  return { createRepair, loading, error }
+  return { createEmployee, loading, error }
 }
 
-export default useCreateRepair
+export default useCreateEmployee

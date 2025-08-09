@@ -4,7 +4,7 @@ import Image from 'next/image'
 import ContainerCard from '../Card/ContainerCard'
 import { redirect } from 'next/navigation'
 import SecondaryButton from '../Button/SecondaryButton'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import Text from '../Text/Text'
 import { signOut, useSession } from 'next-auth/react'
 import GenericTooltip from '../Tooltip/GenericTooltip'
@@ -14,6 +14,7 @@ import { classNames, isDesktopSize, translateRole } from '@/utils'
 import NavbarMobileButton from '../Button/NavbarMobileButton'
 import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
+import { useSearchParams, useRouter } from 'next/navigation'
 import useOutsideClick from '@/app/hooks/utils/useOutsideClick'
 
 export default function MainNavbar() {
@@ -28,6 +29,22 @@ export default function MainNavbar() {
   const [openDivMobile, setOpenDivMobile] = useState(false)
 
   const [tabActive, setTabActive] = useAtom(mainPageActiveTab)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // Sync tabActive with module param in URL
+  useEffect(() => {
+    const moduleParam = searchParams.get('module')
+    if (moduleParam && tabActive !== moduleParam) {
+      setTabActive(moduleParam)
+    }
+  }, [searchParams, setTabActive])
+
+  // Helper to update both tab and URL
+  const handleTabChange = (tab: string) => {
+    setTabActive(tab)
+    router.push(`/dashboard?module=${tab}`)
+  }
 
   const isDesktop = isDesktopSize(screenSize)
 
@@ -36,17 +53,31 @@ export default function MainNavbar() {
   return (
     <div className="flex lg:flex-row flex-col lg:gap-8 gap-4 items-center justify-between lg:py-8 p-4 lg:p-0 bg-none lg:h-48 w-full">
       <ContainerCard
-        onClick={() => redirect('/dashboard/?module=home')}
+        onClick={() => handleTabChange('home')}
         styles="hover:cursor-pointer hover:bg-digiblue-hover/20 w-full lg:w-auto flex justify-between"
       >
-        <div className="flex flex-none h-14 w-[8.125rem] items-start relative">
-          <Image
-            src={'/icons/logo-navbar.svg'}
-            alt={'Logo Image'}
-            style={{ objectFit: 'contain' }}
-            fill
-            priority
+        <div className="flex flex-col gap-1 items-center">
+          <Text
+            text={session?.user?.companyName ?? ''}
+            styles="text-digiblack1624-bold"
+            id={'navbar-title'}
           />
+          <div className="flex gap-2 justify-start lg:justify-center items-center w-full">
+            <Text
+              text={'by'}
+              styles="text-digiblack1212-semibold"
+              id={'navbar-subtitle'}
+            />
+            <div className="flex flex-none h-6 w-[5rem] relative">
+              <Image
+                src={'/icons/logo-navbar.svg'}
+                alt={'Logo Image'}
+                style={{ objectFit: 'contain' }}
+                fill
+                priority
+              />
+            </div>
+          </div>
         </div>
         {!isDesktop && (
           <div
@@ -69,7 +100,7 @@ export default function MainNavbar() {
               id="home"
               text="Visão Geral"
               size="large"
-              onClick={() => setTabActive('home')}
+              onClick={() => handleTabChange('home')}
               active={tabActive === 'home'}
               withImage
               imageSrc={
@@ -81,7 +112,7 @@ export default function MainNavbar() {
             <SecondaryButton
               id="analytics"
               text="Analytics"
-              onClick={() => setTabActive('analytics')}
+              onClick={() => handleTabChange('analytics')}
               active={tabActive === 'analytics'}
               withImage
               imageSrc={
@@ -94,7 +125,7 @@ export default function MainNavbar() {
             <SecondaryButton
               id="clients"
               text="Clientes"
-              onClick={() => setTabActive('clients')}
+              onClick={() => handleTabChange('clients')}
               active={tabActive === 'clients'}
               withImage
               imageSrc={
@@ -107,7 +138,7 @@ export default function MainNavbar() {
             <SecondaryButton
               id="employees"
               text="Colaboradores"
-              onClick={() => setTabActive('employees')}
+              onClick={() => handleTabChange('employees')}
               active={tabActive === 'employees'}
               withImage
               imageSrc={
@@ -209,10 +240,7 @@ export default function MainNavbar() {
             text="Visão Geral"
             isActive={tabActive === 'home'}
             type="button"
-            onClick={() => {
-              setTabActive('home')
-              redirect('/dashboard?module=home')
-            }}
+            onClick={() => handleTabChange('home')}
           />
           <Divider />
           <NavbarMobileButton
@@ -220,7 +248,7 @@ export default function MainNavbar() {
             text="Analytics"
             isActive={tabActive === 'analytics'}
             type="button"
-            onClick={() => setTabActive('analytics')}
+            onClick={() => handleTabChange('analytics')}
             disabled
           />
           <Divider />
@@ -229,7 +257,7 @@ export default function MainNavbar() {
             text="Clientes"
             isActive={tabActive === 'clients'}
             type="button"
-            onClick={() => setTabActive('clients')}
+            onClick={() => handleTabChange('clients')}
             disabled
           />
           <Divider />
@@ -238,7 +266,7 @@ export default function MainNavbar() {
             text="Colaboradores"
             isActive={tabActive === 'employees'}
             type="button"
-            onClick={() => setTabActive('employees')}
+            onClick={() => handleTabChange('employees')}
           />
         </div>
       )}

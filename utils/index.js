@@ -1,3 +1,5 @@
+import { AVAILABLE_ROLES } from '@/app/constants'
+
 export const classNames = (...classes) => {
   return classes.filter(Boolean).join(' ')
 }
@@ -15,16 +17,13 @@ export const isHomePage = (router) => {
 }
 
 export function translateRole(role) {
-  switch (role) {
-    case 'ADMIN':
-      return 'Administrador'
-    case 'EMPLOYEE':
-      return 'Colaborador'
-    case 'MANAGER':
-      return 'Gestor'
-    default:
-      return 'Utilizador'
+  for (const r of AVAILABLE_ROLES) {
+    if (r.value === role) {
+      return r.label
+    }
   }
+
+  return 'Utilizador'
 }
 
 export function translateVehicleValue(vehicle, withLicensePlate = true) {

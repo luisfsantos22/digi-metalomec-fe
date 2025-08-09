@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
+import { AVAILABLE_ROLES } from './app/constants'
 
 // Auth cookie names that need to be cleared on session reset
 const AUTH_COOKIES = [
@@ -31,7 +32,7 @@ export async function middleware(request: NextRequest) {
     })
 
     const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
-    const allowedRoles = ['ADMIN', 'EMPLOYEE', 'MANAGER']
+    const allowedRoles = AVAILABLE_ROLES.map((role) => role.value)
 
     // Case 1: User is not authenticated
     if (!token) {

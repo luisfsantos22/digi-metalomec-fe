@@ -18,7 +18,7 @@ type SearchInputProps = {
   error?: string
   width?: string
   dataIsLoading?: boolean
-  label: string
+  label?: string
   labelStyles?: string
   value?: string
   setValue?: (value: string) => void
@@ -66,11 +66,13 @@ const SearchInput = (props: SearchInputProps) => {
         'flex flex-col items-start justify-start gap-2'
       )}
     >
-      <Text
-        text={label}
-        styles={error ? 'text-digired1624-semibold' : labelStyles}
-        required={mandatory}
-      />
+      {label && (
+        <Text
+          text={label}
+          styles={error ? 'text-digired1624-semibold' : labelStyles}
+          required={mandatory}
+        />
+      )}
       <div className="flex flex-col items-start justify-start gap-2 w-full relative">
         <div className="relative w-full">
           <input

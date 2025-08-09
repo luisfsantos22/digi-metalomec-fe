@@ -10,7 +10,7 @@ export default function DashboardContent() {
   const [tabActive, setTabActive] = useAtom(mainPageActiveTab)
 
   return tabActive === 'home' ? (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-4 w-full p-4 lg:p-0">
       <MetricsSection />
 
       <ChartsSection />

@@ -3,6 +3,7 @@
 import { globalLoadingAtom } from '@/app/atoms'
 import { useAtom } from 'jotai'
 import React from 'react'
+import { OverlaySpinner } from '../Spinner/OverlaySpinner'
 
 export default function GlobalLoadingWrapper({
   children,
@@ -17,11 +18,7 @@ export default function GlobalLoadingWrapper({
       {children}
 
       {/* Loading overlay */}
-      {isLoading && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="w-16 h-16 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
-        </div>
-      )}
+      {isLoading && <OverlaySpinner />}
     </div>
   )
 }

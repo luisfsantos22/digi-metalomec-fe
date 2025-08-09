@@ -13,6 +13,7 @@ type SecondaryButtonProps = {
   id: string
   withImage?: boolean
   imageSrc?: string
+  extraStyles?: string
 }
 
 const SecondaryButton = (props: SecondaryButtonProps) => {
@@ -27,6 +28,7 @@ const SecondaryButton = (props: SecondaryButtonProps) => {
     id,
     withImage = false,
     imageSrc = '',
+    extraStyles = '',
   } = props
 
   return (
@@ -37,6 +39,7 @@ const SecondaryButton = (props: SecondaryButtonProps) => {
         type={type}
         className={classNames(
           fullWidth && 'w-full',
+          extraStyles,
           active
             ? 'bg-digiblue'
             : disabled
