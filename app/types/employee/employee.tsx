@@ -1,5 +1,5 @@
 import { CreateUserData, User } from '../user'
-import { UserLanguage } from '../utils/Language'
+import { UserLanguage } from '@/app/types/utils/language'
 import { EmployeeSkill } from './skill'
 
 type EmergencyContact = {
@@ -66,6 +66,8 @@ type Employee = {
   city: string
   district?: string
   country: string
+  dateOfBirth?: Date
+  phoneNumber?: string
 }
 
 type GenericEmployee = {
@@ -113,6 +115,8 @@ type CreateEmployeeData = {
   city: string
   district?: string
   country: string
+  dateOfBirth?: Date
+  phoneNumber?: string
 }
 
 export type { GenericEmployee, Employee, CreateEmployeeData }

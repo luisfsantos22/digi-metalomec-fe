@@ -39,7 +39,7 @@ const Breadcrumb = (props: BreadcrumbProps) => {
                   </div>
                 </Link>
                 <GenericTooltip
-                  text="Lista de Reparações"
+                  text={path.name}
                   anchorSelect="breadcrumb-home"
                   withArrow={false}
                   width="auto"

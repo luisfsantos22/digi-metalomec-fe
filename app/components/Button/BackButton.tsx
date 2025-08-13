@@ -24,12 +24,12 @@ const BackButton = (props: BackButtonProps) => {
       id={id}
       className={classNames(
         size,
-        'flex flex-none items-start relative hover:cursor-pointer hover:rounded-full hover:bg-digiorange/20'
+        'flex flex-none items-start relative hover:cursor-pointer hover:rounded-full hover:bg-digiblue/20'
       )}
       onClick={onClick}
     >
       <Image
-        src={'/icons/arrow-left-gold.svg'}
+        src={'/icons/arrow-left.svg'}
         alt={'Logo Arrow Left'}
         style={{ objectFit: 'contain' }}
         className="p-2"

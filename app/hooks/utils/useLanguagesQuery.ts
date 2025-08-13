@@ -15,11 +15,14 @@ export const useLanguagesQuery = () => {
       setLoading(true)
       setError(null)
       try {
-        const response = await axiosInstance.get('/api/v1/languages/', {
-          headers: {
-            Authorization: `Bearer ${session?.accessToken}`,
-          },
-        })
+        const response = await axiosInstance.get(
+          '/api/v1/employees/languages/',
+          {
+            headers: {
+              Authorization: `Bearer ${session?.accessToken}`,
+            },
+          }
+        )
         const dataResults = response.data || []
         const mappedResults = dataResults.map((lang: Language) =>
           mapLanguage(lang)

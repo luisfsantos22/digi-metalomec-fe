@@ -15,8 +15,9 @@ import CreateEmployee from '@/app/components/pages/employee/CreateEmployee'
 import { getServerSession } from 'next-auth/next'
 import authOptions from '@/app/api/auth/[...nextauth]/auth'
 import Breadcrumb from '@/app/components/Breadcrumb/Breadcrumb'
+import GeneralLayout from '@/app/components/Layout/GeneralLayout'
 
-const WorkshopCreate = async () => {
+const CreateEmployeePage = async () => {
   const session = await getServerSession(authOptions)
 
   if (!session) {
@@ -24,16 +25,18 @@ const WorkshopCreate = async () => {
   }
 
   return (
-    <div className="flex flex-col gap-4 w-full">
-      <Breadcrumb
-        paths={[
-          { name: 'Colaboradores', href: '/dashboard?module=employees' },
-          { name: 'Novo Colaborador', href: '/employee/create' },
-        ]}
-      />
-      <CreateEmployee session={session} />
-    </div>
+    <GeneralLayout session={session}>
+      <div className="flex flex-col gap-4 w-full">
+        <Breadcrumb
+          paths={[
+            { name: 'Colaboradores', href: '/dashboard?module=employees' },
+            { name: 'Novo Colaborador', href: '/employee/create' },
+          ]}
+        />
+        <CreateEmployee session={session} />
+      </div>
+    </GeneralLayout>
   )
 }
 
-export default WorkshopCreate
+export default CreateEmployeePage

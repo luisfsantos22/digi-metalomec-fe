@@ -15,11 +15,14 @@ export const useJobTitlesQuery = () => {
       setLoading(true)
       setError(null)
       try {
-        const response = await axiosInstance.get('/api/v1/job-titles/', {
-          headers: {
-            Authorization: `Bearer ${session?.accessToken}`,
-          },
-        })
+        const response = await axiosInstance.get(
+          '/api/v1/employees/job-titles/',
+          {
+            headers: {
+              Authorization: `Bearer ${session?.accessToken}`,
+            },
+          }
+        )
         const dataResults = response.data || []
         const mappedResults = dataResults.map((job: GenericJobTitle) =>
           mapGenericJobTitle(job)

@@ -44,6 +44,9 @@ export default function MainNavbar() {
   const handleTabChange = (tab: string) => {
     setTabActive(tab)
     router.push(`/dashboard?module=${tab}`)
+    if (!isDesktopSize(screenSize)) {
+      setOpenDivMobile(false)
+    }
   }
 
   const isDesktop = isDesktopSize(screenSize)
@@ -82,7 +85,10 @@ export default function MainNavbar() {
         {!isDesktop && (
           <div
             className="flex flex-none h-8 w-8 items-center justify-center self-center relative mr-2"
-            onClick={() => setOpenDivMobile(!openDivMobile)}
+            onClick={(e) => {
+              e.stopPropagation()
+              setOpenDivMobile(!openDivMobile)
+            }}
           >
             <Image
               src={'/icons/menu-burger.svg'}

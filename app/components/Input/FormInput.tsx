@@ -7,7 +7,7 @@ type FormInputProps = {
   setQuery: (e: string) => void
   placeholder: string
   error?: string | null
-  inputType?: 'text' | 'email' | 'password' | 'date' | 'number'
+  inputType?: 'text' | 'email' | 'password' | 'date' | 'number' | 'tel'
   mandatory?: boolean
   label?: string
   labelStyles?: string
@@ -41,7 +41,7 @@ const FormInput = (props: FormInputProps) => {
     <div
       className={classNames(
         width,
-        'flex flex-col items-start justify-start gap-2 w-full'
+        'flex flex-col items-start justify-start gap-2'
       )}
     >
       <Text

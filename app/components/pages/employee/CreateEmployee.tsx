@@ -23,6 +23,8 @@ import { Session } from 'next-auth'
 import { redirect, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { set, useForm } from 'react-hook-form'
+import UserFormScreen from '../../Form/UserFormScreen'
+import EmployeeFormScreen from '../../Form/WorkforcesRepairFormScreen'
 
 type CreateEmployeeProps = {
   session: Session | null
@@ -243,26 +245,28 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
               2: (
                 <EmployeeFormScreen
                   formData={formData}
+                  register={register}
                   setValue={setValue}
+                  errors={errors}
                   languages={availableLanguages}
                   jobTitles={availableJobTitles}
                 />
               ),
-              3: (
-                <AvailabilityEmployeeFormScreen
-                  formData={formData}
-                  setValue={setValue}
-                />
-              ),
-              4: (
-                <TechnicalEmployeeFormScreen
-                  formData={formData}
-                  setValue={setValue}
-                  setAreYouSureModalOpen={setAreYouSure}
-                  setSelectedService={setSelectedService}
-                  selectedService={selectedService}
-                />
-              ),
+              // 3: (
+              //   <AvailabilityEmployeeFormScreen
+              //     formData={formData}
+              //     setValue={setValue}
+              //   />
+              // ),
+              // 4: (
+              //   <TechnicalEmployeeFormScreen
+              //     formData={formData}
+              //     setValue={setValue}
+              //     setAreYouSureModalOpen={setAreYouSure}
+              //     setSelectedService={setSelectedService}
+              //     selectedService={selectedService}
+              //   />
+              //),
             }[currentStep]
           }
           <div className="flex flex-row gap-4 lg:gap-8 w-full items-center justify-center lg:justify-end">
@@ -352,18 +356,17 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
               }
             }
 
-            setValue('skills', updatedSkills)
-            setSelectedSkill(undefined)
-            setAreYouSureModalSkillOpen(false)
+            setSelectedCertification(undefined)
+            setAreYouSureModalCertificationOpen(false)
             notifications.show({
-              title: 'Skill Removida',
+              title: 'Certificação Removida',
               color: 'green',
-              message: 'Skill removida com sucesso',
+              message: 'Certificação removida com sucesso',
               position: 'top-right',
             })
           }}
-          title="Remover Skill"
-          message="Tem a certeza que pretende remover esta skill?"
+          title="Remover Certificação"
+          message="Tem a certeza que pretende remover esta certificação?"
         />
       )}
       {areYouSureCloseCreateEmployeeModal && (

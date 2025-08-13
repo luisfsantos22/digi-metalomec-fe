@@ -60,13 +60,14 @@ const FormDropdown = (props: FormDropdownProps) => {
       <div className="flex flex-col items-start justify-start w-full relative">
         <div
           className={classNames(
+            disabled && 'cursor-not-allowed text-gray-500',
             error
               ? 'border-b-digired text-digired1624-normal'
               : selectedValue
                 ? 'border-b-digibrown text-digibrown1624-semibold'
                 : 'border-b-gray-300 text-placeholder-form ',
+
             'flex justify-between items-center gap-2 line-clamp-1 text-left',
-            'disabled:cursor-not-allowed disabled:text-gray-500',
             'border-b p-2 w-full focus:outline-none focus:border-b-digibrown focus:ring-0 hover:cursor-pointer'
           )}
           onClick={handleTriggerClick}
@@ -79,6 +80,7 @@ const FormDropdown = (props: FormDropdownProps) => {
                 : placeholder
             }
             styles={classNames(
+              disabled && 'cursor-not-allowed text-gray-500',
               error
                 ? 'text-digired1624-normal'
                 : selectedValue

@@ -31,3 +31,17 @@ export const NEW_EMPLOYEE_STEPS = [
   'Disponibilidade',
   'Informação Técnica',
 ]
+
+export const GENDER_OPTIONS = [
+  { value: 'MALE', label: 'Masculino' },
+  { value: 'FEMALE', label: 'Feminino' },
+  { value: 'OTHER', label: 'Outro' },
+]
+
+export const MARITAL_STATUS_OPTIONS = [
+  { value: 'SINGLE', label: 'Solteiro(a)' },
+  { value: 'MARRIED', label: 'Casado(a)' },
+  { value: 'DIVORCED', label: 'Divorciado(a)' },
+  { value: 'WIDOWED', label: 'Viúvo(a)' },
+  { value: 'SEPARATED', label: 'Separado(a)' },
+]
