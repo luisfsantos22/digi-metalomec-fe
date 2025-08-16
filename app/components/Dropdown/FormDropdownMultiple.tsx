@@ -4,13 +4,13 @@ import Image from 'next/image'
 import React, { useState } from 'react'
 import Text from '../Text/Text'
 
-type FormDropdownProps = {
+export type FormDropdownMultipleProps = {
   choices: {
     label: string
     value: string | boolean
   }[]
-  selectedValue?: string | boolean
-  setSelectedValue: (value: string | boolean) => void
+  selectedValues: Array<string | boolean>
+  setSelectedValues: (values: Array<string | boolean>) => void
   label?: string
   labelStyles?: string
   error?: string | undefined
@@ -18,13 +18,14 @@ type FormDropdownProps = {
   disabled?: boolean
   mandatory?: boolean
   width?: string
+  dropdownPosition?: 'top' | 'bottom'
 }
 
-const FormDropdown = (props: FormDropdownProps) => {
+const FormDropdownMultiple = (props: FormDropdownMultipleProps) => {
   const {
     choices,
-    selectedValue,
-    setSelectedValue,
+    selectedValues,
+    setSelectedValues,
     label = '',
     labelStyles = 'text-digiblack1624-semibold',
     error = undefined,
@@ -32,16 +33,24 @@ const FormDropdown = (props: FormDropdownProps) => {
     disabled = false,
     mandatory = false,
     width = 'w-full',
+    dropdownPosition = 'bottom',
   } = props
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-
   const dropdownRef = useOutsideClick(() => setIsDropdownOpen(false))
 
   const handleTriggerClick = (e: React.MouseEvent) => {
-    e.stopPropagation() // Prevent event propagation
+    e.stopPropagation()
     if (!disabled) {
-      setIsDropdownOpen((prev) => !prev) // Toggle dropdown
+      setIsDropdownOpen((prev) => !prev)
+    }
+  }
+
+  const handleCheckboxChange = (value: string | boolean) => {
+    if (selectedValues.includes(value)) {
+      setSelectedValues(selectedValues.filter((v) => v !== value))
+    } else {
+      setSelectedValues([...selectedValues, value])
     }
   }
 
@@ -63,10 +72,9 @@ const FormDropdown = (props: FormDropdownProps) => {
             disabled && 'cursor-not-allowed text-gray-500',
             error
               ? 'border-b-digired text-digired1624-normal'
-              : selectedValue
+              : selectedValues.length > 0
                 ? 'border-b-digibrown text-digibrown1624-semibold'
                 : 'border-b-gray-300 text-placeholder-form ',
-
             'flex justify-between items-center gap-2 line-clamp-1 text-left',
             'border-b p-2 w-full focus:outline-none focus:border-b-digibrown focus:ring-0 hover:cursor-pointer'
           )}
@@ -74,22 +82,23 @@ const FormDropdown = (props: FormDropdownProps) => {
         >
           <Text
             text={
-              selectedValue
-                ? (choices.find((choice) => choice.value === selectedValue)
-                    ?.label ?? placeholder)
+              selectedValues.length > 0
+                ? choices
+                    .filter((choice) => selectedValues.includes(choice.value))
+                    .map((choice) => choice.label)
+                    .join(', ')
                 : placeholder
             }
             styles={classNames(
               disabled && 'cursor-not-allowed text-gray-500',
               error
                 ? 'text-digired1624-normal'
-                : selectedValue
+                : selectedValues.length > 0
                   ? 'text-digibrown1624-semibold'
                   : 'text-placeholder-form',
               'line-clamp-1'
             )}
           />
-
           <div className="flex flex-none h-6 w-6 items-start relative">
             <Image
               src={
@@ -102,36 +111,39 @@ const FormDropdown = (props: FormDropdownProps) => {
             />
           </div>
         </div>
-
         <div
           className="w-full"
           ref={dropdownRef}
         >
           <div
             className={classNames(
-              'absolute bg-white border border-gray-300 rounded-xl z-50 shadow-lg w-full top-12',
+              'absolute bg-white border border-gray-300 rounded-xl z-50 shadow-lg w-full',
+              dropdownPosition === 'bottom' ? 'top-12' : 'bottom-12',
               isDropdownOpen ? 'max-h-80 overflow-y-auto' : 'hidden'
             )}
-            id="dropdown"
+            id="dropdown-multiple"
           >
             {choices.map((choice, index) => (
-              <div
+              <label
                 key={index}
                 className={classNames(
-                  selectedValue === choice.value && ' text-digibrown1624-bold',
-                  'p-2 hover:bg-gray-100 cursor-pointer'
+                  'flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer',
+                  selectedValues.includes(choice.value) &&
+                    'text-digibrown1624-bold'
                 )}
-                onClick={() => {
-                  setSelectedValue?.(choice.value)
-                  setIsDropdownOpen(false)
-                }}
               >
+                <input
+                  type="checkbox"
+                  checked={selectedValues.includes(choice.value)}
+                  onChange={() => handleCheckboxChange(choice.value)}
+                  disabled={disabled}
+                  className="form-checkbox h-4 w-4 text-digibrown focus:ring-0"
+                />
                 {choice.label}
-              </div>
+              </label>
             ))}
           </div>
         </div>
-
         {error && (
           <Text
             text={error}
@@ -143,4 +155,4 @@ const FormDropdown = (props: FormDropdownProps) => {
   )
 }
 
-export default FormDropdown
+export default FormDropdownMultiple

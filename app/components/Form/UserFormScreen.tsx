@@ -1,22 +1,10 @@
-import { WorkshopFormData } from '@/app/types/workshop/workshop'
 import { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form'
 import ContainerCard from '../Card/ContainerCard'
-import SearchInput from '../Input/SearchInput'
-import useVehiclesSearchQuery from '@/app/hooks/vehicles/useVehiclesSearchQuery'
-import { useEffect } from 'react'
-import Text from '../Text/Text'
 import FormInput from '../Input/FormInput'
 import Row from '../Row/Row'
-import { WorkshopStatus } from '@/app/enum'
 import FormDropdown from '../Dropdown/FormDropdown'
-import { translateVehicleValue } from '@/utils'
-import { VehicleSearch } from '@/app/types/vehicle'
 import { CreateEmployeeData } from '@/app/types/employee/employee'
-import {
-  AVAILABLE_ROLES,
-  GENDER_OPTIONS,
-  MARITAL_STATUS_OPTIONS,
-} from '@/app/constants'
+import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from '@/app/constants'
 import Separator from '../Separator/Separator'
 import UploadImage from '../Upload/UploadImage'
 import useUploadImage from '@/app/hooks/useUploadImage'
@@ -117,7 +105,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           placeholder="Selecione o Estado Civil"
           selectedValue={maritalStatus}
           setSelectedValue={(value) => {
-            setValue('maritalStatus', value)
+            setValue('maritalStatus', value as unknown as string)
           }}
           mandatory={false}
           label="Estado Civil"
@@ -130,7 +118,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           placeholder="Selecione o Género"
           selectedValue={gender}
           setSelectedValue={(value) => {
-            setValue('gender', value)
+            setValue('gender', value as unknown as string)
           }}
           mandatory={false}
           label="Género"

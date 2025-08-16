@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 type FormInputProps = {
   query: string | number | undefined
-  setQuery: (e: string) => void
+  setQuery: (e: string | number | Date | undefined) => void
   placeholder: string
   error?: string | null
   inputType?: 'text' | 'email' | 'password' | 'date' | 'number' | 'tel'

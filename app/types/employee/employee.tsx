@@ -119,4 +119,9 @@ type CreateEmployeeData = {
   phoneNumber?: string
 }
 
-export type { GenericEmployee, Employee, CreateEmployeeData }
+export type {
+  GenericEmployee,
+  EmployeeCertification,
+  Employee,
+  CreateEmployeeData,
+}

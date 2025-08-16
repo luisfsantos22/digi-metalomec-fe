@@ -28,7 +28,6 @@ export const EMPLOYEE_STATUS = [
 export const NEW_EMPLOYEE_STEPS = [
   'Informação Geral',
   'Informação Colaborador',
-  'Disponibilidade',
   'Informação Técnica',
 ]
 
@@ -44,4 +43,18 @@ export const MARITAL_STATUS_OPTIONS = [
   { value: 'DIVORCED', label: 'Divorciado(a)' },
   { value: 'WIDOWED', label: 'Viúvo(a)' },
   { value: 'SEPARATED', label: 'Separado(a)' },
+]
+
+export const YES_NO_OPTIONS = [
+  { value: true, label: 'Sim' },
+  { value: false, label: 'Não' },
+]
+
+
+export const EDUCATIONAL_QUALIFICATION_OPTIONS = [
+  { value: 'PRIMARY', label: 'Ensino Básico' },
+  { value: 'SECONDARY', label: 'Ensino Secundário' },
+  { value: 'BACHELOR', label: 'Licenciatura' },
+  { value: 'MASTER', label: 'Mestrado' },
+  { value: 'PHD', label: 'Doutoramento' },
 ]
