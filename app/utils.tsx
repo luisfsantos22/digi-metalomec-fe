@@ -5,7 +5,6 @@ export function formatDate(date: Date) {
 }
 
 export function translateEmployeeStatus(status: string) {
-  console.log(status)
   switch (status) {
     case 'Contract with Right Term':
       return 'Contrato a Termo Certo'

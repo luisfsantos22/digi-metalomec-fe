@@ -13,7 +13,7 @@ export default function Row({
 }: {
   title?: string
   withAddButton?: boolean
-  action?: (value: any) => void
+  action?: () => void
   tooltipText?: string
   id?: string
   children: ReactNode
@@ -24,8 +24,8 @@ export default function Row({
         {title && <h3 className="text-digiblack1825-semibold">{title}</h3>}
         {withAddButton && (
           <AddButton
-            id={id}
-            onClick={() => action}
+            id={id ?? ''}
+            onClick={action ?? (() => {})}
             position="right"
             size="w-10 h-10"
             tooltipText={tooltipText}

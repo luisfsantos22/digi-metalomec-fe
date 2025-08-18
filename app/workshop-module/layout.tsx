@@ -20,7 +20,7 @@ export default async function WorkshopModuleLayout({
 
   return (
     <Providers session={session}>
-      <div className="bg-digiblue/20 min-h-screen flex justify-center">
+      <div className="bg-digiblue-hover-options min-h-screen flex justify-center">
         <div className="w-full lg:max-w-[90rem] min-h-screen flex lg:flex-row flex-col">
           <LateralNavbar />
           <div className="flex flex-col gap-2 w-full lg:p-4 p-2 ">

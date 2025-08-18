@@ -17,7 +17,10 @@ import { useGlobalLoading } from '@/app/hooks/utils/useGlobalLoading'
 import { useJobTitlesQuery } from '@/app/hooks/utils/useJobTitlesQuery'
 import { useLanguagesQuery } from '@/app/hooks/utils/useLanguagesQuery'
 import useCreateEmployee from '@/app/hooks/workshop/useCreateRepair'
-import { CreateEmployeeData } from '@/app/types/employee/employee'
+import {
+  CreateEmployeeData,
+  EmployeeCertification,
+} from '@/app/types/employee/employee'
 import { notifications } from '@mantine/notifications'
 import { Session } from 'next-auth'
 import { redirect, useRouter, useSearchParams } from 'next/navigation'
@@ -26,6 +29,7 @@ import { useForm } from 'react-hook-form'
 import UserFormScreen from '../../Form/UserFormScreen'
 import EmployeeFormScreen from '../../Form/EmployeeFormScreen'
 import TechnicalEmployeeFormScreen from '../../Form/TechnicalEmployeeFormScreen'
+import { EmployeeSkill } from '@/app/types/employee/skill'
 
 type CreateEmployeeProps = {
   session: Session | null
@@ -114,9 +118,11 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
     useState(false)
 
   // Selectedskills and certifications states
-  const [selectedSkill, setSelectedSkill] = useState<string | undefined>()
+  const [selectedSkill, setSelectedSkill] = useState<
+    EmployeeSkill | undefined
+  >()
   const [selectedCertification, setSelectedCertification] = useState<
-    string | undefined
+    EmployeeCertification | undefined
   >()
 
   //UseQueries
@@ -259,6 +265,14 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
                   register={register}
                   setValue={setValue}
                   errors={errors}
+                  setAreYouSureModalOpenCertificate={
+                    setAreYouSureModalCertificationOpen
+                  }
+                  setAreYouSureModalOpenSkill={setAreYouSureModalSkillOpen}
+                  selectedCertification={selectedCertification}
+                  setSelectedCertification={setSelectedCertification}
+                  selectedSkill={selectedSkill}
+                  setSelectedSkill={setSelectedSkill}
                 />
               ),
             }[currentStep]

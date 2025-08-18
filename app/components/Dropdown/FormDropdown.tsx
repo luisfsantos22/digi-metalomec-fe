@@ -18,6 +18,7 @@ type FormDropdownProps = {
   disabled?: boolean
   mandatory?: boolean
   width?: string
+  dropdownPosition?: 'top' | 'bottom'
 }
 
 const FormDropdown = (props: FormDropdownProps) => {
@@ -32,6 +33,7 @@ const FormDropdown = (props: FormDropdownProps) => {
     disabled = false,
     mandatory = false,
     width = 'w-full',
+    dropdownPosition = 'bottom',
   } = props
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -109,7 +111,8 @@ const FormDropdown = (props: FormDropdownProps) => {
         >
           <div
             className={classNames(
-              'absolute bg-white border border-gray-300 rounded-xl z-50 shadow-lg w-full top-12',
+              'absolute bg-white border border-gray-300 rounded-xl z-50 shadow-lg w-full',
+              dropdownPosition === 'bottom' ? 'top-12' : 'bottom-12',
               isDropdownOpen ? 'max-h-80 overflow-y-auto' : 'hidden'
             )}
             id="dropdown"
@@ -119,7 +122,7 @@ const FormDropdown = (props: FormDropdownProps) => {
                 key={index}
                 className={classNames(
                   selectedValue === choice.value && ' text-digibrown1624-bold',
-                  'p-2 hover:bg-gray-100 cursor-pointer'
+                  'p-2 hover:bg-digiblue-hover-options cursor-pointer'
                 )}
                 onClick={() => {
                   setSelectedValue?.(choice.value)

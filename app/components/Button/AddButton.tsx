@@ -3,7 +3,7 @@ import GenericTooltip from '../Tooltip/GenericTooltip'
 import Image from 'next/image'
 
 type AddButtonProps = {
-  onClick: () => void
+  onClick: () => void | undefined
   id: string
   tooltipText?: string
   size?: string

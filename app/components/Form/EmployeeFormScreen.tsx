@@ -241,6 +241,7 @@ const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
             setValue('educationQualification', value as unknown as string)
           }
           mandatory={false}
+          dropdownPosition="top"
           placeholder="Selecione a qualificação educacional"
           label="Qualificação Educacional"
           labelStyles="text-digiblack1420-semibold flex gap-1"

@@ -16,7 +16,7 @@ export default function GeneralLayout({
   return (
     <Providers>
       <SessionProvider session={session}>
-        <div className="bg-digiblue/20 min-h-screen flex justify-center">
+        <div className="bg-digiblue-hover-options min-h-screen flex justify-center">
           <Notifications />
           <div className="w-full max-w-[90rem] min-h-screen">
             <MainNavbar />
