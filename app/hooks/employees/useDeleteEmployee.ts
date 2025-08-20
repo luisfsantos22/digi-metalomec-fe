@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import axiosInstance from '../axiosInstance'
 import { notifications } from '@mantine/notifications'
+import { EMPLOYEE_ENDPOINTS } from '../api/endpoints'
 
 export function useDeleteEmployee() {
   const [loading, setLoading] = useState(false)
@@ -18,7 +19,7 @@ export function useDeleteEmployee() {
 
     try {
       const response = await axiosInstance.delete(
-        `/api/v1/employees/employees/${id}`,
+        EMPLOYEE_ENDPOINTS.getEmployeeById(id),
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

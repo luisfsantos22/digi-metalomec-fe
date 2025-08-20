@@ -3,6 +3,7 @@ import { useState } from 'react'
 import axiosInstance from '../axiosInstance'
 import { notifications } from '@mantine/notifications'
 import { useRouter } from 'next/navigation'
+import { EMPLOYEE_ENDPOINTS } from '../api/endpoints'
 
 interface UseCreateEmployeeResult {
   createEmployee: (employeeData: any) => Promise<void>
@@ -21,7 +22,7 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
     setError(null)
 
     try {
-      await axiosInstance.post('/employees/', employeeData, {
+      await axiosInstance.post(EMPLOYEE_ENDPOINTS.employees, employeeData, {
         headers: {
           Authorization: `Bearer ${session?.accessToken}`,
         },

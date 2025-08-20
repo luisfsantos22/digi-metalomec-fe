@@ -1,6 +1,7 @@
 import { CreateUserData, User } from '../user'
 import { UserLanguage } from '@/app/types/utils/language'
 import { EmployeeSkill } from './skill'
+import { GenericJobTitle } from '../utils/job-title'
 
 type EmergencyContact = {
   name: string
@@ -33,7 +34,7 @@ type Employee = {
   id: string
   user: User
   company: string
-  jobTitles: string[]
+  jobTitles: GenericJobTitle[]
   department?: string
   departmentName?: string
   nationalId?: string
@@ -74,7 +75,7 @@ type GenericEmployee = {
   id: string
   user: User
   company: string
-  jobTitles: string[]
+  jobTitles: GenericJobTitle[]
   collaborationStartDate: Date
   photoUrl?: string
   performanceRating?: number
@@ -85,7 +86,7 @@ type GenericEmployee = {
 type CreateEmployeeData = {
   user: CreateUserData
   company?: string
-  jobTitles: string[]
+  jobTitles: GenericJobTitle[]
   department?: string
   departmentName?: string
   nationalId?: string

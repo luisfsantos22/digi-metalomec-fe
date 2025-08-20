@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import axiosInstance from '../axiosInstance'
 import { GenericEmployee } from '@/app/types/employee/employee'
 import { mapGenericEmployee } from '@/app/mappers/employee/employee'
+import { EMPLOYEE_ENDPOINTS } from '../api/endpoints'
 
 interface useCompanyEmployeesQueryResult {
   employees: GenericEmployee[]
@@ -14,7 +15,11 @@ interface useCompanyEmployeesQueryResult {
 }
 
 const useCompanyEmployeesQuery = (
-  page: number
+  page: number,
+  searchQuery: string = '',
+  jobTitleFilter: string = '',
+  availabilityFilter: string[] = [],
+  statusFilter: string = ''
 ): useCompanyEmployeesQueryResult => {
   const { data: session } = useSession()
   const [employees, setEmployees] = useState<GenericEmployee[]>([])
@@ -26,23 +31,32 @@ const useCompanyEmployeesQuery = (
     const fetchUsers = async () => {
       setLoading(true)
       setError(null)
-
       try {
+        // Build params only with non-empty values
+        const params: Record<string, any> = {}
+        if (searchQuery && searchQuery.trim() !== '')
+          params.keyword = searchQuery
+        if (jobTitleFilter && jobTitleFilter.trim() !== '')
+          params.job_title = jobTitleFilter
+        if (availabilityFilter && availabilityFilter.length > 0)
+          params.availability_status = availabilityFilter.join(',')
+        if (statusFilter && statusFilter.trim() !== '')
+          params.status = statusFilter
+
         const response = await axiosInstance.get(
-          `/api/v1/employees/employees/?page=${page}`,
+          EMPLOYEE_ENDPOINTS.getEmployeesPage(page),
           {
             headers: {
               Authorization: `Bearer ${session?.accessToken}`,
             },
+            params,
           }
         )
         const count = response.data.count
         const dataResults = response.data.results
-
         const mappedResults = dataResults.map((emp: any) =>
           mapGenericEmployee(emp)
         )
-
         setCount(count)
         setEmployees(mappedResults)
       } catch {
@@ -54,7 +68,14 @@ const useCompanyEmployeesQuery = (
     if (session?.accessToken) {
       fetchUsers()
     }
-  }, [session?.accessToken, page])
+  }, [
+    session?.accessToken,
+    page,
+    searchQuery,
+    jobTitleFilter,
+    availabilityFilter,
+    statusFilter,
+  ])
 
   return { employees, loading, error, count }
 }

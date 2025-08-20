@@ -1,17 +1,14 @@
 import { Pagination, ScrollArea, Table } from '@mantine/core'
 import { useState } from 'react'
 import ContainerCard from '../../../Card/ContainerCard'
-import SearchInput from '../../../Input/SearchInput'
 import Row from '../../../Row/Row'
 import FormInput from '../../../Input/FormInput'
 import FormDropdown from '../../../Dropdown/FormDropdown'
 import ClearAllFiltersButton from '../../../Button/ClearAllFiltersButton'
 import Text from '../../../Text/Text'
-import PrimaryButton from '@/app/components/Button/PrimaryButton'
 import SecondaryButton from '@/app/components/Button/SecondaryButton'
 import useCompanyEmployeesQuery from '@/app/hooks/employees/useCompanyEmployeesQuery'
 import {
-  formatDate,
   translateEmployeeAvailabilityStatus,
   translateEmployeeStatus,
 } from '@/app/utils'
@@ -27,6 +24,9 @@ import { useDeleteEmployee } from '@/app/hooks/employees/useDeleteEmployee'
 import Image from 'next/image'
 import { classNames } from '@/utils'
 import AddButton from '@/app/components/Button/AddButton'
+import FormCheckbox from '@/app/components/Form/FormCheckbox'
+import { AVAILABILITY_STATUS, EMPLOYEE_STATUS } from '@/app/constants'
+import { set } from 'react-hook-form'
 
 const EmployeesSection = () => {
   const router = useRouter()
@@ -35,8 +35,15 @@ const EmployeesSection = () => {
 
   // States for search and filters
   const [searchQuery, setSearchQuery] = useState('')
-  const [nameFilter, setNameFilter] = useState('')
-  const [roleFilter, setRoleFilter] = useState('')
+  const [jobTitleFilter, setJobTitleFilter] = useState<string | undefined>(
+    undefined
+  )
+  const [availabilityFilter, setAvailabilityFilter] = useState<string[]>([])
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(
+    undefined
+  )
+
+  // State for modal and selected employee
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [activePage, setActivePage] = useState(1)
   const [scrolled, setScrolled] = useState(false)
@@ -47,42 +54,24 @@ const EmployeesSection = () => {
     useState<GenericEmployee | null>(null)
 
   // useQueries
-  const { employees, loading, error, count } =
-    useCompanyEmployeesQuery(activePage)
+  const { employees, loading, error, count } = useCompanyEmployeesQuery(
+    activePage,
+    searchQuery,
+    jobTitleFilter,
+    availabilityFilter,
+    statusFilter
+  )
 
   // Employee deletion function
   const { deleteEmployee } = useDeleteEmployee()
 
-  // Mock data for dropdowns
-  const roleChoices = [
-    { label: 'Mecânico', value: 'mechanic' },
-    { label: 'Supervisor', value: 'supervisor' },
-    { label: 'Gestor', value: 'manager' },
-  ]
-
-  const departmentChoices = [
-    { label: 'Oficina', value: 'workshop' },
-    { label: 'Administração', value: 'admin' },
-    { label: 'Vendas', value: 'sales' },
-  ]
-
   // Clear all filters
   const handleClearFilters = () => {
-    setNameFilter('')
-    setRoleFilter('')
-  }
-
-  // Filter employees based on filter values
-  const getFilteredEmployees = () => {
-    return employees.filter((emp) => {
-      const nameMatch =
-        !nameFilter ||
-        emp.user.fullName.toLowerCase().includes(nameFilter.toLowerCase())
-      const roleMatch =
-        !roleFilter || emp.user.fullName.toLowerCase().includes(roleFilter)
-
-      return nameMatch && roleMatch
-    })
+    setAvailabilityFilter([])
+    setJobTitleFilter('')
+    setSearchQuery('')
+    setStatusFilter('')
+    setActivePage(1)
   }
 
   const handleDelete = async (id: string, token: string) => {
@@ -110,20 +99,12 @@ const EmployeesSection = () => {
         </div>
         <Row>
           {/* Search Bar */}
-          <SearchInput
+          <FormInput
             query={searchQuery}
-            setQuery={setSearchQuery}
+            setQuery={(e) => setSearchQuery(e ? String(e) : '')}
             placeholder="Pesquisar colaboradores..."
-            data={employees.map((emp) => ({
-              ...emp,
-              searchValue: `${emp.user.fullName} - ${emp.user.role}`,
-            }))}
-            setSelectedObj={(emp) => {
-              if (emp) {
-                setNameFilter(emp.user.fullName)
-                setRoleFilter(emp.role.toLowerCase())
-              }
-            }}
+            clearable
+            inputType="text"
           />
           {/* Filters button */}
           <SecondaryButton
@@ -138,21 +119,39 @@ const EmployeesSection = () => {
         {filtersOpen && (
           <Row>
             <FormInput
-              placeholder="Nome do colaborador"
-              query={nameFilter}
-              setQuery={setNameFilter}
-              label="Nome"
+              placeholder="Cargo"
+              query={jobTitleFilter}
+              setQuery={(e) => setJobTitleFilter(e ? String(e) : '')}
+              label="Cargo"
+              clearable
             />
             <FormDropdown
-              choices={roleChoices}
-              selectedValue={roleFilter}
-              setSelectedValue={setRoleFilter}
-              label="Cargo"
-              placeholder="Selecionar cargo"
+              label="Estado de Colaboração"
+              choices={EMPLOYEE_STATUS}
+              labelStyles="text-digiblack1420-semibold flex gap-1"
+              setSelectedValue={(value) => setStatusFilter(value as string)}
+              selectedValue={statusFilter}
+              placeholder="Selecione o estado"
             />
+            <FormCheckbox
+              label="Disponibilidade"
+              options={AVAILABILITY_STATUS}
+              selectedValues={availabilityFilter}
+              setSelectedValues={(values) =>
+                setAvailabilityFilter(values.map(String))
+              }
+              labelStyles="text-digiblack1420-semibold flex gap-1"
+            />
+
             <ClearAllFiltersButton
               onClick={handleClearFilters}
               id="clear-employee-filters"
+              disabled={
+                !searchQuery &&
+                !jobTitleFilter &&
+                availabilityFilter.length === 0 &&
+                !statusFilter
+              }
             />
           </Row>
         )}
@@ -170,6 +169,11 @@ const EmployeesSection = () => {
           <Text
             text={`Erro: ${error}`}
             styles="text-red-500 text-center"
+          />
+        ) : count === 0 ? (
+          <Text
+            text="Nenhum colaborador encontrado"
+            styles="text-digiblack1624-semibold text-center"
           />
         ) : (
           <div className="flex flex-col gap-4 w-full overflow-y-auto">
@@ -229,7 +233,7 @@ const EmployeesSection = () => {
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                  {getFilteredEmployees().map((employee) => (
+                  {employees.map((employee) => (
                     <Table.Tr key={employee.id}>
                       <Table.Td>
                         <div className="flex flex-none h-10 w-10 items-start relative">

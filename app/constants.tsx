@@ -1,3 +1,9 @@
+export const SKILL_LEVELS = [
+  { key: 'Beginner', label: 'Iniciante' },
+  { key: 'Intermediate', label: 'Intermédio' },
+  { key: 'Expert', label: 'Especialista' },
+] as const
+
 export const CAROUSEL_TEXT_LIST = [
   'Tenha uma visão completa do seu negócio e total gestão sobre as suas operações.',
   'Trabalhamos para a excelência do seu negócio. Oferecemos uma plataforma completa, intuitiva e fácil de usar.',
@@ -58,4 +64,9 @@ export const EDUCATIONAL_QUALIFICATION_OPTIONS = [
   { value: 'PHD', label: 'Doutoramento' },
 ]
 
-export const CERTIFICATION_TABLE_LIST = ['Nome', 'Emissor', 'Validade', 'Ações']
+export const CERTIFICATION_TABLE_LIST = [
+  'Nome',
+  'Emissor',
+  'Validade (dias)',
+  'Ações',
+]

@@ -1,11 +1,7 @@
-import { classNames, generateUuid, translateVehicleValue } from '@/utils'
+import { classNames } from '@/utils'
 import Text from '../Text/Text'
 import Spinner from '../Spinner/Spinner'
 import useOutsideClick from '@/app/hooks/utils/useOutsideClick'
-import { useState } from 'react'
-import { VehicleWorkshop } from '@/app/types/vehicle'
-import CreateVehicleModal from '../Modal/CreateVehicleModal'
-import { useSession } from 'next-auth/react'
 
 type SearchInputProps = {
   query: string
@@ -23,6 +19,11 @@ type SearchInputProps = {
   value?: string
   setValue?: (value: string) => void
   setSelectedObj: (obj: any) => void
+  setShowCreateModal: (show: boolean) => void
+  createText?: string
+  source: 'JobTitle'
+  setIsDropdownOpen: (isOpen: boolean) => void
+  isDropdownOpen?: boolean
 }
 
 const SearchInput = (props: SearchInputProps) => {
@@ -42,20 +43,12 @@ const SearchInput = (props: SearchInputProps) => {
     value,
     setValue,
     setSelectedObj,
+    setShowCreateModal,
+    createText = 'Crie um novo objeto',
+    source,
+    setIsDropdownOpen,
+    isDropdownOpen = false,
   } = props
-
-  const { data: session } = useSession()
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [showCreateVehicleModal, setShowCreateVehicleModal] = useState(false)
-  const [newVehicle, setNewVehicle] = useState<VehicleWorkshop>({
-    uuid: generateUuid(),
-    licensePlate: '',
-    brand: '',
-    model: '',
-    version: '',
-    createdAt: new Date().toISOString().slice(0, 10), // yyyy-mm-dd
-    availability: 'REPARING',
-  })
 
   const dropdownRef = useOutsideClick(() => setIsDropdownOpen(false))
 
@@ -137,13 +130,13 @@ const SearchInput = (props: SearchInputProps) => {
                 />
                 <a
                   href="#"
-                  className="text-digibrown1624-medium underline hover:bg-digibrown/10"
+                  className="text-digibrown1624-medium underline hover:bg-digiblue-hover-options"
                   onClick={(e) => {
                     e.preventDefault()
-                    setShowCreateVehicleModal(true)
+                    setShowCreateModal(true)
                   }}
                 >
-                  Crie um novo veículo
+                  {createText}
                 </a>
               </div>
             ) : (
@@ -152,13 +145,15 @@ const SearchInput = (props: SearchInputProps) => {
                   key={index}
                   className="p-2 hover:bg-gray-100 cursor-pointer"
                   onClick={() => {
-                    setValue?.(obj.uuid)
-                    setSelectedObj(obj)
-                    setQuery(translateVehicleValue(obj))
-                    setIsDropdownOpen(false)
+                    if (source === 'JobTitle') {
+                      setValue?.(obj.id)
+                      setSelectedObj(obj)
+                      setQuery(obj.name)
+                      setIsDropdownOpen(false)
+                    }
                   }}
                 >
-                  {translateVehicleValue(obj)}
+                  {source === 'JobTitle' ? obj?.name : null}
                 </div>
               ))
             )}
@@ -173,32 +168,6 @@ const SearchInput = (props: SearchInputProps) => {
           )}
         </div>
       </div>
-      {showCreateVehicleModal && (
-        <CreateVehicleModal
-          isOpen={showCreateVehicleModal}
-          onClose={() => {
-            setShowCreateVehicleModal(false)
-            setNewVehicle({
-              uuid: generateUuid(),
-              licensePlate: '',
-              brand: '',
-              model: '',
-              version: '',
-              createdAt: new Date().toISOString().slice(0, 10), // yyyy-mm-dd
-              availability: 'REPARING',
-            })
-          }}
-          onConfirm={() => {
-            setShowCreateVehicleModal(false)
-            setValue?.(newVehicle?.uuid ?? '')
-            setSelectedObj(newVehicle)
-            setQuery(translateVehicleValue(newVehicle))
-            setIsDropdownOpen(false)
-          }}
-          setNewVehicle={setNewVehicle}
-          newVehicle={newVehicle}
-        />
-      )}
     </div>
   )
 }

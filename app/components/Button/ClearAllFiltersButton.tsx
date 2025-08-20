@@ -7,16 +7,26 @@ interface ClearAllFiltersButtonProps {
   label?: string
   width?: string
   id: string
+  disabled?: boolean
 }
 
 const ClearAllFiltersButton = (props: ClearAllFiltersButtonProps) => {
-  const { onClick, label = 'Limpar Filtros', width = 'w-full', id } = props
+  const {
+    onClick,
+    label = 'Limpar Filtros',
+    width = 'w-full',
+    id,
+    disabled = false,
+  } = props
 
   return (
     <div
       className={classNames(
         width,
-        'flex gap-2 items-center hover:cursor-pointer hover:underline'
+        disabled
+          ? 'opacity-50 cursor-not-allowed'
+          : 'hover:cursor-pointer hover:underline',
+        'flex gap-2 items-center '
       )}
       onClick={onClick}
     >

@@ -15,6 +15,8 @@ import TableRow from '../Table/TableRow'
 import Text from '../Text/Text'
 import DeleteButton from '../Button/DeleteButton'
 
+import SkillModal from '../Modal/SkillModal'
+
 type TechnicalEmployeeFormScreenProps = {
   formData: CreateEmployeeData
   register: UseFormRegister<CreateEmployeeData>
@@ -147,22 +149,75 @@ const TechnicalEmployeeFormScreen = (
         <Row
           title="Habilidades Técnicas"
           withAddButton
-          action={() => setShowSkillsModal(true)}
+          action={() => {
+            setAction('add')
+            setShowSkillsModal(true)
+          }}
           tooltipText="Adicionar Habilidade"
           id="add-skills-button"
         >
           <div className="flex flex-col gap-4 w-full">
-            {skills &&
-              skills?.length > 0 &&
-              skills?.map((skill) => (
-                <div
-                  key={skill.id}
-                  className="border-b border-gray-200 py-2"
-                >
-                  <h4 className="font-semibold">{skill.name}</h4>
-                  <p className="text-sm text-gray-500">{skill.level}</p>
-                </div>
-              ))}
+            {skills && skills.length > 0 && (
+              <Table
+                striped
+                withTableBorder
+                highlightOnHoverColor="bg-digigold-hover/10"
+                className="w-full"
+              >
+                <Table.Thead className="bg-digiblue">
+                  <Table.Tr>
+                    <Table.Th className="text-digiwhite1624-bold">
+                      Nome
+                    </Table.Th>
+                    <Table.Th className="text-digiwhite1624-bold">
+                      Nível
+                    </Table.Th>
+                    <Table.Th className="text-digiwhite1624-bold">
+                      Ações
+                    </Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {skills.map((skill, index) => (
+                    <Table.Tr
+                      key={index}
+                      onClick={() => {
+                        setAction('edit')
+                        setSelectedSkill(skill)
+                        setShowSkillsModal(true)
+                      }}
+                      className="hover:cursor-pointer hover:!bg-digiblue-hover-options"
+                    >
+                      <TableRow>
+                        <Text
+                          text={skill.name}
+                          styles="text-digibrown1624-normal"
+                        />
+                      </TableRow>
+                      <TableRow>
+                        <Text
+                          text={skill.level || '---'}
+                          styles="text-digibrown1624-normal"
+                        />
+                      </TableRow>
+                      <TableRow customStyles="!hover:bg-white/0 z-10">
+                        <div className="flex justify-start items-center">
+                          <DeleteButton
+                            id={`delete-skill-${skill.id}`}
+                            onClick={() => {
+                              setAreYouSureModalOpenSkill(true)
+                              setSelectedSkill(skill)
+                            }}
+                            tooltipText="Remover Habilidade"
+                            hasTooltip
+                          />
+                        </div>
+                      </TableRow>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            )}
           </div>
         </Row>
       </ContainerCard>
@@ -186,6 +241,27 @@ const TechnicalEmployeeFormScreen = (
                 ) ?? -1)
               : undefined
           }
+        />
+      )}
+      {showSkillsModal && (
+        <SkillModal
+          action={action}
+          isOpen={showSkillsModal}
+          onClose={() => setShowSkillsModal(false)}
+          onConfirm={() => {
+            setShowSkillsModal(false)
+            setSelectedSkill(undefined)
+          }}
+          setValue={setValue}
+          selectedSkill={selectedSkill}
+          formData={formData}
+          indexNumber={
+            action === 'edit'
+              ? (skills?.findIndex((skill) => skill.id === selectedSkill?.id) ??
+                -1)
+              : undefined
+          }
+          errors={errors}
         />
       )}
     </>

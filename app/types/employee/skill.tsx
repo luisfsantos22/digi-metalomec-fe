@@ -5,7 +5,7 @@ type Skill = {
 }
 
 type EmployeeSkill = Skill & {
-  level: string
+  level: 'Beginner' | 'Intermediate' | 'Expert'
   acquiredAt?: Date | null
 }
 

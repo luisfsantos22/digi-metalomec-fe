@@ -11,6 +11,14 @@ export const USER_ENDPOINTS = {
   updateProfile: 'api/v1/users/profile/',
 } as const
 
+export const EMPLOYEE_ENDPOINTS = {
+  employees: 'api/v1/employees/employees/',
+  getEmployeesPage: (page: number) =>
+    `api/v1/employees/employees/?page=${page}`,
+  getEmployeeById: (id: string) => `api/v1/employees/employees/${id}/`,
+  jobTitles: 'api/v1/employees/job-titles/',
+}
+
 // Types for API responses
 export interface AuthResponse {
   access: string

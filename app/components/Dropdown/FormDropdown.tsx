@@ -65,7 +65,7 @@ const FormDropdown = (props: FormDropdownProps) => {
             disabled && 'cursor-not-allowed text-gray-500',
             error
               ? 'border-b-digired text-digired1624-normal'
-              : selectedValue
+              : selectedValue !== undefined
                 ? 'border-b-digibrown text-digibrown1624-semibold'
                 : 'border-b-gray-300 text-placeholder-form ',
 
@@ -76,7 +76,7 @@ const FormDropdown = (props: FormDropdownProps) => {
         >
           <Text
             text={
-              selectedValue
+              selectedValue !== undefined
                 ? (choices.find((choice) => choice.value === selectedValue)
                     ?.label ?? placeholder)
                 : placeholder
@@ -85,7 +85,7 @@ const FormDropdown = (props: FormDropdownProps) => {
               disabled && 'cursor-not-allowed text-gray-500',
               error
                 ? 'text-digired1624-normal'
-                : selectedValue
+                : selectedValue !== undefined
                   ? 'text-digibrown1624-semibold'
                   : 'text-placeholder-form',
               'line-clamp-1'

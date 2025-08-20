@@ -14,9 +14,8 @@ import {
   NEW_EMPLOYEE_STEPS,
 } from '@/app/constants'
 import { useGlobalLoading } from '@/app/hooks/utils/useGlobalLoading'
-import { useJobTitlesQuery } from '@/app/hooks/utils/useJobTitlesQuery'
 import { useLanguagesQuery } from '@/app/hooks/utils/useLanguagesQuery'
-import useCreateEmployee from '@/app/hooks/workshop/useCreateRepair'
+import useCreateEmployee from '@/app/hooks/employees/useCreateEmployee'
 import {
   CreateEmployeeData,
   EmployeeCertification,
@@ -38,16 +37,12 @@ type CreateEmployeeProps = {
 export default function CreateEmployee(props: CreateEmployeeProps) {
   const { session } = props
 
-  const searchParams = useSearchParams()
-  const router = useRouter()
-
   const {
     register,
     unregister,
     watch,
     handleSubmit,
     setValue,
-    reset,
     formState: { errors },
   } = useForm<CreateEmployeeData>({
     defaultValues: {
@@ -67,22 +62,22 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
       nif: '',
       socialSecurityNumber: '',
       collaborationStartDate: new Date(),
-      gender: '',
-      maritalStatus: '',
-      transportAvailable: false,
-      geographicAvailability: '',
-      preferredWorkLocation: '',
+      gender: undefined,
+      maritalStatus: undefined,
+      transportAvailable: undefined,
+      geographicAvailability: undefined,
+      preferredWorkLocation: undefined,
       emergencyContact: {
         name: '',
         phone: '',
         relationship: '',
       },
-      educationQualification: '',
+      educationQualification: undefined,
       languages: [],
-      photoUrl: '',
-      currentLocation: '',
-      needsHousing: false,
-      housingProvided: false,
+      photoUrl: undefined,
+      currentLocation: undefined,
+      needsHousing: undefined,
+      housingProvided: undefined,
       availabilityStatus: AVAILABILITY_STATUS.find(
         (status) => status.value === 'AVAILABLE'
       )?.value,
@@ -126,11 +121,6 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
   >()
 
   //UseQueries
-  const {
-    jobTitles: availableJobTitles,
-    loading: loadingJobTitles,
-    error: jobTitlesError,
-  } = useJobTitlesQuery()
 
   const {
     languages: availableLanguages,
@@ -150,8 +140,6 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
     // Define mandatory fields
     const mandatoryEmployeeFields = [
       formData?.jobTitles?.length > 0 ? formData?.jobTitles[0] : undefined,
-      formData?.country,
-      formData?.city,
       formData?.country,
     ]
 
@@ -230,7 +218,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
         onClick={setCurrentStep}
         setCurrentStep={setCurrentStep}
       />
-      {loadingJobTitles && loadingLanguages ? (
+      {loadingLanguages ? (
         <div className="flex justify-center self-center items-center p-4 h-full ">
           <Spinner />
         </div>
@@ -256,7 +244,6 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
                   setValue={setValue}
                   errors={errors}
                   languagesAvailable={availableLanguages}
-                  jobTitlesAvailable={availableJobTitles}
                 />
               ),
               3: (

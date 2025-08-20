@@ -2,25 +2,26 @@ import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import axiosInstance from '../axiosInstance'
 import { notifications } from '@mantine/notifications'
-import { VehicleWorkshop } from '@/app/types/vehicle'
+import { GenericJobTitle } from '@/app/types/utils/job-title'
+import { EMPLOYEE_ENDPOINTS } from '../api/endpoints'
 
-interface useCreateVehicleResult {
-  createVehicle: (vehicleData: VehicleWorkshop) => Promise<void>
+interface useCreateJobTitleResult {
+  createJobTitle: (jobTitleData: GenericJobTitle) => Promise<void>
   loading: boolean
   error: string | null
 }
 
-const useCreateVehicle = (): useCreateVehicleResult => {
+const useCreateJobTitle = (): useCreateJobTitleResult => {
   const { data: session } = useSession()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const createVehicle = async (vehicleData: any) => {
+  const createJobTitle = async (jobTitleData: GenericJobTitle) => {
     setLoading(true)
     setError(null)
 
     try {
-      await axiosInstance.post('/vehicles/', vehicleData, {
+      await axiosInstance.post(EMPLOYEE_ENDPOINTS.jobTitles, jobTitleData, {
         headers: {
           Authorization: `Bearer ${session?.accessToken}`,
         },
@@ -28,15 +29,15 @@ const useCreateVehicle = (): useCreateVehicleResult => {
       notifications.show({
         title: 'Sucesso',
         color: 'green',
-        message: 'Veículo criada com sucesso!',
+        message: 'Cargo criado com sucesso!',
         position: 'top-right',
       })
     } catch {
-      setError('Failed to create repair')
+      setError('Failed to create job title')
       notifications.show({
         title: 'Erro',
         color: 'red',
-        message: 'Falha ao criar o veículo. Tente novamente.',
+        message: 'Falha ao criar o cargo. Tente novamente.',
         position: 'top-right',
       })
     } finally {
@@ -44,7 +45,7 @@ const useCreateVehicle = (): useCreateVehicleResult => {
     }
   }
 
-  return { createVehicle, loading, error }
+  return { createJobTitle, loading, error }
 }
 
-export default useCreateVehicle
+export default useCreateJobTitle
