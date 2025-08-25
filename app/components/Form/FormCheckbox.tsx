@@ -50,7 +50,7 @@ const FormCheckbox: React.FC<FormCheckboxProps> = ({
     <div
       className={classNames(
         width,
-        'flex flex-col items-start justify-start gap-2',
+        'flex flex-col items-start gap-5',
         className
       )}
     >
@@ -65,7 +65,7 @@ const FormCheckbox: React.FC<FormCheckboxProps> = ({
       />
       <div className="flex flex-col gap-0.5 w-full">
         <div className="relative w-full">
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4 items-center">
             {options.map((opt) => (
               <label
                 key={String(opt.value)}

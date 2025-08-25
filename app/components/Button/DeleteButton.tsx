@@ -1,6 +1,7 @@
 import { classNames } from '@/utils'
 import GenericTooltip from '../Tooltip/GenericTooltip'
 import Image from 'next/image'
+import Text from '../Text/Text'
 
 type DeleteButtonProps = {
   tooltipText?: string
@@ -8,6 +9,8 @@ type DeleteButtonProps = {
   id: string
   onClick: () => void
   size?: string
+  extraStyles?: string
+  typeBtn?: 'text' | 'icon'
 }
 
 const DeleteButton = (props: DeleteButtonProps) => {
@@ -17,14 +20,18 @@ const DeleteButton = (props: DeleteButtonProps) => {
     id,
     onClick,
     size = 'h-6 w-6',
+    extraStyles = '',
+    typeBtn = 'icon',
   } = props
 
   return (
     <>
       <div
         className={classNames(
-          size,
-          'flex flex-none items-start relative hover:cursor-pointer'
+          typeBtn === 'icon' ? size : 'px-4 py-2',
+          extraStyles,
+          typeBtn === 'text' && 'rounded-2xl',
+          'flex flex-none items-center relative hover:cursor-pointer'
         )}
         onClick={(e) => {
           e.stopPropagation()
@@ -32,12 +39,19 @@ const DeleteButton = (props: DeleteButtonProps) => {
         }}
         id={id}
       >
-        <Image
-          src={'/icons/delete-red.svg'}
-          alt={'Logo Delete'}
-          style={{ objectFit: 'contain' }}
-          fill
-        />
+        {typeBtn === 'icon' ? (
+          <Image
+            src={'/icons/delete-red.svg'}
+            alt={'Logo Delete'}
+            style={{ objectFit: 'contain' }}
+            fill
+          />
+        ) : (
+          <Text
+            text="Remover"
+            styles="lg:text-digiwhite1825-semibold text-digiwhite1420-semibold"
+          />
+        )}
       </div>
       {hasTooltip && (
         <GenericTooltip

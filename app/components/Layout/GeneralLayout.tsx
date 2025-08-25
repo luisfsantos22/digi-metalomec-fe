@@ -1,9 +1,5 @@
-'use client'
-
-import { SessionProvider } from 'next-auth/react'
 import MainNavbar from '../Navbar/MainNavbar'
 import { ReactNode } from 'react'
-import { Notifications } from '@mantine/notifications'
 import { Providers } from '../providers'
 
 export default function GeneralLayout({
@@ -14,16 +10,13 @@ export default function GeneralLayout({
   session: any
 }) {
   return (
-    <Providers>
-      <SessionProvider session={session}>
-        <div className="bg-digiblue-hover-options min-h-screen flex justify-center">
-          <Notifications />
-          <div className="w-full max-w-[90rem] min-h-screen">
-            <MainNavbar />
-            <main>{children}</main>
-          </div>
+    <Providers session={session}>
+      <div className="bg-digiblue-hover-options min-h-screen flex justify-center">
+        <div className="w-full max-w-[90rem] min-h-screen">
+          <MainNavbar />
+          <main>{children}</main>
         </div>
-      </SessionProvider>
+      </div>
     </Providers>
   )
 }

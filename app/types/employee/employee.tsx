@@ -63,7 +63,7 @@ type Employee = {
   createdAt: Date
   updatedAt: Date
   address?: string
-  postal_code?: string
+  postalCode?: string
   city: string
   district?: string
   country: string
@@ -112,7 +112,7 @@ type CreateEmployeeData = {
   skills?: EmployeeSkill[]
   certifications?: EmployeeCertification[]
   address?: string
-  postal_code?: string
+  postalCode?: string
   city: string
   district?: string
   country: string

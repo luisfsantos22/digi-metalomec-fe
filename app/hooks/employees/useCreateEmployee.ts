@@ -4,6 +4,7 @@ import axiosInstance from '../axiosInstance'
 import { notifications } from '@mantine/notifications'
 import { useRouter } from 'next/navigation'
 import { EMPLOYEE_ENDPOINTS } from '../api/endpoints'
+import snakecaseKeys from 'snakecase-keys'
 
 interface UseCreateEmployeeResult {
   createEmployee: (employeeData: any) => Promise<void>
@@ -21,12 +22,19 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
     setLoading(true)
     setError(null)
 
+    const payload = snakecaseKeys(employeeData, { deep: true })
+    console.log('Payload to create employee:', payload)
+    //#TODO: fix add
     try {
-      await axiosInstance.post(EMPLOYEE_ENDPOINTS.employees, employeeData, {
-        headers: {
-          Authorization: `Bearer ${session?.accessToken}`,
-        },
-      })
+      await axiosInstance.post(
+        EMPLOYEE_ENDPOINTS.employees,
+        JSON.stringify(payload),
+        {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+        }
+      )
       notifications.show({
         title: 'Sucesso',
         color: 'green',

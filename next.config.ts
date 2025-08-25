@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   output: 'standalone',
-  reactStrictMode: true,
+  reactStrictMode: false,
 }
 
 export default nextConfig

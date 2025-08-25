@@ -17,18 +17,18 @@ export const AVAILABLE_ROLES = [
 ]
 
 export const AVAILABILITY_STATUS = [
-  { value: 'AVAILABLE', label: 'Disponível' },
-  { value: 'UNAVAILABLE', label: 'Indisponível' },
+  { value: 'Available', label: 'Disponível' },
+  { value: 'Unavailable', label: 'Indisponível' },
 ]
 
 export const EMPLOYEE_STATUS = [
-  { value: 'CONTRACT_WITH_RIGTH_TERM  ', label: 'Contrato a Termo Certo' },
-  { value: 'CONTRACT_WITHOUT_RIGTH_TERM', label: 'Contrato a Termo Incerto' },
-  { value: 'CONTRACT_WITHOUT_TERM', label: 'Contrato Sem Termo' },
-  { value: 'NO_CONTRACT', label: 'Sem Contrato' },
-  { value: 'ON_LEAVE', label: 'Em Licença' },
-  { value: 'MEDICAL_LEAVE', label: 'Licença Médica' },
-  { value: 'CONTRACT_SERVICE_PROVIDER', label: 'Prestador de Serviços' },
+  { value: 'Contract_With_Right_Term', label: 'Contrato a Termo Certo' },
+  { value: 'Contract_Without_Right_Term', label: 'Contrato a Termo Incerto' },
+  { value: 'Contract_Without_Term', label: 'Contrato Sem Termo' },
+  { value: 'No_Contract', label: 'Sem Contrato' },
+  { value: 'On_Leave', label: 'Em Licença' },
+  { value: 'Medical_Leave', label: 'Licença Médica' },
+  { value: 'Contract_Service_Provider', label: 'Prestador de Serviços' },
 ]
 
 export const NEW_EMPLOYEE_STEPS = [
@@ -38,17 +38,17 @@ export const NEW_EMPLOYEE_STEPS = [
 ]
 
 export const GENDER_OPTIONS = [
-  { value: 'MALE', label: 'Masculino' },
-  { value: 'FEMALE', label: 'Feminino' },
-  { value: 'OTHER', label: 'Outro' },
+  { value: 'Male', label: 'Masculino' },
+  { value: 'Female', label: 'Feminino' },
+  { value: 'Other', label: 'Outro' },
 ]
 
 export const MARITAL_STATUS_OPTIONS = [
-  { value: 'SINGLE', label: 'Solteiro(a)' },
-  { value: 'MARRIED', label: 'Casado(a)' },
-  { value: 'DIVORCED', label: 'Divorciado(a)' },
-  { value: 'WIDOWED', label: 'Viúvo(a)' },
-  { value: 'SEPARATED', label: 'Separado(a)' },
+  { value: 'Single', label: 'Solteiro(a)' },
+  { value: 'Married', label: 'Casado(a)' },
+  { value: 'Divorced', label: 'Divorciado(a)' },
+  { value: 'Widowed', label: 'Viúvo(a)' },
+  { value: 'Separated', label: 'Separado(a)' },
 ]
 
 export const YES_NO_OPTIONS = [
@@ -69,4 +69,12 @@ export const CERTIFICATION_TABLE_LIST = [
   'Emissor',
   'Validade (dias)',
   'Ações',
+]
+
+export const EMPLOYEE_DETAILS_TABS = [
+  { label: 'Geral', value: 'general', disabled: false },
+  { label: 'Contrato', value: 'contract', disabled: true },
+  { label: 'Certificações', value: 'certifications', disabled: true },
+  { label: 'Performance', value: 'performance', disabled: true },
+  { label: 'Documentos', value: 'documents', disabled: true },
 ]

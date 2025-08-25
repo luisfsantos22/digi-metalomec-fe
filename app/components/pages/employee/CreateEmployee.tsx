@@ -88,7 +88,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
       skills: [],
       certifications: [],
       address: '',
-      postal_code: '',
+      postalCode: '',
       city: '',
       district: '',
       country: '',
@@ -128,7 +128,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
     error: languagesError,
   } = useLanguagesQuery()
 
-  const { createEmployee } = useCreateEmployee()
+  const { createEmployee, loading, error } = useCreateEmployee()
   const { startLoading, stopLoading } = useGlobalLoading()
 
   // UseEffects
@@ -175,8 +175,10 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
         position: 'top-right',
       })
     } else {
+      console.log('Form Data to submit:', data)
       try {
         startLoading()
+        console.log('start loading')
         await createEmployee(data)
       } catch (err) {
         console.log(err)

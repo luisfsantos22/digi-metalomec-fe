@@ -1,0 +1,55 @@
+.root {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.list {
+  overflow: auto;
+  flex-wrap: nowrap;
+}
+
+.tabLabel {
+  font-size: 16px;
+  font-weight: 600;
+  color: #5e4b56;
+}
+
+.indicator {
+  width: 50px;
+  height: 4px;
+  transition: width 250ms ease;
+  background-color: white;
+  margin-right: 8px;
+  border-radius: 4px;
+  margin-top: 24px;
+}
+
+.indicator[data-active] {
+  width: 100px;
+}
+
+.control {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  height: 100%;
+
+  @media (max-width: 768px) {
+    padding: 0 16px;
+  }
+}

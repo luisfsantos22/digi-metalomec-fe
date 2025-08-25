@@ -27,11 +27,14 @@ import AddButton from '@/app/components/Button/AddButton'
 import FormCheckbox from '@/app/components/Form/FormCheckbox'
 import { AVAILABILITY_STATUS, EMPLOYEE_STATUS } from '@/app/constants'
 import { set } from 'react-hook-form'
+import { useAtom } from 'jotai'
+import { mainPageActiveTab } from '@/app/atoms'
 
 const EmployeesSection = () => {
   const router = useRouter()
   const { data: session } = useSession()
   const accessToken = session?.accessToken
+  const [tabActive, setTabActive] = useAtom(mainPageActiveTab)
 
   // States for search and filters
   const [searchQuery, setSearchQuery] = useState('')
@@ -128,7 +131,6 @@ const EmployeesSection = () => {
             <FormDropdown
               label="Estado de Colaboração"
               choices={EMPLOYEE_STATUS}
-              labelStyles="text-digiblack1420-semibold flex gap-1"
               setSelectedValue={(value) => setStatusFilter(value as string)}
               selectedValue={statusFilter}
               placeholder="Selecione o estado"
@@ -140,7 +142,6 @@ const EmployeesSection = () => {
               setSelectedValues={(values) =>
                 setAvailabilityFilter(values.map(String))
               }
-              labelStyles="text-digiblack1420-semibold flex gap-1"
             />
 
             <ClearAllFiltersButton
@@ -189,7 +190,10 @@ const EmployeesSection = () => {
               <AddButton
                 id="add-employee-button"
                 tooltipText="Adicionar um novo colaborador"
-                onClick={() => router.push('/employee/add')}
+                onClick={() => {
+                  setTabActive('employees')
+                  router.push('/employee/add')
+                }}
                 size="w-10 h-10 xl:w-12 xl:h-12"
               />
             </div>
@@ -234,7 +238,13 @@ const EmployeesSection = () => {
                 </Table.Thead>
                 <Table.Tbody>
                   {employees.map((employee) => (
-                    <Table.Tr key={employee.id}>
+                    <Table.Tr
+                      onClick={() =>
+                        router.push(`/employee/details?id=${employee.id}`)
+                      }
+                      key={employee.id}
+                      className="hover:cursor-pointer hover:!bg-digiblue-hover-options"
+                    >
                       <Table.Td>
                         <div className="flex flex-none h-10 w-10 items-start relative">
                           <Image
