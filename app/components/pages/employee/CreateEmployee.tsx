@@ -29,6 +29,7 @@ import UserFormScreen from '../../Form/UserFormScreen'
 import EmployeeFormScreen from '../../Form/EmployeeFormScreen'
 import TechnicalEmployeeFormScreen from '../../Form/TechnicalEmployeeFormScreen'
 import { EmployeeSkill } from '@/app/types/employee/skill'
+import useGetEducationalQualifications from '@/app/hooks/employees/useGetEducationalQualifications'
 
 type CreateEmployeeProps = {
   session: Session | null
@@ -128,6 +129,12 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
     error: languagesError,
   } = useLanguagesQuery()
 
+  const {
+    qualifications,
+    loading: loadingEducationalQualifications,
+    error: educationalQualificationsError,
+  } = useGetEducationalQualifications()
+
   const { createEmployee, loading, error } = useCreateEmployee()
   const { startLoading, stopLoading } = useGlobalLoading()
 
@@ -220,7 +227,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
         onClick={setCurrentStep}
         setCurrentStep={setCurrentStep}
       />
-      {loadingLanguages ? (
+      {loadingLanguages || loadingEducationalQualifications ? (
         <div className="flex justify-center self-center items-center p-4 h-full ">
           <Spinner />
         </div>
@@ -246,6 +253,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
                   setValue={setValue}
                   errors={errors}
                   languagesAvailable={availableLanguages}
+                  educationalQualificationsAvailable={qualifications}
                 />
               ),
               3: (

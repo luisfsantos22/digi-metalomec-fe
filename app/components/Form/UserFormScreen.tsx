@@ -28,7 +28,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
     emergencyContact: { name, phone, relationship } = {},
     photoUrl,
     address,
-    postal_code,
+    postalCode,
     city,
     district,
     country,
@@ -139,7 +139,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
       <Row title="Contatos">
         <FormInput
           query={phoneNumber}
-          setQuery={(e) => setValue('phoneNumber', e)}
+          setQuery={(e) => setValue('phoneNumber', e as unknown as string)}
           placeholder="+351912345678"
           inputType="tel"
           mandatory={false}
@@ -151,7 +151,9 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         <FormInput
           label="Nome do Contato de Emergência"
           query={name}
-          setQuery={(e) => setValue('emergencyContact.name', e)}
+          setQuery={(e) =>
+            setValue('emergencyContact.name', e as unknown as string)
+          }
           placeholder="João Silva"
           inputType="text"
           mandatory={false}
@@ -159,7 +161,9 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         <FormInput
           label="Telemóvel de Emergência"
           query={phone}
-          setQuery={(e) => setValue('emergencyContact.phone', e)}
+          setQuery={(e) =>
+            setValue('emergencyContact.phone', e as unknown as string)
+          }
           placeholder="+351912345678"
           inputType="tel"
           mandatory={false}
@@ -167,7 +171,9 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         <FormInput
           label="Relação do Contato de Emergência"
           query={relationship}
-          setQuery={(e) => setValue('emergencyContact.relationship', e)}
+          setQuery={(e) =>
+            setValue('emergencyContact.relationship', e as unknown as string)
+          }
           placeholder="Pai"
           inputType="text"
           mandatory={false}
@@ -177,7 +183,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
       <Row title="Localização">
         <FormInput
           query={country}
-          setQuery={(e) => setValue('country', e)}
+          setQuery={(e) => setValue('country', e as unknown as string)}
           error={errors.country ? 'País é obrigatório' : undefined}
           placeholder="Portugal"
           inputType="text"
@@ -188,7 +194,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         />
         <FormInput
           query={district}
-          setQuery={(e) => setValue('district', e)}
+          setQuery={(e) => setValue('district', e as unknown as string)}
           placeholder="Lisboa"
           inputType="text"
           mandatory={false}
@@ -198,7 +204,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         />
         <FormInput
           query={city}
-          setQuery={(e) => setValue('city', e)}
+          setQuery={(e) => setValue('city', e as unknown as string)}
           placeholder="Lisboa"
           inputType="text"
           mandatory={false}
@@ -210,7 +216,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
       <Row>
         <FormInput
           query={address}
-          setQuery={(e) => setValue('address', e)}
+          setQuery={(e) => setValue('address', e as unknown as string)}
           placeholder="Rua Exemplo"
           inputType="text"
           mandatory={false}
@@ -219,22 +225,22 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           {...register('address', { required: false })}
         />
         <FormInput
-          query={postal_code}
-          setQuery={(e) => setValue('postal_code', e)}
+          query={postalCode}
+          setQuery={(e) => setValue('postalCode', e as unknown as string)}
           placeholder="1000-000"
           inputType="text"
           width="w-40"
           mandatory={false}
           label="Código Postal"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('postal_code', { required: false })}
+          {...register('postalCode', { required: false })}
         />
       </Row>
       <Separator />
       <Row title="Informação Adicional">
         <FormInput
           query={nif}
-          setQuery={(e) => setValue('nif', e)}
+          setQuery={(e) => setValue('nif', e as unknown as string)}
           placeholder="123456789"
           inputType="text"
           mandatory={false}
@@ -244,7 +250,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         />
         <FormInput
           query={nationalId}
-          setQuery={(e) => setValue('nationalId', e)}
+          setQuery={(e) => setValue('nationalId', e as unknown as string)}
           placeholder="123456789"
           inputType="text"
           mandatory={false}
@@ -254,7 +260,9 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         />
         <FormInput
           query={socialSecurityNumber}
-          setQuery={(e) => setValue('socialSecurityNumber', e)}
+          setQuery={(e) =>
+            setValue('socialSecurityNumber', e as unknown as string)
+          }
           placeholder="123456789"
           inputType="text"
           mandatory={false}

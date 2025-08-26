@@ -17,6 +17,7 @@ export const EMPLOYEE_ENDPOINTS = {
     `api/v1/employees/employees/?page=${page}`,
   getEmployeeById: (id: string) => `api/v1/employees/employees/${id}/`,
   jobTitles: 'api/v1/employees/job-titles/',
+  getEducationalQualifications: 'api/v1/employees/educational-qualifications/',
 }
 
 // Types for API responses

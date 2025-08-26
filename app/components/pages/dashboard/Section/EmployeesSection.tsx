@@ -217,16 +217,16 @@ const EmployeesSection = () => {
                       Nome
                     </Table.Th>
                     <Table.Th className="text-digiwhite1624-bold">
+                      Estado
+                    </Table.Th>
+                    <Table.Th className="text-digiwhite1624-bold">
                       Cargo
                     </Table.Th>
                     <Table.Th className="text-digiwhite1624-bold">
                       Disponibilidade
                     </Table.Th>
                     <Table.Th className="text-digiwhite1624-bold">
-                      Estado de Colaboração
-                    </Table.Th>
-                    <Table.Th className="text-digiwhite1624-bold">
-                      Cliente
+                      Tipo de Colaboração
                     </Table.Th>
                     <Table.Th className="text-digiwhite1624-bold">
                       Performance
@@ -264,7 +264,18 @@ const EmployeesSection = () => {
                       </Table.Td>
                       <Table.Td>
                         <Text
-                          text={employee.jobTitles.join(', ')}
+                          text={employee.user?.isActive ? 'Ativo' : 'Inativo'}
+                          styles={classNames(
+                            'text-digiblack1624-normal',
+                            employee.user?.isActive
+                              ? '!text-digigreen'
+                              : '!text-digired'
+                          )}
+                        />
+                      </Table.Td>
+                      <Table.Td>
+                        <Text
+                          text={employee.jobTitles[0]?.name || 'N/A'}
                           styles="text-digiblack1624-normal"
                         />
                       </Table.Td>
@@ -287,13 +298,6 @@ const EmployeesSection = () => {
                         <Text
                           text={translateEmployeeStatus(employee.status)}
                           styles="text-digiblack1624-semibold"
-                        />
-                      </Table.Td>
-                      <Table.Td>
-                        <Text
-                          // text={employee.client?.name || 'N/A'}
-                          text={'N/A'}
-                          styles="text-digiblack1624-normal"
                         />
                       </Table.Td>
                       <Table.Td>

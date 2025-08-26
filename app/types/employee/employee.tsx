@@ -1,7 +1,8 @@
 import { CreateUserData, User } from '../user'
-import { UserLanguage } from '@/app/types/utils/language'
+import { Language, UserLanguage } from '@/app/types/utils/language'
 import { EmployeeSkill } from './skill'
 import { GenericJobTitle } from '../utils/job-title'
+import { EducationalQualification } from '../utils/educational-qualification'
 
 type EmergencyContact = {
   name: string
@@ -47,8 +48,8 @@ type Employee = {
   geographicAvailability?: string
   preferredWorkLocation?: string
   emergencyContact?: EmergencyContact
-  educationQualification?: string
-  languages?: UserLanguage[]
+  educationQualification?: EducationalQualification
+  languages?: Language[]
   photoUrl?: string
   currentLocation?: string
   needsHousing?: boolean
@@ -68,7 +69,6 @@ type Employee = {
   district?: string
   country: string
   dateOfBirth?: Date
-  phoneNumber?: string
 }
 
 type GenericEmployee = {
@@ -86,7 +86,7 @@ type GenericEmployee = {
 type CreateEmployeeData = {
   user: CreateUserData
   company?: string
-  jobTitles: GenericJobTitle[]
+  jobTitles: string[]
   department?: string
   departmentName?: string
   nationalId?: string

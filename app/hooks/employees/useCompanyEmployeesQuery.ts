@@ -1,5 +1,6 @@
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+import useDebouncedValue from '../useDebouncedValue'
 import axiosInstance from '../axiosInstance'
 import { GenericEmployee } from '@/app/types/employee/employee'
 import { mapGenericEmployee } from '@/app/mappers/employee/employee'
@@ -27,6 +28,8 @@ const useCompanyEmployeesQuery = (
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
 
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 1000)
+
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true)
@@ -34,8 +37,8 @@ const useCompanyEmployeesQuery = (
       try {
         // Build params only with non-empty values
         const params: Record<string, any> = {}
-        if (searchQuery && searchQuery.trim() !== '')
-          params.keyword = searchQuery
+        if (debouncedSearchQuery && debouncedSearchQuery.trim() !== '')
+          params.keyword = debouncedSearchQuery
         if (jobTitleFilter && jobTitleFilter.trim() !== '')
           params.job_title = jobTitleFilter
         if (availabilityFilter && availabilityFilter.length > 0)
@@ -71,7 +74,7 @@ const useCompanyEmployeesQuery = (
   }, [
     session?.accessToken,
     page,
-    searchQuery,
+    debouncedSearchQuery,
     jobTitleFilter,
     availabilityFilter,
     statusFilter,

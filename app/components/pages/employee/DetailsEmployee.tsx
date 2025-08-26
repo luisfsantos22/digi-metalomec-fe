@@ -16,6 +16,7 @@ import { useDeleteEmployee } from '@/app/hooks/employees/useDeleteEmployee'
 import ContainerCard from '../../Card/ContainerCard'
 import { EMPLOYEE_DETAILS_TABS } from '@/app/constants'
 import GeneralInfoEmployee from './GeneralInfoEmployee'
+import PrimaryButton from '../../Button/PrimaryButton'
 
 type DetailsEmployeeProps = {
   session: Session | null
@@ -75,7 +76,7 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
   }
 
   return (
-    <div className="flex flex-col lg:items-start lg:justify-start items-center justify-center px-4 lg:px-0 lg:gap-8 gap-4 w-full">
+    <div className="flex flex-col lg:items-start lg:justify-start items-center justify-center px-4 pb-4 lg:px-0 lg:gap-8 gap-4 w-full">
       {/* Title */}
       <div className="flex lg:flex-row flex-col w-full items-center lg:gap-2 gap-4">
         <div className="lg:w-1/3 lg:block hidden">
@@ -98,6 +99,19 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
           styles="lg:w-2/3 w-full lg:text-[32px] text-[20px] lg:leading-[40px] leading-[25px] font-semibold text-digiblack self-center text-center"
         />
         <div className="lg:w-1/3 w-full gap-2 flex items-center xl:justify-end justify-center">
+          <PrimaryButton
+            id="handle-activate-employee"
+            onClick={() => {
+              // Handle activate employee logic here
+            }}
+            text={employee?.user?.isActive ? 'Desativar' : 'Ativar'}
+            type="button"
+            extraStyles={
+              employee?.user?.isActive
+                ? '!bg-digibrown hover:!bg-digibrown/60 !text-white'
+                : '!bg-digigreen hover:!bg-digigreen/60 !text-white'
+            }
+          />
           <EditButton
             id={`edit-${employee?.id}`}
             onClick={() => {

@@ -37,12 +37,12 @@ const PrimaryButton = (props: PrimaryButtonProps) => {
           fullWidth && 'w-full',
           extraStyles,
           size === 'small'
-            ? 'px-2 py-1 text-digiblack1212-semibold'
+            ? 'px-4 py-2 text-digiblack1212-semibold'
             : size === 'medium'
-              ? 'px-4 py-2 text-digiblack1624-semibold'
+              ? 'px-4 py-2 text-digiblack1420-semibold'
               : size === 'large' && 'px-6 py-3 text-digiblack2025-semibold',
           'disabled:!text-gray-500 disabled:hover:cursor-not-allowed disabled:bg-gray-200',
-          'flex self-center justify-center items-center cursor-pointer rounded-xl bg-digiblue hover:bg-digiblue-hover'
+          'flex self-center justify-center items-center cursor-pointer rounded-2xl bg-digiblue hover:bg-digiblue-hover'
         )}
       >
         {text}

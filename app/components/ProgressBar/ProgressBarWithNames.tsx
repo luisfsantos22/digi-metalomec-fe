@@ -65,7 +65,7 @@ const ProgressBarWithNames = (props: ProgressBarWithNamesProps) => {
       })}
       {isDesktop && currentStep < totalSteps.length && (
         <div
-          className="flex items-center justify-center py-2 px-2 bg-white rounded-2xl hover:cursor-pointer"
+          className="flex items-center justify-center py-2 px-2 bg-white hover:bg-digiblue-hover rounded-2xl hover:cursor-pointer"
           onClick={() => setCurrentStep(currentStep + 1)}
         >
           <div className="flex flex-none h-4 w-4 items-start relative">

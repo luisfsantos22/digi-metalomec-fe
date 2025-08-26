@@ -9,10 +9,11 @@ type User = {
   email: string
   firstName: string
   lastName: string
-  is_active: boolean
+  isActive: boolean
   role: string
   fullName: string
   companyName: string
+  phoneNumber?: string
 }
 
 type CreateUserData = {

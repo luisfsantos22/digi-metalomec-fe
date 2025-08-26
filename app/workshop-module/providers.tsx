@@ -2,7 +2,7 @@
 import '@mantine/carousel/styles.css'
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
-import 'app/css/globals.css'
+import '@/app/css/globals.css'
 
 import { MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'

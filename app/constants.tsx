@@ -56,14 +56,6 @@ export const YES_NO_OPTIONS = [
   { value: false, label: 'Não' },
 ]
 
-export const EDUCATIONAL_QUALIFICATION_OPTIONS = [
-  { value: 'PRIMARY', label: 'Ensino Básico' },
-  { value: 'SECONDARY', label: 'Ensino Secundário' },
-  { value: 'BACHELOR', label: 'Licenciatura' },
-  { value: 'MASTER', label: 'Mestrado' },
-  { value: 'PHD', label: 'Doutoramento' },
-]
-
 export const CERTIFICATION_TABLE_LIST = [
   'Nome',
   'Emissor',

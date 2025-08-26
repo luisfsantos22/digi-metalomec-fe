@@ -8,7 +8,6 @@ import { GenericJobTitle } from '@/app/types/utils/job-title'
 import FormDropdown from '../Dropdown/FormDropdown'
 import {
   AVAILABILITY_STATUS,
-  EDUCATIONAL_QUALIFICATION_OPTIONS,
   EMPLOYEE_STATUS,
   YES_NO_OPTIONS,
 } from '@/app/constants'
@@ -18,6 +17,7 @@ import useJobTitlesSearchQuery from '@/app/hooks/employees/useJobTitlesSearchQue
 import FormDropdownMultiple from '../Dropdown/FormDropdownMultiple'
 import Separator from '../Separator/Separator'
 import CreateJobTitleModal from '../Modal/CreateJobTitleModal'
+import { EducationalQualification } from '@/app/types/utils/educational-qualification'
 
 type EmployeeFormScreenProps = {
   formData: CreateEmployeeData
@@ -25,10 +25,18 @@ type EmployeeFormScreenProps = {
   setValue: UseFormSetValue<CreateEmployeeData>
   errors: FieldErrors<CreateEmployeeData>
   languagesAvailable: Language[]
+  educationalQualificationsAvailable: EducationalQualification[]
 }
 
 const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
-  const { formData, register, setValue, errors, languagesAvailable } = props
+  const {
+    formData,
+    register,
+    setValue,
+    errors,
+    languagesAvailable,
+    educationalQualificationsAvailable,
+  } = props
   const {
     jobTitles,
     departmentName,
@@ -57,9 +65,7 @@ const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
 
   // Selected job title object
   const [selectedJobTitle, setSelectedJobTitle] =
-    useState<GenericJobTitle | null>(
-      jobTitles?.length > 0 ? jobTitles[0] : null
-    )
+    useState<GenericJobTitle | null>(null)
   const [showCreateJobTitleModal, setShowCreateJobTitleModal] = useState(false)
   const [jobTitleObject, setJobTitleObject] = useState<GenericJobTitle>({
     id: '',
@@ -126,7 +132,7 @@ const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
               // If selected from search, set jobTitles to [id]
               const found = searchedJobTitles.find((jt) => jt.name === name)
               if (found) {
-                setValue('jobTitles', [found])
+                setValue('jobTitles', [found?.id])
                 setSelectedJobTitle(found)
               } else {
                 // If not found, treat as new creation (could trigger modal or API call)
@@ -137,7 +143,7 @@ const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
             }}
             setSelectedObj={(obj) => {
               if (obj) {
-                setValue('jobTitles', [obj])
+                setValue('jobTitles', [obj?.id])
                 setSelectedJobTitle(obj)
               } else {
                 setValue('jobTitles', [])
@@ -289,7 +295,10 @@ const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
             {...register('medicalCertificationExpiry', { required: false })}
           />
           <FormDropdown
-            choices={EDUCATIONAL_QUALIFICATION_OPTIONS}
+            choices={educationalQualificationsAvailable.map((eq) => ({
+              label: eq.name,
+              value: eq.id,
+            }))}
             selectedValue={educationQualification}
             setSelectedValue={(value) =>
               setValue('educationQualification', value as unknown as string)

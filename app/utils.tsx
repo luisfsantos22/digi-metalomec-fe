@@ -1,7 +1,9 @@
 import moment from 'moment'
 
 export function formatDate(date: Date) {
-  return moment(date).format('MMM Do YY')
+  moment.locale('pt')
+
+  return moment(date).format('L')
 }
 
 export function translateEmployeeStatus(status: string) {
