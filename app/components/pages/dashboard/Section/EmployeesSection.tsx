@@ -197,7 +197,7 @@ const EmployeesSection = () => {
                   setTabActive('employees')
                   router.push('/employee/add')
                 }}
-                size="w-10 h-10 xl:w-12 xl:h-12"
+                size="w-10 h-10 lg:w-12 lg:h-12"
               />
             </div>
             {loading && activePage > 1 && <OverlaySpinner />}
@@ -350,7 +350,7 @@ const EmployeesSection = () => {
                 onChange={setActivePage}
                 radius="xl"
                 color="#478ac9"
-                className="flex justify-center xl:justify-end"
+                className="flex justify-center lg:justify-end"
               />
             </div>
           </div>

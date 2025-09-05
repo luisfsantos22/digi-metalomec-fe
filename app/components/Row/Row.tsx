@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react'
 import AddButton from '../Button/AddButton'
+import { classNames } from '@/utils'
 
 export default function Row({
   title,
@@ -10,16 +11,18 @@ export default function Row({
   tooltipText,
   id,
   children,
+  extraStyles = '',
 }: {
   title?: string
   withAddButton?: boolean
   action?: () => void
   tooltipText?: string
   id?: string
+  extraStyles?: string
   children: ReactNode
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className={classNames(extraStyles, 'flex flex-col gap-2')}>
       <div className="flex items-center justify-between w-full">
         {title && <h3 className="text-digiblack1825-semibold">{title}</h3>}
         {withAddButton && (

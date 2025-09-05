@@ -57,7 +57,7 @@ type Employee = {
   status: string
   workPermitExpiry?: Date | null
   medicalCertificationExpiry?: Date | null
-  skills?: string[]
+  skills?: EmployeeSkill[]
   certifications?: EmployeeCertification[]
   performances?: Performance[]
   createdAt: Date

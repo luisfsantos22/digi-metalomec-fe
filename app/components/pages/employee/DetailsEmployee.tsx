@@ -20,6 +20,7 @@ import PrimaryButton from '../../Button/PrimaryButton'
 import { useActivationEmployee } from '@/app/hooks/employees/useActivationEmployee'
 import { classNames } from '@/utils'
 import CertificationsEmployee from './CertificationsEmployee'
+import TechnicalQualificationsEmployee from './TechnicalQualificationsEmployee'
 
 type DetailsEmployeeProps = {
   session: Session | null
@@ -123,7 +124,7 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
           }
           styles="lg:w-2/3 w-full lg:text-[32px] text-[20px] lg:leading-[40px] leading-[25px] font-semibold text-digiblack self-center text-center"
         />
-        <div className="lg:w-1/3 w-full gap-2 flex items-center xl:justify-end justify-center">
+        <div className="lg:w-1/3 w-full gap-2 flex items-center lg:justify-end justify-center">
           <PrimaryButton
             id="handle-activate-employee"
             onClick={() => {
@@ -185,8 +186,7 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
         ) : tab === 'certifications' ? (
           <CertificationsEmployee certifications={employee?.certifications} />
         ) : tab === 'technicalQualifications' ? (
-          // <TechnicalQualificationsEmployee employee={employee} />
-          <></>
+          <TechnicalQualificationsEmployee skills={employee?.skills} />
         ) : null}
       </ContainerCard>
 

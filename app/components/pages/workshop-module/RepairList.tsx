@@ -113,7 +113,7 @@ export default function RepairList() {
             }}
             tooltipText={'Criar nova reparação'}
             size="lg:w-20 lg:h-20 h-10 w-10"
-            width={'300'}
+            widthTooltip={'300'}
           />
         )}
       </div>
@@ -138,7 +138,7 @@ export default function RepairList() {
               router.push('/workshop-module/repair/create')
             }}
             tooltipText={'Criar nova reparação'}
-            width="300"
+            widthTooltip="300"
           />
         </div>
       ) : (

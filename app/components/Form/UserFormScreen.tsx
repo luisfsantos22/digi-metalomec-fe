@@ -265,7 +265,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           setQuery={(e) => setValue('postalCode', e as unknown as string)}
           placeholder="1000-000"
           inputType="text"
-          width="xl:w-40 w-full"
+          width="lg:w-40 w-full"
           mandatory={false}
           label="Código Postal"
           labelStyles="text-digiblack1420-semibold flex gap-1"

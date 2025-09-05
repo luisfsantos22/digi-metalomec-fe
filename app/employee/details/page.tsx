@@ -15,8 +15,8 @@ const DetailEmployeePage = async ({
   if (!session) {
     redirect('/auth/signin')
   }
-
-  const employeeId = searchParams.id
+  const { id } = await searchParams
+  const employeeId = id
 
   return (
     <GeneralLayout session={session}>

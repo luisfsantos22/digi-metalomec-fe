@@ -1,4 +1,3 @@
-import { EmployeeCertification } from '@/app/types/employee/employee'
 import Label from '../../Label/Label'
 import Row from '../../Row/Row'
 import Collapsible from '../../Collapsible/Collapsible'
@@ -8,32 +7,33 @@ import { formatDate } from '@/app/utils'
 import Separator from '../../Separator/Separator'
 import Text from '../../Text/Text'
 import AddButton from '../../Button/AddButton'
+import { EmployeeSkill } from '@/app/types/employee/skill'
 
-type CertificationsEmployeeProps = {
-  certifications: EmployeeCertification[] | undefined
+type TechnicalQualificationsEmployeeProps = {
+  skills: EmployeeSkill[] | undefined
 }
 
-export default function CertificationsEmployee(
-  props: CertificationsEmployeeProps
+export default function TechnicalQualificationsEmployee(
+  props: TechnicalQualificationsEmployeeProps
 ) {
-  const { certifications } = props
+  const { skills } = props
 
   //TODO: request for edit, delete and add btn
 
-  if (!certifications || certifications.length === 0) {
+  if (!skills || skills.length === 0) {
     return (
       <div className="flex flex-col gap-4 justify-center items-center">
         <Text
           header="h2"
           styles="text-digired2025-semibold text-center"
-          text="Nenhuma certificação encontrada"
+          text="Nenhuma habilidade técnica encontrada"
         />
         <AddButton
-          id="add-certification"
+          id="add-skill"
           onClick={() => {
             /* handle add */
           }}
-          tooltipText="Adicionar Certificação"
+          tooltipText="Adicionar Habilidade Técnica"
           size="h-20 w-20"
           widthTooltip="300"
         />
@@ -49,29 +49,29 @@ export default function CertificationsEmployee(
           styles="text-digiblack2025-normal lg:text-left text-center"
           text={
             <span>
-              Total de Certificações:{' '}
-              <strong>{certifications?.length || 0}</strong>
+              Total de Habilidades Técnicas:{' '}
+              <strong>{skills?.length || 0}</strong>
               <span className="text-digiblack1212-semibold">
                 {' '}
-                (Lista de Certificações associadas a este colaborador)
+                (Lista de Habilidades Técnicas associadas a este colaborador)
               </span>
             </span>
           }
         />
         <AddButton
-          id="add-certification"
+          id="add-skill"
           onClick={() => {
             /* handle add */
           }}
-          tooltipText="Adicionar Certificação"
+          tooltipText="Adicionar Habilidade Técnica"
           size="h-10 w-10"
         />
       </div>
 
       <div className="flex flex-col gap-4 max-h-[25rem] overflow-y-auto border border-digiblue py-4 px-6 rounded-2xl">
-        {certifications?.map((certification, index) => (
+        {skills?.map((skill, index) => (
           <div
-            key={certification?.id}
+            key={skill?.id}
             className="flex flex-col gap-4"
           >
             <Collapsible
@@ -79,73 +79,53 @@ export default function CertificationsEmployee(
                 <div className="flex flex-row items-start lg:items-center justify-between gap-2">
                   <Row extraStyles="flex-1">
                     <Label
-                      label="Nome da Certificação"
-                      value={certification?.name || undefined}
+                      label="Nome da Habilidade Técnica"
+                      value={skill?.name || undefined}
                     />
                     <Label
-                      label="Emitido Por"
-                      value={certification?.issuer || undefined}
+                      label="Nível"
+                      value={skill?.level || undefined}
                     />
                     <Label
-                      label="Data de Emissão"
+                      label="Data de Aquisição"
                       value={
-                        certification?.issuedAt
-                          ? formatDate(certification?.issuedAt)
+                        skill?.acquiredAt
+                          ? formatDate(skill?.acquiredAt)
                           : undefined
-                      }
-                    />
-                    <Label
-                      label="Data de Validade"
-                      value={
-                        certification?.expiresAt
-                          ? formatDate(certification?.expiresAt)
-                          : undefined
-                      }
-                    />
-                    <Label
-                      label="Valido por (dias)"
-                      value={
-                        certification?.validForDays?.toString() || undefined
                       }
                     />
                   </Row>
                   <div className="flex flex-row gap-2 pt-2 lg:pt-0">
                     <EditButton
-                      id={`edit-cert-${certification?.id}`}
+                      id={`edit-skill-${skill?.id}`}
                       onClick={() => {
                         /* handle edit */
                       }}
-                      tooltipText="Editar Certificação"
+                      tooltipText="Editar Habilidade Técnica"
                       hasTooltip={true}
                     />
                     <DeleteButton
-                      id={`delete-cert-${certification?.id}`}
+                      id={`delete-skill-${skill?.id}`}
                       onClick={() => {
                         /* handle delete */
                       }}
-                      tooltipText="Remover Certificação"
+                      tooltipText="Remover Habilidade Técnica"
                       hasTooltip={true}
                     />
                   </div>
                 </div>
               }
-              buttonId={`toggle-cert-${certification?.id}`}
+              buttonId={`toggle-skill-${skill?.id}`}
               fullWidth
             >
               <Row>
                 <Label
                   label="Descrição"
-                  value={certification?.description || undefined}
-                />
-              </Row>
-              <Row>
-                <Label
-                  label="URL"
-                  value={certification?.certificateUrl || undefined}
+                  value={skill?.description || undefined}
                 />
               </Row>
             </Collapsible>
-            {index < certifications.length - 1 && <Separator />}
+            {index < skills.length - 1 && <Separator />}
           </div>
         ))}
       </div>

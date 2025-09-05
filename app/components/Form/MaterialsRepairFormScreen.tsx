@@ -64,7 +64,7 @@ const MaterialsRepairFormScreen = (props: MaterialsRepairFormScreenProps) => {
             }}
             tooltipText={'Criar novo material'}
             size="lg:w-12 lg:h-12 h-10 w-10"
-            width={'300'}
+            widthTooltip={'300'}
             position="top"
           />
         </div>

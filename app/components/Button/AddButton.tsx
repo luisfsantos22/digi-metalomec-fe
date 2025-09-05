@@ -7,7 +7,7 @@ type AddButtonProps = {
   id: string
   tooltipText?: string
   size?: string
-  width?: string
+  widthTooltip?: string
   position?: 'top' | 'bottom' | 'left' | 'right'
 }
 
@@ -17,7 +17,7 @@ const AddButton = (props: AddButtonProps) => {
     id,
     tooltipText = '',
     size = 'lg:h-32 lg:w-32 w-10 h-10',
-    width = 'auto',
+    widthTooltip = 'auto',
     position = 'bottom',
   } = props
 
@@ -41,7 +41,7 @@ const AddButton = (props: AddButtonProps) => {
         anchorSelect={id}
         position={position}
         withArrow={false}
-        width={width}
+        width={widthTooltip}
       />
     </div>
   )
