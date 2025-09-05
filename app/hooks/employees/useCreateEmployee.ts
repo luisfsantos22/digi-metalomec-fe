@@ -7,7 +7,7 @@ import { EMPLOYEE_ENDPOINTS } from '../api/endpoints'
 import snakecaseKeys from 'snakecase-keys'
 
 interface UseCreateEmployeeResult {
-  createEmployee: (employeeData: any) => Promise<void>
+  createEmployee: (employeeData: any) => Promise<string | null>
   loading: boolean
   error: string | null
 }
@@ -23,10 +23,8 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
     setError(null)
 
     const payload = snakecaseKeys(employeeData, { deep: true })
-    console.log('Payload to create employee:', payload)
-    //#TODO: fix add
     try {
-      await axiosInstance.post(
+      const response = await axiosInstance.post(
         EMPLOYEE_ENDPOINTS.employees,
         JSON.stringify(payload),
         {
@@ -35,13 +33,16 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
           },
         }
       )
+      const id = response?.data?.id || null
       notifications.show({
         title: 'Sucesso',
         color: 'green',
         message: 'Colaborador criado com sucesso!',
         position: 'top-right',
       })
-      router.push('/dashboard?module=employees')
+      router.push(`/employee/details?id=${id}`)
+
+      return id
     } catch {
       setError('Failed to create employee')
       notifications.show({
@@ -50,6 +51,8 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
         message: 'Falha ao criar o colaborador. Tente novamente.',
         position: 'top-right',
       })
+
+      return null
     } finally {
       setLoading(false)
     }

@@ -1,8 +1,8 @@
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import axiosInstance from '../axiosInstance'
-import { Language } from '@/app/types/utils/Language'
 import { mapLanguage } from '@/app/mappers/utils/language'
+import { Language } from '@/app/types/utils/language'
 
 export const useLanguagesQuery = () => {
   const { data: session } = useSession()

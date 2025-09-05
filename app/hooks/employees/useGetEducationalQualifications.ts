@@ -24,7 +24,7 @@ const useGetEducationalQualifications = () => {
             Authorization: `Bearer ${session?.accessToken}`,
           },
         })
-        const qualifications = response.data.map((item: any) =>
+        const qualifications = response?.data?.map((item: any) =>
           mapEducationalQualification(item)
         )
         setQualifications(qualifications)

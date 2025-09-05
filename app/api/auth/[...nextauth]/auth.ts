@@ -1,7 +1,6 @@
 import CredentialsProvider from 'next-auth/providers/credentials'
 import axiosInstance from '@/app/hooks/axiosInstance'
 import { AUTH_ENDPOINTS } from '@/app/hooks/api/endpoints'
-import { translateRole } from '@/utils'
 import type { AuthOptions } from 'next-auth'
 import jwt from 'jsonwebtoken'
 
@@ -45,6 +44,7 @@ const authOptions: AuthOptions = {
               last_name: userData.user.last_name,
               refresh: data.refresh,
               company_name: userData.user.company_name || '',
+              company_id: userData.user.company_id || '',
             }
           }
 
@@ -85,6 +85,7 @@ const authOptions: AuthOptions = {
           accessToken: user.access,
           refreshToken: user.refresh || '',
           companyName: user.company_name || '',
+          companyId: user.company_id || '',
         }
       }
 
@@ -102,6 +103,7 @@ const authOptions: AuthOptions = {
           fullName: token.fullName,
           role: token.role,
           companyName: token.companyName || '',
+          companyId: token.companyId || '',
         },
         accessToken: token.accessToken,
         refreshToken: token.refreshToken,

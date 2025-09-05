@@ -26,7 +26,6 @@ import { classNames } from '@/utils'
 import AddButton from '@/app/components/Button/AddButton'
 import FormCheckbox from '@/app/components/Form/FormCheckbox'
 import { AVAILABILITY_STATUS, EMPLOYEE_STATUS } from '@/app/constants'
-import { set } from 'react-hook-form'
 import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
 
@@ -55,6 +54,8 @@ const EmployeesSection = () => {
     useState<boolean>(false)
   const [selectedEmployee, setSelectedEmployee] =
     useState<GenericEmployee | null>(null)
+  // State to force refresh
+  const [refreshFlag, setRefreshFlag] = useState(false)
 
   // useQueries
   const { employees, loading, error, count } = useCompanyEmployeesQuery(
@@ -62,7 +63,8 @@ const EmployeesSection = () => {
     searchQuery,
     jobTitleFilter,
     availabilityFilter,
-    statusFilter
+    statusFilter,
+    refreshFlag // add refreshFlag as a dependency
   )
 
   // Employee deletion function
@@ -81,6 +83,7 @@ const EmployeesSection = () => {
     await deleteEmployee(id, token)
     setAreYouSureToDeleteOpen(false)
     setSelectedEmployee(null)
+    setRefreshFlag((prev) => !prev) // toggle to force refresh
   }
 
   return (

@@ -16,19 +16,20 @@ type SearchInputProps = {
   dataIsLoading?: boolean
   label?: string
   labelStyles?: string
-  value?: string
-  setValue?: (value: string) => void
+  value: string
+  setValue: (value: string) => void
   setSelectedObj: (obj: any) => void
   setShowCreateModal: (show: boolean) => void
   createText?: string
   source: 'JobTitle'
   setIsDropdownOpen: (isOpen: boolean) => void
   isDropdownOpen?: boolean
+  seletectedObjValue?: string
 }
 
 const SearchInput = (props: SearchInputProps) => {
   const {
-    query,
+    query = '',
     setQuery,
     placeholder,
     disabled = false,
@@ -40,7 +41,7 @@ const SearchInput = (props: SearchInputProps) => {
     width = 'w-full',
     label,
     labelStyles = 'text-digiblack1624-semibold',
-    value,
+    value = '',
     setValue,
     setSelectedObj,
     setShowCreateModal,
@@ -48,6 +49,7 @@ const SearchInput = (props: SearchInputProps) => {
     source,
     setIsDropdownOpen,
     isDropdownOpen = false,
+    seletectedObjValue = '',
   } = props
 
   const dropdownRef = useOutsideClick(() => setIsDropdownOpen(false))
@@ -73,10 +75,13 @@ const SearchInput = (props: SearchInputProps) => {
             disabled={disabled}
             required={mandatory}
             placeholder={placeholder}
-            value={query}
+            value={seletectedObjValue ? seletectedObjValue : query}
+            readOnly={!!seletectedObjValue}
             onChange={(e) => {
-              setQuery(e.target.value)
-              setIsDropdownOpen(true)
+              if (!seletectedObjValue) {
+                setQuery(e.target.value)
+                setIsDropdownOpen(true)
+              }
             }}
             className={classNames(
               error
@@ -122,7 +127,7 @@ const SearchInput = (props: SearchInputProps) => {
                   width={64}
                 />
               </div>
-            ) : data?.length === 0 && query?.length > 0 ? (
+            ) : data && data?.length === 0 && query?.length > 0 ? (
               <div className="flex flex-col justify-center items-center p-4 h-full">
                 <Text
                   text="Nenhum resultado encontrado."
@@ -140,13 +145,14 @@ const SearchInput = (props: SearchInputProps) => {
                 </a>
               </div>
             ) : (
-              data.map((obj, index) => (
+              data &&
+              data?.map((obj, index) => (
                 <div
                   key={index}
                   className="p-2 hover:bg-gray-100 cursor-pointer"
                   onClick={() => {
                     if (source === 'JobTitle') {
-                      setValue?.(obj.id)
+                      setValue(obj.id)
                       setSelectedObj(obj)
                       setQuery(obj.name)
                       setIsDropdownOpen(false)

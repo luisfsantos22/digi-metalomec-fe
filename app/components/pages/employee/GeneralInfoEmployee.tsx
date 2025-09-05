@@ -3,6 +3,7 @@ import Label from '../../Label/Label'
 import Row from '../../Row/Row'
 import { formatDate } from '@/app/utils'
 import Image from 'next/image'
+import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from '@/app/constants'
 
 type GeneralInfoEmployeeProps = {
   employee: Employee | null
@@ -37,11 +38,21 @@ export default function GeneralInfoEmployee(props: GeneralInfoEmployeeProps) {
         <Label
           label="Telefone"
           type="phone"
-          value={employee?.user?.phoneNumber}
+          value={
+            employee?.user?.phoneNumber
+              ? employee?.user?.phoneNumber
+              : undefined
+          }
         />
         <Label
           label="Estado Civil"
-          value={employee?.maritalStatus ? employee?.maritalStatus : undefined}
+          value={
+            employee?.maritalStatus
+              ? MARITAL_STATUS_OPTIONS.find(
+                  (option) => option.value === employee?.maritalStatus
+                )?.label
+              : undefined
+          }
         />
         <Label
           label="Data de Nascimento"
@@ -104,7 +115,7 @@ export default function GeneralInfoEmployee(props: GeneralInfoEmployeeProps) {
         <Label
           label="Linguagens"
           value={
-            employee?.languages
+            employee?.languages && employee?.languages?.length > 0
               ? employee?.languages?.map((lang) => lang.name).join(', ')
               : undefined
           }
@@ -119,7 +130,13 @@ export default function GeneralInfoEmployee(props: GeneralInfoEmployeeProps) {
         />
         <Label
           label="Género"
-          value={employee?.gender ? employee?.gender : undefined}
+          value={
+            employee?.gender
+              ? GENDER_OPTIONS.find(
+                  (option) => option.value === employee?.gender
+                )?.label
+              : undefined
+          }
         />
       </Row>
       <Row>

@@ -43,9 +43,8 @@ const CertificationModal = (props: CertificationModalProps) => {
             id: generateUuid(),
             name: '',
             issuer: '',
-            issueDate: new Date(),
             description: '',
-            validityPeriod: null,
+            validForDays: null,
             issuedAt: null,
             expiresAt: null,
             certificateUrl: '',
@@ -54,9 +53,8 @@ const CertificationModal = (props: CertificationModalProps) => {
             id: seletectedCertification?.id || generateUuid(),
             name: seletectedCertification?.name || '',
             issuer: seletectedCertification?.issuer || '',
-            issueDate: seletectedCertification?.issueDate || new Date(),
             description: seletectedCertification?.description || '',
-            validityPeriod: seletectedCertification?.validityPeriod || null,
+            validForDays: seletectedCertification?.validForDays || null,
             issuedAt: seletectedCertification?.issuedAt ?? null,
             expiresAt: seletectedCertification?.expiresAt ?? null,
             certificateUrl: seletectedCertification?.certificateUrl || '',
@@ -67,11 +65,11 @@ const CertificationModal = (props: CertificationModalProps) => {
     if (
       tempEmployeeCertification.expiresAt !== undefined &&
       tempEmployeeCertification.expiresAt !== null &&
-      tempEmployeeCertification.issueDate !== undefined &&
-      tempEmployeeCertification.issueDate !== null
+      tempEmployeeCertification.issuedAt !== undefined &&
+      tempEmployeeCertification.issuedAt !== null
     ) {
       const expiresAtDate = new Date(tempEmployeeCertification.expiresAt)
-      const issueDateDate = new Date(tempEmployeeCertification.issueDate)
+      const issueDateDate = new Date(tempEmployeeCertification.issuedAt)
       if (!isNaN(expiresAtDate.getTime()) && !isNaN(issueDateDate.getTime())) {
         const validityPeriod = Math.ceil(
           (expiresAtDate.getTime() - issueDateDate.getTime()) /
@@ -79,11 +77,11 @@ const CertificationModal = (props: CertificationModalProps) => {
         )
         setTempEmployeeCertification((prev) => ({
           ...prev,
-          validityPeriod,
+          validForDays: validityPeriod,
         }))
       }
     }
-  }, [tempEmployeeCertification.issueDate, tempEmployeeCertification.expiresAt])
+  }, [tempEmployeeCertification.issuedAt, tempEmployeeCertification.expiresAt])
 
   const createCertificate = () => {
     if (action === 'add') {
@@ -98,8 +96,7 @@ const CertificationModal = (props: CertificationModalProps) => {
         id: seletectedCertification?.id || generateUuid(),
         name: tempEmployeeCertification.name,
         issuer: tempEmployeeCertification.issuer,
-        issueDate: tempEmployeeCertification.issueDate,
-        validityPeriod: tempEmployeeCertification.validityPeriod,
+        validForDays: tempEmployeeCertification.validForDays,
         issuedAt: tempEmployeeCertification.issuedAt,
         expiresAt: tempEmployeeCertification.expiresAt,
         certificateUrl: tempEmployeeCertification.certificateUrl,
@@ -174,17 +171,17 @@ const CertificationModal = (props: CertificationModalProps) => {
             label="Data de Emissão"
             labelStyles="text-digiblack1420-semibold flex gap-1"
             error={
-              errors?.certifications?.[indexNumber]?.issueDate
+              errors?.certifications?.[indexNumber]?.issuedAt
                 ? 'Data de Emissão é obrigatória'
                 : undefined
             }
             placeholder="dd/mm/aaaa"
             mandatory
-            query={tempEmployeeCertification.issueDate as unknown as string}
+            query={tempEmployeeCertification.issuedAt as unknown as string}
             setQuery={(value) =>
               setTempEmployeeCertification((prev) => ({
                 ...prev,
-                issueDate: value as unknown as Date,
+                issuedAt: value as unknown as Date,
               }))
             }
             inputType="date"
@@ -220,7 +217,7 @@ const CertificationModal = (props: CertificationModalProps) => {
             mandatory={false}
             disabled
             inputType="number"
-            query={tempEmployeeCertification.validityPeriod || undefined}
+            query={tempEmployeeCertification.validForDays || undefined}
             setQuery={() => {}}
             width="lg:w-1/3 w-full"
           />
@@ -274,7 +271,7 @@ const CertificationModal = (props: CertificationModalProps) => {
               !(
                 tempEmployeeCertification.name &&
                 tempEmployeeCertification.issuer &&
-                tempEmployeeCertification.issueDate &&
+                tempEmployeeCertification.issuedAt &&
                 tempEmployeeCertification.expiresAt
               )
             }

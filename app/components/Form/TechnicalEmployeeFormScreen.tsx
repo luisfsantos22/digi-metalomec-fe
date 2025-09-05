@@ -115,11 +115,11 @@ const TechnicalEmployeeFormScreen = (
                       <TableRow>
                         <Text
                           text={
-                            (certificate?.validityPeriod as unknown as string) ||
+                            (certificate?.validForDays as unknown as string) ||
                             '---'
                           }
                           styles={
-                            certificate?.validityPeriod
+                            certificate?.validForDays
                               ? 'text-digigreen1624-normal'
                               : 'text-digired1624-normal'
                           }

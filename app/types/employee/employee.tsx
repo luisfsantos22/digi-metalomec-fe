@@ -5,24 +5,23 @@ import { GenericJobTitle } from '../utils/job-title'
 import { EducationalQualification } from '../utils/educational-qualification'
 
 type EmergencyContact = {
-  name: string
-  phone: string
-  relationship: string
+  name?: string
+  phone?: string
+  relationship?: string
 }
 
 type Certification = {
-  id: string
+  id?: string
   name: string
   issuer: string
-  issueDate: Date
   description?: string
-  validityPeriod?: number | null // in years
 }
 
 type EmployeeCertification = Certification & {
   issuedAt?: Date | null
   expiresAt?: Date | null
   certificateUrl?: string | null
+  validForDays?: number | null
 }
 
 type Performance = {
@@ -59,7 +58,7 @@ type Employee = {
   workPermitExpiry?: Date | null
   medicalCertificationExpiry?: Date | null
   skills?: string[]
-  certifications?: Certification[]
+  certifications?: EmployeeCertification[]
   performances?: Performance[]
   createdAt: Date
   updatedAt: Date
@@ -85,14 +84,13 @@ type GenericEmployee = {
 
 type CreateEmployeeData = {
   user: CreateUserData
-  company?: string
-  jobTitles: string[]
+  jobTitles: GenericJobTitle[]
   department?: string
   departmentName?: string
   nationalId?: string
   nif?: string
   socialSecurityNumber?: string
-  collaborationStartDate?: Date
+  collaborationStartDate?: string
   gender?: string
   maritalStatus?: string
   transportAvailable?: boolean
@@ -125,4 +123,5 @@ export type {
   EmployeeCertification,
   Employee,
   CreateEmployeeData,
+  Certification,
 }

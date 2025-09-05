@@ -17,6 +17,9 @@ import ContainerCard from '../../Card/ContainerCard'
 import { EMPLOYEE_DETAILS_TABS } from '@/app/constants'
 import GeneralInfoEmployee from './GeneralInfoEmployee'
 import PrimaryButton from '../../Button/PrimaryButton'
+import { useActivationEmployee } from '@/app/hooks/employees/useActivationEmployee'
+import { classNames } from '@/utils'
+import CertificationsEmployee from './CertificationsEmployee'
 
 type DetailsEmployeeProps = {
   session: Session | null
@@ -31,10 +34,21 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
 
   const [tabActive, setTabActive] = useAtom(mainPageActiveTab)
   const employeeId = searchParams.get('id')
-  const { loading, error, employee } = useGetEmployee(employeeId ?? '')
+
+  const [activationTrigger, setActivationTrigger] = useState(0)
+  const { loading, error, employee } = useGetEmployee(employeeId ?? '', [
+    activationTrigger,
+  ])
   const { deleteEmployee } = useDeleteEmployee()
+  const {
+    activationEmployee,
+    loading: activatingLoading,
+    error: activatingError,
+  } = useActivationEmployee()
 
   const [areYouSureToDeleteOpen, setAreYouSureToDeleteOpen] =
+    useState<boolean>(false)
+  const [areYouSureToActivateOpen, setAreYouSureToActivateOpen] =
     useState<boolean>(false)
   const [tab, setTab] = useState<string>(
     EMPLOYEE_DETAILS_TABS?.find((t) => t.value === 'general')?.value ||
@@ -73,6 +87,17 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
   const handleDelete = async (id: string, token: string) => {
     await deleteEmployee(id, token)
     setAreYouSureToDeleteOpen(false)
+    router.push('/dashboard?module=employees')
+  }
+
+  const handleActivation = async (
+    id: string,
+    isActive: boolean,
+    token: string
+  ) => {
+    await activationEmployee(id, isActive, token)
+    setAreYouSureToActivateOpen(false)
+    setActivationTrigger((prev) => prev + 1)
   }
 
   return (
@@ -102,7 +127,7 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
           <PrimaryButton
             id="handle-activate-employee"
             onClick={() => {
-              // Handle activate employee logic here
+              setAreYouSureToActivateOpen(true)
             }}
             text={employee?.user?.isActive ? 'Desativar' : 'Ativar'}
             type="button"
@@ -136,7 +161,10 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
       </div>
       <ContainerCard
         padding="lg:p-8 p-4"
-        styles="flex flex-col gap-4 w-full rounded-xl"
+        styles={classNames(
+          employee?.user?.isActive ? 'border-digigreen' : 'border-digibrown',
+          'flex flex-col gap-4 w-full rounded-xl border'
+        )}
         withTabs
         tabs={EMPLOYEE_DETAILS_TABS}
         activeTab={tab}
@@ -154,6 +182,11 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
           />
         ) : tab === 'general' ? (
           <GeneralInfoEmployee employee={employee} />
+        ) : tab === 'certifications' ? (
+          <CertificationsEmployee certifications={employee?.certifications} />
+        ) : tab === 'technicalQualifications' ? (
+          // <TechnicalQualificationsEmployee employee={employee} />
+          <></>
         ) : null}
       </ContainerCard>
 
@@ -171,6 +204,26 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
             setAreYouSureToDeleteOpen(false)
           }}
           primaryBtnText="Remover"
+        />
+      )}
+      {areYouSureToActivateOpen && (
+        <AreYouSureModal
+          isOpen={areYouSureToActivateOpen}
+          title={`${employee?.user?.isActive ? 'Desativar' : 'Ativar'} Colaborador`}
+          message={`Tem a certeza que deseja ${employee?.user?.isActive ? 'desativar' : 'ativar'} o colaborador selecionado (${employee?.user?.fullName})?`}
+          onConfirm={() => {
+            if (employeeId && accessToken) {
+              handleActivation(
+                employeeId,
+                employee?.user?.isActive ? false : true,
+                accessToken
+              )
+            }
+          }}
+          onClose={() => {
+            setAreYouSureToActivateOpen(false)
+          }}
+          primaryBtnText={employee?.user?.isActive ? 'Desativar' : 'Ativar'}
         />
       )}
     </div>

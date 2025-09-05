@@ -9,7 +9,7 @@ import useCreateJobTitle from '@/app/hooks/employees/useCreateJobTitle'
 type CreateJobTitleModalProps = {
   isOpen: boolean
   onClose: () => void
-  onConfirm: () => void
+  onConfirm: (createdJobTitle: GenericJobTitle) => void
   setNewJobTitle: (jobTitle: any) => void
   newJobTitle: GenericJobTitle | undefined
 }
@@ -21,9 +21,9 @@ const CreateJobTitleModal = (props: CreateJobTitleModalProps) => {
 
   const createExternalService = async () => {
     if (newJobTitle) {
-      await createJobTitle(newJobTitle)
-      if (!error) {
-        onConfirm()
+      const createdJobTitle = await createJobTitle(newJobTitle)
+      if (createdJobTitle && !error) {
+        onConfirm(createdJobTitle)
       }
     }
   }

@@ -20,7 +20,8 @@ const useCompanyEmployeesQuery = (
   searchQuery: string = '',
   jobTitleFilter: string = '',
   availabilityFilter: string[] = [],
-  statusFilter: string = ''
+  statusFilter: string = '',
+  refreshFlag: boolean = false
 ): useCompanyEmployeesQueryResult => {
   const { data: session } = useSession()
   const [employees, setEmployees] = useState<GenericEmployee[]>([])
@@ -29,6 +30,7 @@ const useCompanyEmployeesQuery = (
   const [error, setError] = useState<string | null>(null)
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 1000)
+  const debouncedJobTitleFilter = useDebouncedValue(jobTitleFilter, 1000)
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -39,8 +41,8 @@ const useCompanyEmployeesQuery = (
         const params: Record<string, any> = {}
         if (debouncedSearchQuery && debouncedSearchQuery.trim() !== '')
           params.keyword = debouncedSearchQuery
-        if (jobTitleFilter && jobTitleFilter.trim() !== '')
-          params.job_title = jobTitleFilter
+        if (debouncedJobTitleFilter && debouncedJobTitleFilter.trim() !== '')
+          params.job_title = debouncedJobTitleFilter
         if (availabilityFilter && availabilityFilter.length > 0)
           params.availability_status = availabilityFilter.join(',')
         if (statusFilter && statusFilter.trim() !== '')
@@ -75,9 +77,10 @@ const useCompanyEmployeesQuery = (
     session?.accessToken,
     page,
     debouncedSearchQuery,
-    jobTitleFilter,
+    debouncedJobTitleFilter,
     availabilityFilter,
     statusFilter,
+    refreshFlag,
   ])
 
   return { employees, loading, error, count }

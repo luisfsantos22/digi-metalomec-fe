@@ -7,22 +7,15 @@ import AreYouSureModal from '@/app/components/Modal/AreYouSureModal'
 import ProgressBarWithNames from '@/app/components/ProgressBar/ProgressBarWithNames'
 import Spinner from '@/app/components/Spinner/Spinner'
 import Text from '@/app/components/Text/Text'
-import {
-  AVAILABILITY_STATUS,
-  AVAILABLE_ROLES,
-  EMPLOYEE_STATUS,
-  NEW_EMPLOYEE_STEPS,
-} from '@/app/constants'
+import { NEW_EMPLOYEE_STEPS } from '@/app/constants'
 import { useGlobalLoading } from '@/app/hooks/utils/useGlobalLoading'
 import { useLanguagesQuery } from '@/app/hooks/utils/useLanguagesQuery'
-import useCreateEmployee from '@/app/hooks/employees/useCreateEmployee'
+// import useUpdateEmployee from '@/app/hooks/employees/useUpdateEmployee'
 import {
   CreateEmployeeData,
   EmployeeCertification,
 } from '@/app/types/employee/employee'
 import { notifications } from '@mantine/notifications'
-import { Session } from 'next-auth'
-import { redirect, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import UserFormScreen from '../../Form/UserFormScreen'
@@ -32,82 +25,22 @@ import { EmployeeSkill } from '@/app/types/employee/skill'
 import useGetEducationalQualifications from '@/app/hooks/employees/useGetEducationalQualifications'
 import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
+import useGetEmployee from '@/app/hooks/employees/useGetEmployee'
+import { useSearchParams } from 'next/navigation'
 
-type CreateEmployeeProps = {
-  session: Session | null
-}
+export default function EditEmployee() {
+  const searchParams = useSearchParams()
 
-export default function CreateEmployee(props: CreateEmployeeProps) {
-  const { session } = props
+  const employeeId = searchParams.get('id')
 
-  const {
-    register,
-    unregister,
-    watch,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<CreateEmployeeData>({
-    defaultValues: {
-      user: {
-        username: '',
-        email: '',
-        firstName: '',
-        lastName: '',
-        role: AVAILABLE_ROLES.find((role) => role.value === 'EMPLOYEE')?.value,
-        company: session?.user.companyId || '',
-        phoneNumber: '',
-      },
-      jobTitles: [],
-      department: '',
-      departmentName: '',
-      nationalId: undefined,
-      nif: undefined,
-      socialSecurityNumber: undefined,
-      collaborationStartDate: new Date().toISOString().slice(0, 10),
-      gender: undefined,
-      maritalStatus: undefined,
-      transportAvailable: undefined,
-      geographicAvailability: undefined,
-      preferredWorkLocation: undefined,
-      emergencyContact: {
-        name: undefined,
-        phone: undefined,
-        relationship: undefined,
-      },
-      educationQualification: undefined,
-      languages: [],
-      photoUrl: undefined,
-      currentLocation: undefined,
-      needsHousing: undefined,
-      housingProvided: undefined,
-      availabilityStatus: AVAILABILITY_STATUS.find(
-        (status) => status.value === 'AVAILABLE'
-      )?.value,
-      status: EMPLOYEE_STATUS.find((status) => status.value === 'NO_CONTRACT')
-        ?.value,
-      workPermitExpiry: null,
-      medicalCertificationExpiry: null,
-      skills: [],
-      certifications: [],
-      address: '',
-      postalCode: '',
-      city: '',
-      district: '',
-      country: '',
-    },
-  })
-
-  const formData = watch()
   const [tabActive, setTabActive] = useAtom(mainPageActiveTab)
-
-  const [canSubmit, setCanSubmit] = useState(false)
   const [currentStep, setCurrentStep] = useState<number>(1)
+  const [canSubmit, setCanSubmit] = useState(false)
 
   // Modal states
   const [
-    areYouSureCloseCreateEmployeeModal,
-    setAreYouSureCloseCreateEmployeeModal,
+    areYouSureCloseEditEmployeeModal,
+    setAreYouSureCloseEditEmployeeModal,
   ] = useState(false)
   const [
     areYouSureModalCertificationOpen,
@@ -116,7 +49,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
   const [areYouSureModalSkillOpen, setAreYouSureModalSkillOpen] =
     useState(false)
 
-  // Selectedskills and certifications states
+  // Selected skills and certifications states
   const [selectedSkill, setSelectedSkill] = useState<
     EmployeeSkill | undefined
   >()
@@ -124,8 +57,14 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
     EmployeeCertification | undefined
   >()
 
-  //UseQueries
+  // Fetch employee data
+  const {
+    employee,
+    loading: loadingEmployee,
+    error: errorEmployee,
+  } = useGetEmployee(employeeId ?? '')
 
+  // UseQueries
   const {
     languages: availableLanguages,
     loading: loadingLanguages,
@@ -138,10 +77,24 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
     error: educationalQualificationsError,
   } = useGetEducationalQualifications()
 
-  const { createEmployee, loading, error } = useCreateEmployee()
+  //   const { updateEmployee, loading, error } = useUpdateEmployee()
   const { startLoading, stopLoading } = useGlobalLoading()
 
-  // UseEffects
+  // Form setup
+  const {
+    register,
+    unregister,
+    watch,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    reset,
+  } = useForm<CreateEmployeeData>({
+    defaultValues: employee as CreateEmployeeData | undefined,
+  })
+
+  const formData = watch()
+
   useEffect(() => {
     setTabActive('employees')
   }, [])
@@ -151,18 +104,20 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
   }, [currentStep])
 
   useEffect(() => {
+    if (employee) {
+      reset(employee as CreateEmployeeData)
+    }
+  }, [employee, reset])
+
+  useEffect(() => {
     // Define mandatory fields
     const mandatoryEmployeeFields = [
       formData?.jobTitles?.length > 0 ? formData?.jobTitles[0] : undefined,
       formData?.country,
     ]
-
-    // Check if all mandatory fields are filled
     const isEmployeeDataValid = mandatoryEmployeeFields?.every(
       (field) => field !== '' && field !== undefined && field !== null
     )
-
-    // Validate user data
     const mandatoryUserFields = [
       formData?.user?.email,
       formData?.user?.firstName,
@@ -170,11 +125,11 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
       formData?.user?.role,
       formData?.user?.company,
     ]
-
     const isUserDataValid = mandatoryUserFields?.every(
       (field) => field !== '' && field !== undefined && field !== null
     )
 
+    console.log(isEmployeeDataValid, isUserDataValid)
     setCanSubmit(isEmployeeDataValid && isUserDataValid)
   }, [formData])
 
@@ -201,7 +156,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
       }
       try {
         startLoading()
-        await createEmployee(data)
+        // await updateEmployee(employeeId, data)
       } catch (err) {
         console.log(err)
       } finally {
@@ -210,11 +165,27 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
     }
   }
 
-  const handleBackToMenu = () => {
-    if (!formData || Object.keys(formData).length === 0) {
-      redirect('/dashboard?module=employees')
-    }
-    setAreYouSureCloseCreateEmployeeModal(true)
+  if (
+    !employeeId ||
+    loadingEmployee ||
+    loadingLanguages ||
+    loadingEducationalQualifications
+  ) {
+    return (
+      <div className="flex justify-center self-center items-center p-4 h-full ">
+        <Spinner />
+      </div>
+    )
+  }
+
+  if (errorEmployee) {
+    // Optionally show an error message instead of redirecting immediately
+    return (
+      <Text
+        text={`Erro: ${errorEmployee}`}
+        styles="text-red-500 text-center"
+      />
+    )
   }
 
   return (
@@ -223,92 +194,82 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
       <div className="flex w-full items-center gap-2">
         <div className="lg:w-1/3 lg:block hidden">
           <BackButton
-            id="back-btn-create-employee"
-            onClick={() => handleBackToMenu()}
+            id="back-btn-edit-employee"
+            onClick={() => setAreYouSureCloseEditEmployeeModal(true)}
             size="h-10 w-10"
           />
         </div>
         <Text
           header="h1"
-          text={'Criar Colaborador'}
+          text={'Editar Colaborador'}
           styles="lg:w-1/3 w-full lg:text-[32px] text-[20px] lg:leading-[40px] leading-[25px] font-semibold text-digiblack self-center text-center"
         />
         <div className="lg:w-1/3 lg:block hidden"></div>
       </div>
-
       <ProgressBarWithNames
         currentStep={currentStep}
         totalSteps={NEW_EMPLOYEE_STEPS}
         onClick={setCurrentStep}
         setCurrentStep={setCurrentStep}
       />
-      {loadingLanguages || loadingEducationalQualifications ? (
-        <div className="flex justify-center self-center items-center p-4 h-full ">
-          <Spinner />
-        </div>
-      ) : (
-        <form
-          onSubmit={handleSubmit(formSubmit)}
-          className="w-full flex flex-col gap-4"
-        >
+      <form
+        onSubmit={handleSubmit(formSubmit)}
+        className="w-full flex flex-col gap-4"
+      >
+        {
           {
-            {
-              1: (
-                <UserFormScreen
-                  formData={formData}
-                  register={register}
-                  setValue={setValue}
-                  errors={errors}
-                />
-              ),
-              2: (
-                <EmployeeFormScreen
-                  formData={formData}
-                  register={register}
-                  setValue={setValue}
-                  errors={errors}
-                  languagesAvailable={availableLanguages}
-                  educationalQualificationsAvailable={qualifications}
-                />
-              ),
-              3: (
-                <TechnicalEmployeeFormScreen
-                  formData={formData}
-                  register={register}
-                  setValue={setValue}
-                  errors={errors}
-                  setAreYouSureModalOpenCertificate={
-                    setAreYouSureModalCertificationOpen
-                  }
-                  setAreYouSureModalOpenSkill={setAreYouSureModalSkillOpen}
-                  selectedCertification={selectedCertification}
-                  setSelectedCertification={setSelectedCertification}
-                  selectedSkill={selectedSkill}
-                  setSelectedSkill={setSelectedSkill}
-                />
-              ),
-            }[currentStep]
-          }
-          <div className="flex flex-row gap-4 lg:gap-8 w-full items-center justify-center lg:justify-end">
-            <SecondaryButton
-              text="Cancelar"
-              id="cancelar"
-              onClick={() => {
-                setAreYouSureCloseCreateEmployeeModal(true)
-              }}
-            />
-
-            <PrimaryButton
-              text={'Criar'}
-              type="submit"
-              size={'medium'}
-              disabled={Object.keys(errors).length > 0 || !canSubmit}
-              id="btn-repair-action"
-              textDisabled="Preencha todos os campos obrigatórios"
-            />
-          </div>
-        </form>
-      )}
+            1: (
+              <UserFormScreen
+                formData={formData}
+                register={register}
+                setValue={setValue}
+                errors={errors}
+              />
+            ),
+            2: (
+              <EmployeeFormScreen
+                formData={formData}
+                register={register}
+                setValue={setValue}
+                errors={errors}
+                languagesAvailable={availableLanguages}
+                educationalQualificationsAvailable={qualifications}
+              />
+            ),
+            3: (
+              <TechnicalEmployeeFormScreen
+                formData={formData}
+                register={register}
+                setValue={setValue}
+                errors={errors}
+                setAreYouSureModalOpenCertificate={
+                  setAreYouSureModalCertificationOpen
+                }
+                setAreYouSureModalOpenSkill={setAreYouSureModalSkillOpen}
+                selectedCertification={selectedCertification}
+                setSelectedCertification={setSelectedCertification}
+                selectedSkill={selectedSkill}
+                setSelectedSkill={setSelectedSkill}
+              />
+            ),
+          }[currentStep]
+        }
+        <div className="flex flex-row gap-4 lg:gap-8 w-full items-center justify-center lg:justify-end">
+          <SecondaryButton
+            text="Cancelar"
+            id="cancelar"
+            onClick={() => setAreYouSureCloseEditEmployeeModal(true)}
+          />
+          <PrimaryButton
+            text={'Salvar'}
+            type="submit"
+            size={'medium'}
+            disabled={Object.keys(errors).length > 0 || !canSubmit}
+            id="btn-edit-employee-action"
+            textDisabled="Preencha todos os campos obrigatórios"
+          />
+        </div>
+      </form>
       {areYouSureModalSkillOpen && (
         <AreYouSureModal
           isOpen={areYouSureModalSkillOpen}
@@ -328,7 +289,6 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
                 unregister(`skills.${skillIndex}`)
               }
             }
-
             setValue('skills', updatedSkills)
             setSelectedSkill(undefined)
             setAreYouSureModalSkillOpen(false)
@@ -365,7 +325,6 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
                 unregister(`certifications.${certificationIndex}`)
               }
             }
-
             setValue('certifications', updatedCertifications)
             {
               const skillIndex = formData?.skills?.findIndex(
@@ -375,7 +334,6 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
                 unregister(`skills.${skillIndex}`)
               }
             }
-
             setSelectedCertification(undefined)
             setAreYouSureModalCertificationOpen(false)
             notifications.show({
@@ -389,14 +347,17 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
           message="Tem a certeza que pretende remover esta certificação?"
         />
       )}
-      {areYouSureCloseCreateEmployeeModal && (
+      {areYouSureCloseEditEmployeeModal && (
         <AreYouSureModal
-          isOpen={areYouSureCloseCreateEmployeeModal}
+          isOpen={areYouSureCloseEditEmployeeModal}
           onClose={() => {
-            setAreYouSureCloseCreateEmployeeModal(false)
+            setAreYouSureCloseEditEmployeeModal(false)
           }}
-          onConfirm={() => redirect('/dashboard?module=employees')}
-          title="Sair da Criação de um Novo Colaborador"
+          onConfirm={() => {
+            // Redirect to dashboard or previous page
+            window.location.href = '/dashboard?module=employees'
+          }}
+          title="Sair da Edição de um Colaborador"
           message="Tem a certeza que pretende sair?"
           primaryBtnText="Sair"
         />

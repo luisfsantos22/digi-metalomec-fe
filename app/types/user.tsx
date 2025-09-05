@@ -5,24 +5,25 @@ type UserCredentials = {
 
 type User = {
   id: string
-  username: string
+  username?: string
   email: string
   firstName: string
   lastName: string
   isActive: boolean
   role: string
   fullName: string
-  companyName: string
+  company: string
   phoneNumber?: string
 }
 
 type CreateUserData = {
-  username: string
+  username?: string
   email: string
   firstName: string
   lastName: string
   role: string
-  companyName: string
+  company: string
+  phoneNumber?: string
 }
 
 export type { UserCredentials, User, CreateUserData }

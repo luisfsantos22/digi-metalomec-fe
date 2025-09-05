@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { mapEmployee } from '@/app/mappers/employee/employee'
 import { Employee } from '@/app/types/employee/employee'
 
-const useGetEmployee = (employeeId: string) => {
+const useGetEmployee = (employeeId: string, deps: any[] = []) => {
   const { data: session } = useSession()
   const [employee, setEmployee] = useState<Employee | null>(null)
   const [loading, setLoading] = useState(false)
@@ -33,7 +33,7 @@ const useGetEmployee = (employeeId: string) => {
       }
     }
     fetchEmployee()
-  }, [session?.accessToken, employeeId])
+  }, [session?.accessToken, employeeId, ...deps])
 
   return { loading, error, employee }
 }

@@ -1,5 +1,8 @@
+import dynamic from 'next/dynamic'
 import Text from '../Text/Text'
-import IntlTelInput from 'intl-tel-input/reactWithUtils'
+const IntlTelInput = dynamic(() => import('intl-tel-input/reactWithUtils'), {
+  ssr: false,
+})
 import 'intl-tel-input/styles'
 
 import Image from 'next/image'
@@ -54,12 +57,12 @@ const Label = ({
                 'w-full h-auto max-h-32 object-contain p-2 disabled:cursor-not-allowed disabled:text-gray-400 line-clamp-1 text-left border-b-gray-300'
               }
             />
-          ) : type === 'phone' ? (
+          ) : type === 'phone' && value ? (
             <IntlTelInput
               initialValue={value || ''}
-              containerClassName="intl-tel-input"
-              inputClassName={valueStyles}
-              placeholder={'Por Preencher...'}
+              inputProps={{
+                placeholder: 'Por Preencher...',
+              }}
               initOptions={{
                 allowDropdown: false,
               }}

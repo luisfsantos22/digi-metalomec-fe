@@ -4,6 +4,7 @@ export const AUTH_ENDPOINTS = {
   login: 'api/v1/users/login/',
   refreshToken: 'api/v1/users/refresh/',
   logout: 'api/v1/users/logout/',
+  ping: 'api/v1/users/auth/ping/',
 } as const
 
 export const USER_ENDPOINTS = {
@@ -16,6 +17,8 @@ export const EMPLOYEE_ENDPOINTS = {
   getEmployeesPage: (page: number) =>
     `api/v1/employees/employees/?page=${page}`,
   getEmployeeById: (id: string) => `api/v1/employees/employees/${id}/`,
+  getEmployeeForActivation: (id: string) =>
+    `api/v1/employees/employees/${id}/activation/`,
   jobTitles: 'api/v1/employees/job-titles/',
   getEducationalQualifications: 'api/v1/employees/educational-qualifications/',
 }

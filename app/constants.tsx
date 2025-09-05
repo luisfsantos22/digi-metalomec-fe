@@ -18,17 +18,17 @@ export const AVAILABLE_ROLES = [
 
 export const AVAILABILITY_STATUS = [
   { value: 'Available', label: 'Disponível' },
-  { value: 'Unavailable', label: 'Indisponível' },
+  { value: 'Not Available', label: 'Indisponível' },
 ]
 
 export const EMPLOYEE_STATUS = [
-  { value: 'Contract_With_Right_Term', label: 'Contrato a Termo Certo' },
-  { value: 'Contract_Without_Right_Term', label: 'Contrato a Termo Incerto' },
-  { value: 'Contract_Without_Term', label: 'Contrato Sem Termo' },
-  { value: 'No_Contract', label: 'Sem Contrato' },
-  { value: 'On_Leave', label: 'Em Licença' },
-  { value: 'Medical_Leave', label: 'Licença Médica' },
-  { value: 'Contract_Service_Provider', label: 'Prestador de Serviços' },
+  { value: 'Contract with Right Term', label: 'Contrato a Termo Certo' },
+  { value: 'Contract without Right Term', label: 'Contrato a Termo Incerto' },
+  { value: 'Contract without Term', label: 'Contrato Sem Termo' },
+  { value: 'No Contract', label: 'Sem Contrato' },
+  { value: 'On Leave', label: 'Em Licença' },
+  { value: 'Medical Leave', label: 'Licença Médica' },
+  { value: 'Contract Service Provider', label: 'Prestador de Serviços' },
 ]
 
 export const NEW_EMPLOYEE_STEPS = [
@@ -65,8 +65,14 @@ export const CERTIFICATION_TABLE_LIST = [
 
 export const EMPLOYEE_DETAILS_TABS = [
   { label: 'Geral', value: 'general', disabled: false },
+
+  { label: 'Certificações', value: 'certifications', disabled: false },
   { label: 'Contrato', value: 'contract', disabled: true },
-  { label: 'Certificações', value: 'certifications', disabled: true },
-  { label: 'Performance', value: 'performance', disabled: true },
   { label: 'Documentos', value: 'documents', disabled: true },
+  {
+    label: 'Habilitações Técnicas',
+    value: 'technicalQualifications',
+    disabled: false,
+  },
+  { label: 'Performance', value: 'performance', disabled: true },
 ]

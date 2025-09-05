@@ -31,7 +31,7 @@ export function translateEmployeeAvailabilityStatus(status: string) {
   switch (status) {
     case 'Available':
       return 'Disponível'
-    case 'Unavailable':
+    case 'Not Available':
       return 'Indisponível'
     default:
       return 'Desconhecido'

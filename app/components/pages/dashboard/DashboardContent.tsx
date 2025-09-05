@@ -13,7 +13,7 @@ export default function DashboardContent() {
     <div className="flex flex-col gap-4 w-full p-4 lg:p-0">
       <MetricsSection />
 
-      <ChartsSection />
+      {/* <ChartsSection /> */}
     </div>
   ) : tabActive === 'employees' ? (
     <EmployeesSection />

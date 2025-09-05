@@ -10,6 +10,7 @@ declare module 'next-auth' {
       fullName?: string
       role: string
       companyName?: string
+      companyId?: string
     }
     accessToken: string
     refreshToken: string
@@ -24,6 +25,7 @@ declare module 'next-auth' {
     access: string
     refresh?: string
     company_name?: string
+    company_id?: string
   }
 }
 
@@ -38,5 +40,6 @@ declare module 'next-auth/jwt' {
     accessToken: string
     refreshToken: string
     companyName?: string
+    companyId?: string
   }
 }

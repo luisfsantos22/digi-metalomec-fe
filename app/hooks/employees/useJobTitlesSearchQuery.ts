@@ -18,8 +18,10 @@ const useJobTitlesSearchQuery = (): UseJobTitlesSearchQueryResult => {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
 
+  const searchTrimmed = search.trim()
+
   useEffect(() => {
-    if (!search) {
+    if (!searchTrimmed) {
       setJobTitles([])
 
       return
@@ -35,7 +37,7 @@ const useJobTitlesSearchQuery = (): UseJobTitlesSearchQueryResult => {
             headers: {
               Authorization: `Bearer ${session?.accessToken}`,
             },
-            params: { keyword: search },
+            params: { keyword: searchTrimmed },
           }
         )
         setJobTitles(response.data)
@@ -46,7 +48,7 @@ const useJobTitlesSearchQuery = (): UseJobTitlesSearchQueryResult => {
       }
     }
     fetchJobTitles()
-  }, [search, session?.accessToken])
+  }, [searchTrimmed, session?.accessToken])
 
   return { jobTitles, search, setSearch, loading, error }
 }

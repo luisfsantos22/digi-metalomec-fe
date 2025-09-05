@@ -50,13 +50,13 @@ const SecondaryButton = (props: SecondaryButtonProps) => {
                 active
                   ? 'text-digiwhite1212-semibold'
                   : 'text-digiblack1212-semibold hover:text-digiwhite1212-normal disabled:!text-gray-500',
-                'px-2 py-1'
+                'px-4 py-2'
               )
             : size === 'medium'
               ? classNames(
                   active
-                    ? 'text-digiwhite1624-semibold'
-                    : 'text-digiblack1624-semibold hover:text-digiwhite1624-normal disabled:!text-gray-500',
+                    ? 'text-digiwhite1420-semibold'
+                    : 'text-digiblack1420-semibold hover:text-digiwhite1420-normal disabled:!text-gray-500',
                   'px-4 py-2'
                 )
               : size === 'large' &&
@@ -66,7 +66,7 @@ const SecondaryButton = (props: SecondaryButtonProps) => {
                     : 'text-digiblack2025-semibold hover:text-digiwhite2025-normal disabled:!text-gray-500',
                   'px-6 py-3'
                 ),
-          'flex gap-2 self-center justify-center items-center cursor-pointer rounded-xl'
+          'flex gap-2 self-center justify-center items-center cursor-pointer rounded-2xl'
         )}
         disabled={disabled}
       >

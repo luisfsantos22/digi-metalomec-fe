@@ -1,6 +1,12 @@
 import { classNames } from '@/utils'
 import Text from '../Text/Text'
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
+import { pt } from 'intl-tel-input/i18n'
+const IntlTelInput = dynamic(() => import('intl-tel-input/reactWithUtils'), {
+  ssr: false,
+})
+import 'intl-tel-input/styles'
 
 type FormInputProps = {
   query: string | number | undefined
@@ -34,7 +40,9 @@ const FormInput = (props: FormInputProps) => {
   const [internalErrorStyles, setInternalErrorStyles] = useState(!!error)
 
   useEffect(() => {
-    setInternalErrorStyles(!!error)
+    if (inputType !== 'tel') {
+      setInternalErrorStyles(!!error)
+    }
   }, [error])
 
   return (
@@ -55,11 +63,36 @@ const FormInput = (props: FormInputProps) => {
       />
       <div className="flex flex-col gap-0.5 w-full">
         <div className="relative w-full">
+          {/* {inputType === 'tel' ? (
+            <IntlTelInput
+              initOptions={{
+                containerClass: classNames(
+                  error && internalErrorStyles
+                    ? 'border-b-digired'
+                    : query
+                      ? 'border-b-digibrown'
+                      : 'border-b-gray-300',
+                  'border-b text-digibrown1624-semibold focus:outline-none focus:border-b-digibrown focus:ring-0',
+                  'disabled:cursor-not-allowed disabled:text-gray-400 outline-none'
+                ),
+                i18n: pt,
+              }}
+              inputProps={{
+                placeholder: placeholder,
+              }}
+              onChangeNumber={(value) => {
+                console.log(value, '<PhoneNumber>')
+                if (value?.length > 0 && query !== value) {
+                  setQuery(value)
+                }
+              }}
+            />
+          ) : ( */}
           <input
             type={inputType}
             disabled={disabled}
             placeholder={placeholder}
-            value={query}
+            value={query ? query : ''}
             onChange={(e) => {
               setInternalErrorStyles(false)
               setQuery(e.target.value)
@@ -74,6 +107,7 @@ const FormInput = (props: FormInputProps) => {
               'disabled:cursor-not-allowed disabled:text-gray-400 line-clamp-1 text-left'
             )}
           />
+          {/* )} */}
           {clearable && query && query?.toString().length > 0 && (
             <button
               type="button"

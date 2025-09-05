@@ -104,7 +104,7 @@ const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
           <FormInput
             query={collaborationStartDate as unknown as string}
             setQuery={(e) =>
-              setValue('collaborationStartDate', e as unknown as Date)
+              setValue('collaborationStartDate', e as unknown as string)
             }
             placeholder="dd/mm/aaaa"
             inputType="date"
@@ -127,29 +127,25 @@ const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
             labelStyles="text-digiblack1420-semibold flex gap-1"
             mandatory={true}
             width="lg:w-1/5 w-full"
-            value={selectedJobTitle?.name}
-            setValue={(name) => {
-              // If selected from search, set jobTitles to [id]
-              const found = searchedJobTitles.find((jt) => jt.name === name)
+            value={search}
+            setValue={(id) => {
+              const found = searchedJobTitles.find((jt) => jt.id === id)
               if (found) {
-                setValue('jobTitles', [found?.id])
+                setValue('jobTitles', [found])
                 setSelectedJobTitle(found)
-              } else {
-                // If not found, treat as new creation (could trigger modal or API call)
-                // For now, just set the name as selected
-                // setValue('jobTitles', [name])
-                // setSelectedJobTitle({ id: '', name, description: '' })
               }
             }}
             setSelectedObj={(obj) => {
               if (obj) {
-                setValue('jobTitles', [obj?.id])
+                setValue('jobTitles', [obj])
                 setSelectedJobTitle(obj)
               } else {
                 setValue('jobTitles', [])
                 setSelectedJobTitle(null)
+                setSearch('')
               }
             }}
+            seletectedObjValue={selectedJobTitle ? selectedJobTitle.name : ''}
             setShowCreateModal={setShowCreateJobTitleModal}
             createText="Crie um novo Cargo/Função"
             source="JobTitle"
@@ -249,18 +245,18 @@ const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
         <Separator />
         <Row title="Informação Adicional">
           <FormDropdownMultiple
-            choices={languagesAvailable.map((lang) => ({
+            choices={languagesAvailable?.map((lang) => ({
               label: lang.name,
               value: lang.id,
             }))}
             placeholder="Selecione as Línguas Faladas"
-            selectedValues={languages ? languages.map((l) => l.id) : []}
+            selectedValues={languages ? languages?.map((l) => l?.id) : []}
             setSelectedValues={(ids) => {
-              const selectedLangs = languagesAvailable.filter((lang) =>
+              const selectedLangs = languagesAvailable?.filter((lang) =>
                 ids.includes(lang.id)
               )
               // Map Language to UserLanguage with default proficiency
-              const userLanguages = selectedLangs.map((lang) => ({
+              const userLanguages = selectedLangs?.map((lang) => ({
                 ...lang,
                 proficiency: 'Fluent', // Default, can be changed as needed
               }))
@@ -295,9 +291,9 @@ const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
             {...register('medicalCertificationExpiry', { required: false })}
           />
           <FormDropdown
-            choices={educationalQualificationsAvailable.map((eq) => ({
-              label: eq.name,
-              value: eq.id,
+            choices={educationalQualificationsAvailable?.map((eq) => ({
+              label: eq?.name,
+              value: eq?.id,
             }))}
             selectedValue={educationQualification}
             setSelectedValue={(value) =>
@@ -319,11 +315,11 @@ const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
             setShowCreateJobTitleModal(false)
             setJobTitleObject({ id: '', name: '', description: '' })
           }}
-          onConfirm={() => {
+          onConfirm={(createdJobTitle) => {
             setShowCreateJobTitleModal(false)
-            setValue('jobTitles', [jobTitleObject])
-            setSelectedJobTitle(jobTitleObject)
-            setSearch(jobTitleObject?.name ?? '')
+            setValue('jobTitles', [createdJobTitle])
+            setSelectedJobTitle(createdJobTitle)
+            setSearch(createdJobTitle?.name ?? '')
             setIsDropdownOpen(false)
           }}
           setNewJobTitle={setJobTitleObject}

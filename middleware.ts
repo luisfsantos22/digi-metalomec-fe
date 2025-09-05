@@ -2,23 +2,17 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import { AVAILABLE_ROLES } from './app/constants'
+import axiosInstance from './app/hooks/axiosInstance'
+import { AUTH_ENDPOINTS } from './app/hooks/api/endpoints'
 
-// Auth cookie names that need to be cleared on session reset
 const AUTH_COOKIES = [
   'next-auth.session-token',
   'next-auth.csrf-token',
   '__Secure-next-auth.session-token',
 ]
 
-/**
- * Creates a redirect response with cleared auth cookies
- * @param request - The incoming request
- * @param destination - The URL to redirect to
- */
 const createAuthRedirect = (request: NextRequest, destination: string) => {
   const response = NextResponse.redirect(new URL(destination, request.url))
-
-  // Clear all auth cookies
   AUTH_COOKIES.forEach((cookie) => response.cookies.delete(cookie))
 
   return response
@@ -31,30 +25,45 @@ export async function middleware(request: NextRequest) {
       secret: process.env.NEXTAUTH_SECRET,
     })
 
-    const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
+    const pathname = request.nextUrl.pathname
+    const isAuthPage = pathname.startsWith('/auth')
     const allowedRoles = AVAILABLE_ROLES.map((role) => role.value)
 
-    // Case 1: User is not authenticated
-    if (!token) {
-      // Allow access to auth pages
-      if (isAuthPage) {
-        return NextResponse.next()
+    // 1. If user is not authenticated
+    if (!token || !token.role || !allowedRoles.includes(token.role)) {
+      if (!isAuthPage) {
+        return createAuthRedirect(request, '/auth/signin')
       }
 
-      // Redirect to login for non-auth pages
-      return createAuthRedirect(request, '/auth/signin')
+      return NextResponse.next()
     }
 
-    // Case 2: User is authenticated
-    // Verify token and role
-    const userRole = token.role
-    if (!allowedRoles.includes(userRole)) {
-      // Redirect to login - invalid role
-      return createAuthRedirect(request, '/auth/signin')
+    // 2. Check Django API token validity
+    try {
+      const apiResponse = await axiosInstance.get(AUTH_ENDPOINTS.ping, {
+        headers: {
+          Authorization: `Bearer ${token.accessToken}`,
+        },
+      })
+
+      if (apiResponse.status === 406) {
+        if (!isAuthPage) {
+          return createAuthRedirect(request, '/auth/signin')
+        }
+
+        return NextResponse.next()
+      }
+    } catch (err) {
+      console.error('API check failed:', err)
+      if (!isAuthPage) {
+        return createAuthRedirect(request, '/auth/signin')
+      }
+
+      return NextResponse.next()
     }
 
-    // Don't allow authenticated users to access auth pages
-    if (isAuthPage || request.nextUrl.pathname === '/') {
+    // 3. Prevent logged-in users from hitting auth pages
+    if (isAuthPage || pathname === '/') {
       return NextResponse.redirect(
         new URL('/dashboard/?module=home', request.url)
       )
@@ -63,12 +72,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   } catch (error) {
     console.error('Middleware error:', error)
+    if (!request.nextUrl.pathname.startsWith('/auth')) {
+      return createAuthRedirect(request, '/auth/signin')
+    }
 
-    return createAuthRedirect(request, '/auth/signin')
+    return NextResponse.next()
   }
 }
 
-// Apply middleware to specific routes
 export const config = {
   matcher: ['/', '/dashboard/:path*', '/profile/:path*', '/auth/:path*'],
 }

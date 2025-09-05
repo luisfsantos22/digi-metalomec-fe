@@ -19,7 +19,7 @@ type UserFormScreenProps = {
 const UserFormScreen = (props: UserFormScreenProps) => {
   const { formData, register, setValue, errors } = props
   const {
-    user: { username, email, firstName, lastName },
+    user: { email, firstName, lastName, phoneNumber } = {},
     nif,
     nationalId,
     socialSecurityNumber,
@@ -33,7 +33,6 @@ const UserFormScreen = (props: UserFormScreenProps) => {
     district,
     country,
     dateOfBirth,
-    phoneNumber,
   } = formData
 
   const { uploadImage, loading, error } = useUploadImage()
@@ -46,7 +45,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
       <Row title="Informação Básica">
         <FormInput
           query={firstName}
-          setQuery={(e) => setValue('user.firstName', e)}
+          setQuery={(e) => setValue('user.firstName', e as unknown as string)}
           error={errors.user?.firstName ? 'Nome é obrigatório' : undefined}
           placeholder="José"
           inputType="text"
@@ -57,7 +56,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         />
         <FormInput
           query={lastName}
-          setQuery={(e) => setValue('user.lastName', e)}
+          setQuery={(e) => setValue('user.lastName', e as unknown as string)}
           error={errors.user?.lastName ? 'Apelido é obrigatório' : undefined}
           placeholder="Silva"
           inputType="text"
@@ -67,19 +66,18 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           {...register('user.lastName', { required: true })}
         />
         <FormInput
-          query={username}
-          setQuery={(e) => setValue('user.username', e)}
-          error={errors.user?.username ? 'Username é obrigatório' : undefined}
+          query={email?.split('@')[0]}
+          setQuery={() => {}}
           placeholder="jose.carlos"
           inputType="text"
           mandatory={true}
-          label="Username"
+          disabled
+          label="Username (gerado automaticamente)"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('user.username', { required: true })}
         />
         <FormInput
           query={email}
-          setQuery={(e) => setValue('user.email', e)}
+          setQuery={(e) => setValue('user.email', e as unknown as string)}
           error={errors.user?.email ? 'Email é obrigatório' : undefined}
           placeholder="jose.carlos@email.com"
           inputType="email"
@@ -138,9 +136,9 @@ const UserFormScreen = (props: UserFormScreenProps) => {
       <Separator />
       <Row title="Contatos">
         <FormInput
-          query={phoneNumber}
-          setQuery={(e) => setValue('phoneNumber', e as unknown as string)}
-          placeholder="+351912345678"
+          query={phoneNumber ? phoneNumber : ''}
+          setQuery={(e) => setValue('user.phoneNumber', e as unknown as string)}
+          placeholder="912 345 678"
           inputType="tel"
           mandatory={false}
           label="Número de Telemóvel"
@@ -157,16 +155,40 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           placeholder="João Silva"
           inputType="text"
           mandatory={false}
+          error={errors?.emergencyContact?.name?.message}
+          {...register('emergencyContact.name', {
+            validate: (value) => {
+              const phone = formData?.emergencyContact?.phone
+              const relationship = formData?.emergencyContact?.relationship
+              if (value || phone || relationship) {
+                return value ? true : 'Preencha o nome do contato de emergência'
+              }
+
+              return true
+            },
+          })}
         />
         <FormInput
           label="Telemóvel de Emergência"
-          query={phone}
+          query={phone ? phone : ''}
           setQuery={(e) =>
             setValue('emergencyContact.phone', e as unknown as string)
           }
-          placeholder="+351912345678"
+          placeholder="912 345 678"
           inputType="tel"
           mandatory={false}
+          error={errors?.emergencyContact?.phone?.message}
+          {...register('emergencyContact.phone', {
+            validate: (value) => {
+              const name = formData?.emergencyContact?.name
+              const relationship = formData?.emergencyContact?.relationship
+              if (value || name || relationship) {
+                return value ? true : 'Preencha o telemóvel de emergência'
+              }
+
+              return true
+            },
+          })}
         />
         <FormInput
           label="Relação do Contato de Emergência"
@@ -177,6 +199,20 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           placeholder="Pai"
           inputType="text"
           mandatory={false}
+          error={errors?.emergencyContact?.relationship?.message}
+          {...register('emergencyContact.relationship', {
+            validate: (value) => {
+              const name = formData?.emergencyContact?.name
+              const phone = formData?.emergencyContact?.phone
+              if (value || name || phone) {
+                return value
+                  ? true
+                  : 'Preencha a relação do contato de emergência'
+              }
+
+              return true
+            },
+          })}
         />
       </Row>
       <Separator />
@@ -229,7 +265,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           setQuery={(e) => setValue('postalCode', e as unknown as string)}
           placeholder="1000-000"
           inputType="text"
-          width="w-40"
+          width="xl:w-40 w-full"
           mandatory={false}
           label="Código Postal"
           labelStyles="text-digiblack1420-semibold flex gap-1"
