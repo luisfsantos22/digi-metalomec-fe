@@ -5,7 +5,6 @@ import PrimaryButton from '../Button/PrimaryButton'
 import { generateUuid } from '@/utils'
 import Row from '../Row/Row'
 import { FieldErrors, UseFormSetValue } from 'react-hook-form'
-import { WorkshopFormData } from '@/app/types/workshop/workshop'
 import FormInput from '../Input/FormInput'
 import {
   CreateEmployeeData,
@@ -16,12 +15,13 @@ type CertificationModalProps = {
   action: 'add' | 'edit'
   isOpen: boolean
   onClose: () => void
-  onConfirm: () => void
-  setValue: UseFormSetValue<CreateEmployeeData>
+  onConfirm: (data?: EmployeeCertification) => void
+  setValue?: UseFormSetValue<CreateEmployeeData>
   seletectedCertification: EmployeeCertification | undefined
   formData?: CreateEmployeeData
   indexNumber?: number
   errors?: FieldErrors<CreateEmployeeData>
+  parent?: 'employee' | 'certification'
 }
 
 const CertificationModal = (props: CertificationModalProps) => {
@@ -34,6 +34,7 @@ const CertificationModal = (props: CertificationModalProps) => {
     seletectedCertification,
     indexNumber = -1,
     errors,
+    parent = 'employee',
   } = props
 
   const [tempEmployeeCertification, setTempEmployeeCertification] =
@@ -85,22 +86,40 @@ const CertificationModal = (props: CertificationModalProps) => {
 
   const createCertificate = () => {
     if (action === 'add') {
-      setValue('certifications', [
-        ...(props.formData?.certifications || []),
-        tempEmployeeCertification,
-      ])
+      if (parent === 'employee' && setValue) {
+        setValue('certifications', [
+          ...(props.formData?.certifications || []),
+          tempEmployeeCertification,
+        ])
+      } else {
+        onConfirm(tempEmployeeCertification)
+      }
     } else {
-      setValue(`certifications.${indexNumber}`, {
-        ...seletectedCertification,
-        description: tempEmployeeCertification.description,
-        id: seletectedCertification?.id || generateUuid(),
-        name: tempEmployeeCertification.name,
-        issuer: tempEmployeeCertification.issuer,
-        validForDays: tempEmployeeCertification.validForDays,
-        issuedAt: tempEmployeeCertification.issuedAt,
-        expiresAt: tempEmployeeCertification.expiresAt,
-        certificateUrl: tempEmployeeCertification.certificateUrl,
-      })
+      if (parent === 'employee' && setValue && seletectedCertification) {
+        setValue(`certifications.${indexNumber}`, {
+          ...seletectedCertification,
+          description: tempEmployeeCertification.description,
+          id: seletectedCertification?.id || generateUuid(),
+          name: tempEmployeeCertification.name,
+          issuer: tempEmployeeCertification.issuer,
+          validForDays: tempEmployeeCertification.validForDays,
+          issuedAt: tempEmployeeCertification.issuedAt,
+          expiresAt: tempEmployeeCertification.expiresAt,
+          certificateUrl: tempEmployeeCertification.certificateUrl,
+        })
+      } else {
+        onConfirm({
+          ...seletectedCertification,
+          description: tempEmployeeCertification.description,
+          id: seletectedCertification?.id || generateUuid(),
+          name: tempEmployeeCertification.name,
+          issuer: tempEmployeeCertification.issuer,
+          validForDays: tempEmployeeCertification.validForDays,
+          issuedAt: tempEmployeeCertification.issuedAt,
+          expiresAt: tempEmployeeCertification.expiresAt,
+          certificateUrl: tempEmployeeCertification.certificateUrl,
+        })
+      }
     }
     onConfirm()
   }

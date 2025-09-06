@@ -20,7 +20,7 @@ import PrimaryButton from '../../Button/PrimaryButton'
 import { useActivationEmployee } from '@/app/hooks/employees/useActivationEmployee'
 import { classNames } from '@/utils'
 import CertificationsEmployee from './CertificationsEmployee'
-import TechnicalQualificationsEmployee from './TechnicalQualificationsEmployee'
+import SkillsEmployee from './SkillsEmployee'
 
 type DetailsEmployeeProps = {
   session: Session | null
@@ -186,7 +186,7 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
         ) : tab === 'certifications' ? (
           <CertificationsEmployee certifications={employee?.certifications} />
         ) : tab === 'technicalQualifications' ? (
-          <TechnicalQualificationsEmployee skills={employee?.skills} />
+          <SkillsEmployee skills={employee?.skills} />
         ) : null}
       </ContainerCard>
 

@@ -8,17 +8,46 @@ import Separator from '../../Separator/Separator'
 import Text from '../../Text/Text'
 import AddButton from '../../Button/AddButton'
 import { EmployeeSkill } from '@/app/types/employee/skill'
+import { useSession } from 'next-auth/react'
+import { useState } from 'react'
+import useCreateSkill from '@/app/hooks/employees/skills/useCreateSkill'
+import { useEditSkill } from '@/app/hooks/employees/certification/useEditCertification'
+import { useDeleteSkill } from '@/app/hooks/employees/certification/useDeleteCertification'
 
-type TechnicalQualificationsEmployeeProps = {
+type SkillsEmployeeProps = {
   skills: EmployeeSkill[] | undefined
 }
 
-export default function TechnicalQualificationsEmployee(
-  props: TechnicalQualificationsEmployeeProps
-) {
+export default function SkillsEmployee(props: SkillsEmployeeProps) {
   const { skills } = props
+  const { data: session } = useSession()
+  const accessToken = session?.accessToken || ''
 
-  //TODO: request for edit, delete and add btn
+  const [areYouSureToDeleteOpen, setAreYouSureToDeleteOpen] = useState(false)
+  const [actionModal, setActionModal] = useState<'add' | 'edit'>('add')
+  const [openHandleSkillModal, setOpenHandleSkillModal] = useState(false)
+  const [skillToEdit, setSkillToEdit] = useState<EmployeeSkill | null>(null)
+  const [skillToDelete, setSkillToDelete] = useState<EmployeeSkill | null>(null)
+
+  const handleOpenAddModal = () => {
+    setActionModal('add')
+    setOpenHandleSkillModal(true)
+  }
+
+  const handleOpenEditModal = (skill: EmployeeSkill) => {
+    setActionModal('edit')
+    setSkillToEdit(skill)
+    setOpenHandleSkillModal(true)
+  }
+
+  const handleOpenAreYouSureModal = (skill: EmployeeSkill) => {
+    setSkillToDelete(skill)
+    setAreYouSureToDeleteOpen(true)
+  }
+
+  const { createSkill } = useCreateSkill()
+  const { editSkill } = useEditSkill()
+  const { deleteSkill } = useDeleteSkill()
 
   if (!skills || skills.length === 0) {
     return (
@@ -30,9 +59,7 @@ export default function TechnicalQualificationsEmployee(
         />
         <AddButton
           id="add-skill"
-          onClick={() => {
-            /* handle add */
-          }}
+          onClick={handleOpenAddModal}
           tooltipText="Adicionar Habilidade Técnica"
           size="h-20 w-20"
           widthTooltip="300"
@@ -60,9 +87,7 @@ export default function TechnicalQualificationsEmployee(
         />
         <AddButton
           id="add-skill"
-          onClick={() => {
-            /* handle add */
-          }}
+          onClick={handleOpenAddModal}
           tooltipText="Adicionar Habilidade Técnica"
           size="h-10 w-10"
         />
@@ -98,17 +123,13 @@ export default function TechnicalQualificationsEmployee(
                   <div className="flex flex-row gap-2 pt-2 lg:pt-0">
                     <EditButton
                       id={`edit-skill-${skill?.id}`}
-                      onClick={() => {
-                        /* handle edit */
-                      }}
+                      onClick={() => handleOpenEditModal(skill)}
                       tooltipText="Editar Habilidade Técnica"
                       hasTooltip={true}
                     />
                     <DeleteButton
                       id={`delete-skill-${skill?.id}`}
-                      onClick={() => {
-                        /* handle delete */
-                      }}
+                      onClick={() => handleOpenAreYouSureModal(skill)}
                       tooltipText="Remover Habilidade Técnica"
                       hasTooltip={true}
                     />
@@ -129,6 +150,7 @@ export default function TechnicalQualificationsEmployee(
           </div>
         ))}
       </div>
+      {/* TODO: missing modals */}
     </div>
   )
 }

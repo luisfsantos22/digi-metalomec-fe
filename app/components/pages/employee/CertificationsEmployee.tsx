@@ -8,6 +8,14 @@ import { formatDate } from '@/app/utils'
 import Separator from '../../Separator/Separator'
 import Text from '../../Text/Text'
 import AddButton from '../../Button/AddButton'
+import useCreateCertification from '@/app/hooks/employees/certification/useCreateCertification'
+import { useEditCertification } from '@/app/hooks/employees/skills/useEditSkill'
+import { useDeleteCertification } from '@/app/hooks/employees/skills/useDeleteSkill'
+import { useSession } from 'next-auth/react'
+import { useState } from 'react'
+import CertificationModal from '../../Modal/CertificationModal'
+import { notifications } from '@mantine/notifications'
+import AreYouSureModal from '../../Modal/AreYouSureModal'
 
 type CertificationsEmployeeProps = {
   certifications: EmployeeCertification[] | undefined
@@ -17,8 +25,37 @@ export default function CertificationsEmployee(
   props: CertificationsEmployeeProps
 ) {
   const { certifications } = props
+  const { data: session } = useSession()
+  const accessToken = session?.accessToken || ''
 
-  //TODO: request for edit, delete and add btn
+  const [areYouSureToDeleteOpen, setAreYouSureToDeleteOpen] = useState(false)
+  const [actionModal, setActionModal] = useState<'add' | 'edit'>('add')
+  const [openHandleCertificationModal, setOpenHandleCertificationModal] =
+    useState(false)
+  const [certificationToEdit, setCertificationToEdit] =
+    useState<EmployeeCertification | null>(null)
+  const [certificationToDelete, setCertificationToDelete] =
+    useState<EmployeeCertification | null>(null)
+
+  const handleOpenAddModal = () => {
+    setActionModal('add')
+    setOpenHandleCertificationModal(true)
+  }
+
+  const handleOpenEditModal = (certification: EmployeeCertification) => {
+    setActionModal('edit')
+    setCertificationToEdit(certification)
+    setOpenHandleCertificationModal(true)
+  }
+
+  const handleOpenAreYouSureModal = (certification: EmployeeCertification) => {
+    setCertificationToDelete(certification)
+    setAreYouSureToDeleteOpen(true)
+  }
+
+  const { createCertification } = useCreateCertification()
+  const { editCertification } = useEditCertification()
+  const { deleteCertification } = useDeleteCertification()
 
   if (!certifications || certifications.length === 0) {
     return (
@@ -30,9 +67,7 @@ export default function CertificationsEmployee(
         />
         <AddButton
           id="add-certification"
-          onClick={() => {
-            /* handle add */
-          }}
+          onClick={handleOpenAddModal}
           tooltipText="Adicionar Certificação"
           size="h-20 w-20"
           widthTooltip="300"
@@ -60,9 +95,7 @@ export default function CertificationsEmployee(
         />
         <AddButton
           id="add-certification"
-          onClick={() => {
-            /* handle add */
-          }}
+          onClick={handleOpenAddModal}
           tooltipText="Adicionar Certificação"
           size="h-10 w-10"
         />
@@ -112,17 +145,13 @@ export default function CertificationsEmployee(
                   <div className="flex flex-row gap-2 pt-2 lg:pt-0">
                     <EditButton
                       id={`edit-cert-${certification?.id}`}
-                      onClick={() => {
-                        /* handle edit */
-                      }}
+                      onClick={() => handleOpenEditModal(certification)}
                       tooltipText="Editar Certificação"
                       hasTooltip={true}
                     />
                     <DeleteButton
                       id={`delete-cert-${certification?.id}`}
-                      onClick={() => {
-                        /* handle delete */
-                      }}
+                      onClick={() => handleOpenAreYouSureModal(certification)}
                       tooltipText="Remover Certificação"
                       hasTooltip={true}
                     />
@@ -149,6 +178,49 @@ export default function CertificationsEmployee(
           </div>
         ))}
       </div>
+      {openHandleCertificationModal && (
+        <CertificationModal
+          isOpen={openHandleCertificationModal}
+          action={actionModal}
+          onClose={() => setOpenHandleCertificationModal(false)}
+          onConfirm={async (data) => {
+            if (data) {
+              if (actionModal === 'edit') {
+                await editCertification(
+                  certificationToEdit?.id,
+                  data,
+                  accessToken
+                )
+              } else {
+                await createCertification(data)
+              }
+            } else {
+              notifications.show({
+                title: 'Erro',
+                color: 'red',
+                message: `Falha ao ${actionModal === 'edit' ? 'editar' : 'criar'} o certificado. Tente novamente.`,
+                position: 'top-right',
+              })
+            }
+          }}
+          seletectedCertification={certificationToEdit ?? undefined}
+          parent="certification"
+        />
+      )}
+      {areYouSureToDeleteOpen && certificationToDelete && (
+        <AreYouSureModal
+          isOpen={areYouSureToDeleteOpen}
+          onClose={() => setAreYouSureToDeleteOpen(false)}
+          onConfirm={async () => {
+            if (certificationToDelete) {
+              await deleteCertification(certificationToDelete.id, accessToken)
+            }
+          }}
+          message="Tem certeza que deseja remover esta certificação?"
+          title="Remover Certificação"
+          primaryBtnText="Remover"
+        />
+      )}
     </div>
   )
 }

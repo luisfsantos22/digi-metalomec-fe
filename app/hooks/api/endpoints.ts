@@ -20,6 +20,11 @@ export const EMPLOYEE_ENDPOINTS = {
   getEmployeeForActivation: (id: string) =>
     `api/v1/employees/employees/${id}/activation/`,
   jobTitles: 'api/v1/employees/job-titles/',
+  certifications: 'api/v1/employees/certifications/',
+  getCertificationById: (id: string) =>
+    `api/v1/employees/certifications/${id}/`,
+  skills: 'api/v1/employees/skills/',
+  getSkillById: (id: string) => `api/v1/employees/skills/${id}/`,
   getEducationalQualifications: 'api/v1/employees/educational-qualifications/',
 }
 
