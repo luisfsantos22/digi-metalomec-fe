@@ -131,6 +131,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           label="Foto"
           labelStyles="text-digiblack1420-semibold flex gap-1"
           uploadImage={uploadImage}
+          disabled
         />
       </Row>
       <Separator />

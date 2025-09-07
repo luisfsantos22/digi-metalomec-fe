@@ -69,7 +69,8 @@ const UploadImage = ({
               'block w-full text-sm text-digibrown1624-semibold',
               'file:mr-4 file:py-3 file:px-4 file:rounded-full file:border-0',
               'file:text-sm file:font-semibold file:bg-digiblue-hover/10 file:text-digibrown hover:file:cursor-pointer hover:file:text-white hover:file:bg-digiblue-hover',
-              'disabled:cursor-not-allowed disabled:text-gray-400'
+              'disabled:cursor-not-allowed disabled:text-gray-400 disabled:file:bg-gray-400/10 disabled:hover:file:bg-gray-400/10',
+              'disabled:hover:file:text-gray-400 disabled:file:text-gray-400 disabled:file:cursor-not-allowed'
             )}
           />
           {loading && (
