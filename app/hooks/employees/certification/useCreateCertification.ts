@@ -1,64 +1,79 @@
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import { notifications } from '@mantine/notifications'
-import { GenericJobTitle } from '@/app/types/utils/job-title'
-import { Certification } from '@/app/types/employee/employee'
+import { EmployeeCertification } from '@/app/types/employee/employee'
 import axiosInstance from '../../axiosInstance'
 import { EMPLOYEE_ENDPOINTS } from '../../api/endpoints'
+import snakecaseKeys from 'snakecase-keys'
 
-interface useCreateCertificationResult {
-  createCertification: (
-    certificationData: Certification
-  ) => Promise<Certification | null>
+interface useCreateEmployeeCertificationResult {
+  createEmployeeCertification: (
+    employeeId: string,
+    certificationData: EmployeeCertification
+  ) => Promise<EmployeeCertification | null>
   loading: boolean
   error: string | null
 }
 
-const useCreateCertification = (): useCreateCertificationResult => {
-  const { data: session } = useSession()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+const useCreateEmployeeCertification =
+  (): useCreateEmployeeCertificationResult => {
+    const { data: session } = useSession()
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
-  const createCertification = async (
-    certificationData: Certification
-  ): Promise<Certification | null> => {
-    setLoading(true)
-    setError(null)
+    const createEmployeeCertification = async (
+      employeeId: string,
+      certificationData: EmployeeCertification
+    ): Promise<EmployeeCertification | null> => {
+      setLoading(true)
+      setError(null)
 
-    try {
-      const response = await axiosInstance.post(
-        EMPLOYEE_ENDPOINTS.certifications,
-        certificationData,
-        {
-          headers: {
-            Authorization: `Bearer ${session?.accessToken}`,
-          },
+      let payload = snakecaseKeys(certificationData, { deep: true })
+      payload = { ...payload, employee: employeeId }
+      try {
+        const response = await axiosInstance.post(
+          EMPLOYEE_ENDPOINTS.employeeCertification,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${session?.accessToken}`,
+            },
+          }
+        )
+        if (response.status === 201) {
+          notifications.show({
+            title: 'Sucesso',
+            color: 'green',
+            message: 'Certificação criada com sucesso!',
+            position: 'top-right',
+          })
+        } else {
+          notifications.show({
+            title: 'Erro',
+            color: 'red',
+            message: 'Falha ao criar a certificação. Tente novamente.',
+            position: 'top-right',
+          })
         }
-      )
-      notifications.show({
-        title: 'Sucesso',
-        color: 'green',
-        message: 'Certificação criada com sucesso!',
-        position: 'top-right',
-      })
 
-      return response.data
-    } catch {
-      setError('Failed to create certification')
-      notifications.show({
-        title: 'Erro',
-        color: 'red',
-        message: 'Falha ao criar a certificação. Tente novamente.',
-        position: 'top-right',
-      })
+        return response.data
+      } catch {
+        console.error('Failed to create certification')
+        setError('Failed to create certification')
+        notifications.show({
+          title: 'Erro',
+          color: 'red',
+          message: 'Falha ao criar a certificação. Tente novamente.',
+          position: 'top-right',
+        })
 
-      return null
-    } finally {
-      setLoading(false)
+        return null
+      } finally {
+        setLoading(false)
+      }
     }
+
+    return { createEmployeeCertification, loading, error }
   }
 
-  return { createCertification, loading, error }
-}
-
-export default useCreateCertification
+export default useCreateEmployeeCertification

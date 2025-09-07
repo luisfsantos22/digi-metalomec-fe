@@ -94,37 +94,37 @@ const CertificationModal = (props: CertificationModalProps) => {
       } else {
         onConfirm(tempEmployeeCertification)
       }
+    } else if (parent === 'employee' && setValue && seletectedCertification) {
+      setValue(`certifications.${indexNumber}`, {
+        ...seletectedCertification,
+        description: tempEmployeeCertification.description,
+        id: seletectedCertification?.id || generateUuid(),
+        name: tempEmployeeCertification.name,
+        issuer: tempEmployeeCertification.issuer,
+        validForDays: tempEmployeeCertification.validForDays,
+        issuedAt: tempEmployeeCertification.issuedAt,
+        expiresAt: tempEmployeeCertification.expiresAt,
+        certificateUrl: tempEmployeeCertification.certificateUrl,
+      })
     } else {
-      if (parent === 'employee' && setValue && seletectedCertification) {
-        setValue(`certifications.${indexNumber}`, {
-          ...seletectedCertification,
-          description: tempEmployeeCertification.description,
-          id: seletectedCertification?.id || generateUuid(),
-          name: tempEmployeeCertification.name,
-          issuer: tempEmployeeCertification.issuer,
-          validForDays: tempEmployeeCertification.validForDays,
-          issuedAt: tempEmployeeCertification.issuedAt,
-          expiresAt: tempEmployeeCertification.expiresAt,
-          certificateUrl: tempEmployeeCertification.certificateUrl,
-        })
-      } else {
-        onConfirm({
-          ...seletectedCertification,
-          description: tempEmployeeCertification.description,
-          id: seletectedCertification?.id || generateUuid(),
-          name: tempEmployeeCertification.name,
-          issuer: tempEmployeeCertification.issuer,
-          validForDays: tempEmployeeCertification.validForDays,
-          issuedAt: tempEmployeeCertification.issuedAt,
-          expiresAt: tempEmployeeCertification.expiresAt,
-          certificateUrl: tempEmployeeCertification.certificateUrl,
-        })
-      }
+      onConfirm({
+        ...seletectedCertification,
+        description: tempEmployeeCertification.description,
+        id: seletectedCertification?.id || generateUuid(),
+        name: tempEmployeeCertification.name,
+        issuer: tempEmployeeCertification.issuer,
+        validForDays: tempEmployeeCertification.validForDays,
+        issuedAt: tempEmployeeCertification.issuedAt,
+        expiresAt: tempEmployeeCertification.expiresAt,
+        certificateUrl: tempEmployeeCertification.certificateUrl,
+      })
     }
     onConfirm()
   }
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   return (
     <Modal

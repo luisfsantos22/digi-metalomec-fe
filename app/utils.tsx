@@ -37,3 +37,16 @@ export function translateEmployeeAvailabilityStatus(status: string) {
       return 'Desconhecido'
   }
 }
+
+export function translateSkillLevel(level: string) {
+  switch (level) {
+    case 'Beginner':
+      return 'Iniciante'
+    case 'Intermediate':
+      return 'Intermediário'
+    case 'Advanced':
+      return 'Avançado'
+    default:
+      return 'Desconhecido'
+  }
+}

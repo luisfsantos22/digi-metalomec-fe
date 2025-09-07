@@ -9,17 +9,21 @@ import { EmployeeSkill } from '@/app/types/employee/skill'
 import FormInput from '../Input/FormInput'
 import FormDropdown from '../Dropdown/FormDropdown'
 import { SKILL_LEVELS } from '@/app/constants'
+import { generateUuid } from '@/utils'
 
 export type SkillModalProps = {
   action: 'add' | 'edit'
   isOpen: boolean
   onClose: () => void
-  onConfirm: () => void
-  setValue: UseFormSetValue<CreateEmployeeData>
+  onConfirm: (data?: EmployeeSkill) => void
+  setValue?: UseFormSetValue<CreateEmployeeData>
   selectedSkill: EmployeeSkill | undefined
   formData?: CreateEmployeeData
   indexNumber?: number
   errors?: FieldErrors<CreateEmployeeData>
+  parent?: 'employee' | 'skill'
+  employeeId?: string
+  companyId?: string
 }
 
 const SkillModal = (props: SkillModalProps) => {
@@ -33,43 +37,73 @@ const SkillModal = (props: SkillModalProps) => {
     indexNumber = -1,
     errors,
     formData,
+    parent = 'employee',
+    employeeId,
+    companyId = '',
   } = props
 
   const [tempSkill, setTempSkill] = useState<EmployeeSkill>(
     action === 'add'
       ? {
-          id: Math.random().toString(36).substring(2, 15),
+          id: generateUuid(),
           name: '',
           level: 'Beginner',
-          description: '',
+          description: undefined,
           acquiredAt: null,
+          skillId: generateUuid(),
+          employee: employeeId || undefined,
+          company: formData?.user?.company || companyId || '',
         }
       : {
-          id: selectedSkill?.id || Math.random().toString(36).substring(2, 15),
+          id: selectedSkill?.id || generateUuid(),
           name: selectedSkill?.name || '',
           level: selectedSkill?.level || 'Beginner',
           description: selectedSkill?.description || '',
           acquiredAt: selectedSkill?.acquiredAt ?? null,
+          skillId: selectedSkill?.skillId || generateUuid(),
+          employee: selectedSkill?.employee || undefined,
+          company: formData?.user?.company || companyId || '',
         }
   )
 
   const createSkill = () => {
     if (action === 'add') {
-      setValue('skills', [...(formData?.skills || []), tempSkill])
-    } else {
+      if (parent === 'employee' && setValue) {
+        setValue('skills', [...(formData?.skills || []), tempSkill])
+      } else {
+        onConfirm(tempSkill)
+      }
+    } else if (parent === 'employee' && setValue && selectedSkill) {
       setValue(`skills.${indexNumber}`, {
         ...selectedSkill,
-        id: selectedSkill?.id || '',
+        id: tempSkill?.id || generateUuid(),
         name: tempSkill.name,
         level: tempSkill.level,
         description: tempSkill.description,
         acquiredAt: tempSkill.acquiredAt,
+        skillId: tempSkill.skillId,
+        employee: tempSkill.employee,
+        company: tempSkill.company,
+      })
+    } else {
+      onConfirm({
+        ...selectedSkill,
+        id: tempSkill?.id || generateUuid(),
+        name: tempSkill.name,
+        level: tempSkill.level,
+        description: tempSkill.description,
+        acquiredAt: tempSkill.acquiredAt,
+        skillId: tempSkill.skillId,
+        employee: tempSkill.employee,
+        company: tempSkill.company,
       })
     }
     onConfirm()
   }
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   return (
     <Modal
@@ -150,7 +184,7 @@ const SkillModal = (props: SkillModalProps) => {
             setQuery={(value) =>
               setTempSkill((prev) => ({
                 ...prev,
-                description: typeof value === 'string' ? value : String(value),
+                description: value as string,
               }))
             }
             width="w-full"

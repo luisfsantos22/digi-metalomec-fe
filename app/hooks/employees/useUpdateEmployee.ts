@@ -1,35 +1,32 @@
 import { useState } from 'react'
 import { notifications } from '@mantine/notifications'
-import axiosInstance from '../../axiosInstance'
-import { EMPLOYEE_ENDPOINTS } from '../../api/endpoints'
 import snakecaseKeys from 'snakecase-keys'
+import axiosInstance from '../axiosInstance'
+import { EMPLOYEE_ENDPOINTS } from '../api/endpoints'
+import { useSession } from 'next-auth/react'
 
-export function useEditSkill() {
+export function useEditEmployee() {
+  const { data: session } = useSession()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const editSkill = async (
-    id: string | undefined,
-    employeeId: string,
-    skillData: any,
-    accessToken: string
-  ) => {
+  const editEmployee = async (id: string | undefined, employeeData: any) => {
     if (!id) {
       return
     }
     setLoading(true)
     setError(null)
 
-    let payload = snakecaseKeys(skillData, { deep: true })
-    payload = { ...payload, employee: employeeId }
+    let payload = snakecaseKeys(employeeData, { deep: true })
+    payload = { ...payload }
 
     try {
       const response = await axiosInstance.put(
-        EMPLOYEE_ENDPOINTS.getSkillEmployeeById(id),
+        EMPLOYEE_ENDPOINTS.getEmployeeById(id),
         payload,
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${session?.accessToken}`,
           },
         }
       )
@@ -37,14 +34,14 @@ export function useEditSkill() {
         notifications.show({
           title: 'Sucesso',
           color: 'green',
-          message: 'Habilidade técnica editada com sucesso!',
+          message: 'Colaborador editado com sucesso!',
           position: 'top-right',
         })
       } else {
         notifications.show({
           title: 'Erro',
           color: 'red',
-          message: 'Falha ao editar a habilidade técnica. Tente novamente.',
+          message: 'Falha ao editar o colaborador. Tente novamente.',
           position: 'top-right',
         })
       }
@@ -54,14 +51,14 @@ export function useEditSkill() {
       notifications.show({
         title: 'Erro',
         color: 'red',
-        message: 'Falha ao editar a habilidade técnica. Tente novamente.',
+        message: 'Falha ao editar o colaborador. Tente novamente.',
         position: 'top-right',
       })
-      setError('Um erro ocorreu ao editar a habilidade técnica')
+      setError('Um erro ocorreu ao editar o colaborador')
     } finally {
       setLoading(false)
     }
   }
 
-  return { editSkill, loading, error }
+  return { editEmployee, loading, error }
 }

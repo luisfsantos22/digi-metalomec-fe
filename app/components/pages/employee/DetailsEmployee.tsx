@@ -184,9 +184,18 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
         ) : tab === 'general' ? (
           <GeneralInfoEmployee employee={employee} />
         ) : tab === 'certifications' ? (
-          <CertificationsEmployee certifications={employee?.certifications} />
+          <CertificationsEmployee
+            employeeId={employee?.id}
+            certifications={employee?.certifications}
+            setActivationTrigger={setActivationTrigger}
+          />
         ) : tab === 'technicalQualifications' ? (
-          <SkillsEmployee skills={employee?.skills} />
+          <SkillsEmployee
+            employeeId={employee?.id}
+            skills={employee?.skills}
+            setActivationTrigger={setActivationTrigger}
+            companyId={employee?.user?.company}
+          />
         ) : null}
       </ContainerCard>
 

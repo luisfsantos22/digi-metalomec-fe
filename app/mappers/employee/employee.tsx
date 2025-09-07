@@ -13,7 +13,6 @@ export const mapGenericEmployee = (data: any): GenericEmployee => ({
     role: data.user.role,
     company: data.user.company || '',
   },
-  company: data.company,
   jobTitles: data.job_titles || [],
   collaborationStartDate: data.collaboration_start_date,
   photoUrl: data.photoUrl || '',
@@ -36,13 +35,12 @@ export const mapEmployee = (data: any): Employee => ({
     company: data?.user?.company || '',
     phoneNumber: data?.user?.phone_number || '',
   },
-  company: data?.company || '',
   jobTitles: data?.job_titles || [],
   department: data?.department || '',
   departmentName: data?.department_name || '',
-  nationalId: data?.national_id || '',
-  nif: data?.nif || '',
-  socialSecurityNumber: data?.social_security_number || '',
+  nationalId: data?.national_id || undefined,
+  nif: data?.nif || undefined,
+  socialSecurityNumber: data?.social_security_number || undefined,
   collaborationStartDate: data?.collaboration_start_date || undefined,
   gender: data?.gender || '',
   maritalStatus: data?.marital_status || '',
@@ -50,11 +48,13 @@ export const mapEmployee = (data: any): Employee => ({
   geographicAvailability: data?.geographic_availability || '',
   preferredWorkLocation: data?.preferred_work_location || '',
   emergencyContact: data?.emergency_contact || undefined,
-  educationQualification: {
-    id: data?.education_qualification?.id || undefined,
-    name: data?.education_qualification?.name || undefined,
-    level: data?.education_qualification?.level || undefined,
-  },
+  educationQualification: data?.education_qualification
+    ? {
+        id: data?.education_qualification?.id || undefined,
+        name: data?.education_qualification?.name || undefined,
+        level: data?.education_qualification?.level || undefined,
+      }
+    : undefined,
   languages: data?.languages || [],
   photoUrl: data?.photo_url || '',
   currentLocation: data?.current_location || '',
@@ -64,10 +64,20 @@ export const mapEmployee = (data: any): Employee => ({
   status: data?.status || '',
   workPermitExpiry: data?.work_permit_expiry || undefined,
   medicalCertificationExpiry: data?.medical_certification_expiry || undefined,
-  skills: data?.skills || [],
+  skills: data?.skills
+    ? data?.skills.map((skill: any) => ({
+        id: skill.id,
+        name: skill.skill_name,
+        level: skill.level,
+        description: skill.description || '',
+        acquiredAt: skill.acquired_at || null,
+        skillId: skill.skill,
+      }))
+    : [],
   certifications: data?.certifications
     ? data?.certifications.map((certification: any) => ({
-        id: certification.certification,
+        id: certification.id,
+        certificationId: certification.certification,
         name: certification.certification_name,
         certificateUrl: certification.certificate_url,
         issuer: certification.issuer_name,

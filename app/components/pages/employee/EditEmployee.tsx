@@ -10,7 +10,6 @@ import Text from '@/app/components/Text/Text'
 import { NEW_EMPLOYEE_STEPS } from '@/app/constants'
 import { useGlobalLoading } from '@/app/hooks/utils/useGlobalLoading'
 import { useLanguagesQuery } from '@/app/hooks/utils/useLanguagesQuery'
-// import useUpdateEmployee from '@/app/hooks/employees/useUpdateEmployee'
 import {
   CreateEmployeeData,
   EmployeeCertification,
@@ -26,12 +25,14 @@ import useGetEducationalQualifications from '@/app/hooks/employees/useGetEducati
 import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
 import useGetEmployee from '@/app/hooks/employees/useGetEmployee'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEditEmployee } from '@/app/hooks/employees/useUpdateEmployee'
 
 export default function EditEmployee() {
   const searchParams = useSearchParams()
+  const router = useRouter()
 
-  const employeeId = searchParams.get('id')
+  const employeeId = searchParams.get('id') || undefined
 
   const [tabActive, setTabActive] = useAtom(mainPageActiveTab)
   const [currentStep, setCurrentStep] = useState<number>(1)
@@ -77,7 +78,7 @@ export default function EditEmployee() {
     error: educationalQualificationsError,
   } = useGetEducationalQualifications()
 
-  //   const { updateEmployee, loading, error } = useUpdateEmployee()
+  const { editEmployee, loading, error } = useEditEmployee()
   const { startLoading, stopLoading } = useGlobalLoading()
 
   // Form setup
@@ -129,7 +130,6 @@ export default function EditEmployee() {
       (field) => field !== '' && field !== undefined && field !== null
     )
 
-    console.log(isEmployeeDataValid, isUserDataValid)
     setCanSubmit(isEmployeeDataValid && isUserDataValid)
   }, [formData])
 
@@ -156,10 +156,14 @@ export default function EditEmployee() {
       }
       try {
         startLoading()
-        // await updateEmployee(employeeId, data)
+        const result = await editEmployee(employeeId, data)
+
+        if (result?.id) {
+          router.push(`/employee/details?id=${result.id}`)
+        }
+        stopLoading()
       } catch (err) {
         console.log(err)
-      } finally {
         stopLoading()
       }
     }
@@ -261,7 +265,7 @@ export default function EditEmployee() {
             onClick={() => setAreYouSureCloseEditEmployeeModal(true)}
           />
           <PrimaryButton
-            text={'Salvar'}
+            text={'Editar'}
             type="submit"
             size={'medium'}
             disabled={Object.keys(errors).length > 0 || !canSubmit}

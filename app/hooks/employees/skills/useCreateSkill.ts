@@ -1,43 +1,60 @@
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import { notifications } from '@mantine/notifications'
-import { GenericJobTitle } from '@/app/types/utils/job-title'
-import { Certification } from '@/app/types/employee/employee'
 import axiosInstance from '../../axiosInstance'
 import { EMPLOYEE_ENDPOINTS } from '../../api/endpoints'
-import { Skill } from '@/app/types/employee/skill'
+import { EmployeeSkill } from '@/app/types/employee/skill'
+import snakecaseKeys from 'snakecase-keys'
 
-interface useCreateSkillResult {
-  createSkill: (skillData: Skill) => Promise<Skill | null>
+interface useCreateSkillEmployeeResult {
+  createEmployeeSkill: (
+    employeeId: string,
+    skillData: EmployeeSkill
+  ) => Promise<EmployeeSkill | null>
   loading: boolean
   error: string | null
 }
 
-const useCreateSkill = (): useCreateSkillResult => {
+const useCreateEmployeeSkill = (): useCreateSkillEmployeeResult => {
   const { data: session } = useSession()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const createSkill = async (skillData: Skill): Promise<Skill | null> => {
+  const createEmployeeSkill = async (
+    employeeId: string,
+    skillData: EmployeeSkill
+  ): Promise<EmployeeSkill | null> => {
     setLoading(true)
     setError(null)
 
+    let payload = snakecaseKeys(skillData, { deep: true })
+    payload = { ...payload, employee: employeeId }
+
     try {
       const response = await axiosInstance.post(
-        EMPLOYEE_ENDPOINTS.skills,
-        skillData,
+        EMPLOYEE_ENDPOINTS.skillEmployee,
+        payload,
         {
           headers: {
             Authorization: `Bearer ${session?.accessToken}`,
           },
         }
       )
-      notifications.show({
-        title: 'Sucesso',
-        color: 'green',
-        message: 'Habilidade Técnica criada com sucesso!',
-        position: 'top-right',
-      })
+      if (response.status === 201) {
+        notifications.show({
+          title: 'Sucesso',
+          color: 'green',
+          message: 'Habilidade Técnica criada com sucesso!',
+          position: 'top-right',
+        })
+      } else {
+        notifications.show({
+          title: 'Erro',
+          color: 'red',
+          message: 'Falha ao criar a habilidade técnica. Tente novamente.',
+          position: 'top-right',
+        })
+      }
 
       return response.data
     } catch {
@@ -55,7 +72,7 @@ const useCreateSkill = (): useCreateSkillResult => {
     }
   }
 
-  return { createSkill, loading, error }
+  return { createEmployeeSkill, loading, error }
 }
 
-export default useCreateSkill
+export default useCreateEmployeeSkill

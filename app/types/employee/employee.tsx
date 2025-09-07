@@ -17,11 +17,17 @@ type Certification = {
   description?: string
 }
 
-type EmployeeCertification = Certification & {
+type EmployeeCertification = {
+  id?: string
+  name: string
+  issuer: string
+  description?: string
+  certificationId?: string
   issuedAt?: Date | null
   expiresAt?: Date | null
   certificateUrl?: string | null
   validForDays?: number | null
+  employee?: string
 }
 
 type Performance = {
@@ -33,7 +39,6 @@ type Performance = {
 type Employee = {
   id: string
   user: User
-  company: string
   jobTitles: GenericJobTitle[]
   department?: string
   departmentName?: string
@@ -73,7 +78,6 @@ type Employee = {
 type GenericEmployee = {
   id: string
   user: User
-  company: string
   jobTitles: GenericJobTitle[]
   collaborationStartDate: Date
   photoUrl?: string

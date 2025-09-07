@@ -12,7 +12,9 @@ const useGetEmployee = (employeeId: string, deps: any[] = []) => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!session?.accessToken || !employeeId) return
+    if (!session?.accessToken || !employeeId) {
+      return
+    }
     const fetchEmployee = async () => {
       setLoading(true)
       setError(null)

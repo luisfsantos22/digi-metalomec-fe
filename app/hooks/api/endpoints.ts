@@ -1,4 +1,5 @@
 import { SimpleUser } from '@/app/types/user/user'
+import { get } from 'axios'
 
 export const AUTH_ENDPOINTS = {
   login: 'api/v1/users/login/',
@@ -21,9 +22,15 @@ export const EMPLOYEE_ENDPOINTS = {
     `api/v1/employees/employees/${id}/activation/`,
   jobTitles: 'api/v1/employees/job-titles/',
   certifications: 'api/v1/employees/certifications/',
+  employeeCertification: 'api/v1/employees/employee-certifications/',
+  getCertificationEmployeeById: (id: string) =>
+    `api/v1/employees/employee-certifications/${id}/`,
   getCertificationById: (id: string) =>
     `api/v1/employees/certifications/${id}/`,
   skills: 'api/v1/employees/skills/',
+  skillEmployee: 'api/v1/employees/employee-skills/',
+  getSkillEmployeeById: (id: string) =>
+    `api/v1/employees/employee-skills/${id}/`,
   getSkillById: (id: string) => `api/v1/employees/skills/${id}/`,
   getEducationalQualifications: 'api/v1/employees/educational-qualifications/',
 }

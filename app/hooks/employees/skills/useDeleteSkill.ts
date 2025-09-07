@@ -3,14 +3,11 @@ import { notifications } from '@mantine/notifications'
 import axiosInstance from '../../axiosInstance'
 import { EMPLOYEE_ENDPOINTS } from '../../api/endpoints'
 
-export function useDeleteCertification() {
+export function useDeleteSkill() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const deleteCertification = async (
-    id: string | undefined,
-    accessToken: string
-  ) => {
+  const deleteSkill = async (id: string | undefined, accessToken: string) => {
     if (!id) {
       return
     }
@@ -19,7 +16,7 @@ export function useDeleteCertification() {
 
     try {
       const response = await axiosInstance.delete(
-        EMPLOYEE_ENDPOINTS.getCertificationById(id),
+        EMPLOYEE_ENDPOINTS.getSkillById(id),
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -30,30 +27,36 @@ export function useDeleteCertification() {
         notifications.show({
           title: 'Sucesso',
           color: 'green',
-          message: 'Certificação eliminada com sucesso!',
+          message: 'Habilidade técnica eliminada com sucesso!',
           position: 'top-right',
         })
+
+        return true
       } else {
         notifications.show({
           title: 'Erro',
           color: 'red',
-          message: 'Falha ao eliminar a certificação. Tente novamente.',
+          message: 'Falha ao eliminar a habilidade técnica. Tente novamente.',
           position: 'top-right',
         })
-        setError('Um erro ocorreu ao eliminar a certificação')
+        setError('Um erro ocorreu ao eliminar a habilidade técnica')
+
+        return false
       }
     } catch {
       notifications.show({
         title: 'Erro',
         color: 'red',
-        message: 'Falha ao eliminar a certificação. Tente novamente.',
+        message: 'Falha ao eliminar a habilidade técnica. Tente novamente.',
         position: 'top-right',
       })
-      setError('Um erro ocorreu ao eliminar a certificação')
+      setError('Um erro ocorreu ao eliminar a habilidade técnica')
+
+      return false
     } finally {
       setLoading(false)
     }
   }
 
-  return { deleteCertification, loading, error }
+  return { deleteSkill, loading, error }
 }
