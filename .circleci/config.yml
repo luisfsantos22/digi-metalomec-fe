@@ -37,8 +37,8 @@ jobs:
       - run:
           name: Push Docker Image
           command: |
-            echo "Pushing image gic2luis/digiauto-fe-v2:staging..."
-            docker push gic2luis/digiauto-fe-v2:staging
+            echo "Pushing image gic2luis/digi-metalomec-fe-v1:staging..."
+            docker push gic2luis/digi-metalomec-fe-v1:staging
 
   deploy:
     machine:
@@ -47,7 +47,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - 'SHA256:YTR5Qa8pYOmlY9g2CcOGKFy6hbV4VBkxzwiow/5CDc8'
+            - 'TODO:CIRCLECI SSH KEY'
       - run:
           name: Debug env vars
           command: |
@@ -56,14 +56,14 @@ jobs:
           name: Deploy over SSH
           command: |
             ssh -o StrictHostKeyChecking=no $SSH_USER_PROD@$SSH_HOST_PROD "
-              sudo docker pull gic2luis/digiauto-fe-v2:staging && \
-              sudo docker container stop digiauto-fe-v2-staging || true && \
-              sudo docker container rm digiauto-fe-v2-staging || true && \
-              sudo docker run --name digiauto-fe-v2-staging -d -p 8085:80 \
+              docker pull gic2luis/digi-metalomec-fe-v1:staging && \
+              docker container stop digi-metalomec-fe-v1-staging || true && \
+              docker container rm digi-metalomec-fe-v1-staging || true && \
+              docker run --name digi-metalomec-fe-v1-staging -d -p 8089:80 \
                 -e NEXTAUTH_SECRET=${NEXTAUTH_SECRET} \
                 -e NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
                 -e NEXTAUTH_URL=${NEXTAUTH_URL} \
-                gic2luis/digiauto-fe-v2:staging"
+                gic2luis/digi-metalomec-fe-v1:staging"
 
 workflows:
   version: 2
