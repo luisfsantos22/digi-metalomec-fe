@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: gic2luis/digi-metalomec-fe:staging
+    image: gic2luis/digi-metalomec-fe-v1:staging
     build:
       context: .
       dockerfile: Dockerfile
