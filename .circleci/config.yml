@@ -47,7 +47,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - 'SHA256:6kHuqciG/GdKLdOHT/CHwto5caziLzdITvOAkOaR6kM'
+            - ${SSH_FINGERPRINT}
       - run:
           name: Debug env vars
           command: |
@@ -55,7 +55,7 @@ jobs:
       - run:
           name: Deploy over SSH
           command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER_PROD@$SSH_HOST_PROD "
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} "
               docker pull gic2luis/digi-metalomec-fe-v1:staging && \
               docker container stop digi-metalomec-fe-v1-staging || true && \
               docker container rm digi-metalomec-fe-v1-staging || true && \
