@@ -1,4 +1,4 @@
-import { Language } from '@/app/types/utils/Language'
+import { Language } from '@/app/types/utils/language'
 
 export const mapLanguage = (lang: Language) => {
   return {

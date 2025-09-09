@@ -5,19 +5,18 @@ import DetailsEmployee from '@/app/components/pages/employee/DetailsEmployee'
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 
-const DetailEmployeePage = async ({
-  searchParams,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined }
-}) => {
-  const session = await getServerSession(authOptions)
+interface PageProps {
+  params?: Promise<{ id: string }>
+}
 
+const DetailEmployeePage = async ({ params }: PageProps) => {
+  const resolvedParams = await params
+  const employeeId = resolvedParams?.id ?? ''
+
+  const session = await getServerSession(authOptions)
   if (!session) {
     redirect('/auth/signin')
   }
-
-  const idParam = searchParams?.id
-  const employeeId = Array.isArray(idParam) ? idParam[0] : (idParam ?? '')
 
   return (
     <GeneralLayout session={session}>
@@ -27,7 +26,7 @@ const DetailEmployeePage = async ({
             { name: 'Colaboradores', href: '/dashboard?module=employees' },
             {
               name: 'Detalhes do Colaborador',
-              href: `/employee/details?id=${employeeId}`,
+              href: `/employee/details/${employeeId}`,
             },
           ]}
         />

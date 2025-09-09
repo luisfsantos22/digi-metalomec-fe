@@ -3,18 +3,16 @@ import React from 'react'
 import GlobalLoadingWrapper from './components/Wrapper/GlobalLoadingWrapper'
 import { Providers } from './components/providers'
 
+export interface LayoutProps {
+  children?: React.ReactNode
+}
+
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
 }
 
-export default function RootLayout({
-  children,
-  session,
-}: {
-  children: React.ReactNode
-  session: any
-}) {
+export default function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="en">
       <head>
@@ -28,7 +26,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-inter antialiased">
-        <Providers session={session}>
+        <Providers>
           <GlobalLoadingWrapper>{children}</GlobalLoadingWrapper>
         </Providers>
       </body>

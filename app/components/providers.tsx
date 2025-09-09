@@ -8,8 +8,16 @@ import { Provider } from 'jotai'
 import { MantineProvider } from '@mantine/core'
 import { SessionProvider } from 'next-auth/react'
 import { Notifications } from '@mantine/notifications'
+import React from 'react'
 
-export const Providers = ({ children, session }) => {
+interface ProvidersProps {
+  children: React.ReactNode
+  session?: any
+}
+
+export const Providers = (props: ProvidersProps) => {
+  const { children, session } = props
+
   return (
     <SessionProvider session={session}>
       <Provider>
