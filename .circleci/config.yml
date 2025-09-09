@@ -48,6 +48,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - '20:38:99:33:01:01:74:f5:eb:6b:6b:24:dc:ef:c9:1c'
+            - 'SHA256:6kHuqciG/GdKLdOHT/CHwto5caziLzdITvOAkOaR6kM'
       - run:
           name: Debug env vars
           command: |
