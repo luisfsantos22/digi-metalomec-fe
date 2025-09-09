@@ -8,15 +8,16 @@ import { redirect } from 'next/navigation'
 const DetailEmployeePage = async ({
   searchParams,
 }: {
-  searchParams: { [key: string]: string }
+  searchParams?: { [key: string]: string | string[] | undefined }
 }) => {
   const session = await getServerSession(authOptions)
 
   if (!session) {
     redirect('/auth/signin')
   }
-  const { id } = await searchParams
-  const employeeId = id
+
+  const idParam = searchParams?.id
+  const employeeId = Array.isArray(idParam) ? idParam[0] : (idParam ?? '')
 
   return (
     <GeneralLayout session={session}>

@@ -47,7 +47,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - 'TODO:CIRCLECI SSH KEY'
+            - 'SHA256:6kHuqciG/GdKLdOHT/CHwto5caziLzdITvOAkOaR6kM'
       - run:
           name: Debug env vars
           command: |
