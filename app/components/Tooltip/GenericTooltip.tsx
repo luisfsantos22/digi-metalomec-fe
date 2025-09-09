@@ -1,6 +1,6 @@
 'use client'
 
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import { PlacesType, Tooltip } from 'react-tooltip'
 
 type GenericTooltipProps = {

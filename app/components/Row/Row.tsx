@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react'
 import AddButton from '../Button/AddButton'
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 
 export default function Row({
   title,

@@ -6,7 +6,7 @@ import FormInput from '../Input/FormInput'
 import Row from '../Row/Row'
 import PrimaryButton from '../Button/PrimaryButton'
 import { Divider, Table } from '@mantine/core'
-import { classNames, generateUuid } from '@/utils'
+import { classNames, generateUuid } from 'utils'
 import Image from 'next/image'
 import GenericTooltip from '../Tooltip/GenericTooltip'
 

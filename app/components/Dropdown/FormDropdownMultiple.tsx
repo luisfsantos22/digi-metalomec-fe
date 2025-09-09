@@ -1,5 +1,5 @@
 import useOutsideClick from '@/app/hooks/utils/useOutsideClick'
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import Text from '../Text/Text'

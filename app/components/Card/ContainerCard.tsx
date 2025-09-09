@@ -1,4 +1,4 @@
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import React from 'react'
 import { Tabs } from '@mantine/core'
 import { TabItem } from '@/app/types/utils/tab'

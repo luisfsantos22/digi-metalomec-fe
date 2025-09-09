@@ -9,7 +9,7 @@ import { EmployeeSkill } from '@/app/types/employee/skill'
 import FormInput from '../Input/FormInput'
 import FormDropdown from '../Dropdown/FormDropdown'
 import { SKILL_LEVELS } from '@/app/constants'
-import { generateUuid } from '@/utils'
+import { generateUuid } from 'utils'
 
 export type SkillModalProps = {
   action: 'add' | 'edit'

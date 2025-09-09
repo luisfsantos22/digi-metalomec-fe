@@ -18,7 +18,7 @@ import { EMPLOYEE_DETAILS_TABS } from '@/app/constants'
 import GeneralInfoEmployee from './GeneralInfoEmployee'
 import PrimaryButton from '../../Button/PrimaryButton'
 import { useActivationEmployee } from '@/app/hooks/employees/useActivationEmployee'
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import CertificationsEmployee from './CertificationsEmployee'
 import SkillsEmployee from './SkillsEmployee'
 

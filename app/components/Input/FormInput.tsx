@@ -1,4 +1,4 @@
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import Text from '../Text/Text'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'

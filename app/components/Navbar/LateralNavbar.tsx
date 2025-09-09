@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react'
 import { useWindowSize } from '@/utils/hooks'
-import { isDesktopSize, classNames } from '@/utils'
+import { isDesktopSize, classNames } from 'utils'
 import TopMobileNavbar from './TopMobileNavbar'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'

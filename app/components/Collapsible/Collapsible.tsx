@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import SecondaryButton from '../Button/SecondaryButton'
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 
 type CollapsibleProps = {
   header: React.ReactNode

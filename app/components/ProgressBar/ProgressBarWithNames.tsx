@@ -1,7 +1,7 @@
 // component to show the progress of a task
 import React, { Fragment } from 'react'
 import Text from '../Text/Text'
-import { classNames, isDesktopSize } from '@/utils'
+import { classNames, isDesktopSize } from 'utils'
 import Image from 'next/image'
 import { useWindowSize } from '@/utils/hooks'
 

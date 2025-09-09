@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import Text from '../Text/Text'
 
 export type FormCheckboxOption = {

@@ -1,4 +1,4 @@
-import { requiredSpan } from '@/utils'
+import { requiredSpan } from 'utils'
 import { JSX, RefObject } from 'react'
 
 type TextProps = {
