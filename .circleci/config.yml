@@ -47,7 +47,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - ${SSH_FINGERPRINT}
+            - '${SSH_FINGERPRINT}'
       - run:
           name: Debug env vars
           command: |
