@@ -63,7 +63,9 @@ jobs:
                 -e NEXTAUTH_SECRET="${NEXTAUTH_SECRET}" \
                 -e NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
                 -e NEXTAUTH_URL=${NEXTAUTH_URL} \
-                gic2luis/digi-metalomec-fe-v1:staging;
+                gic2luis/digi-metalomec-fe-v1:staging && sleep 10;
+              sudo docker image prune -f --filter "label=stage=builder";
+              sudo docker images | grep "digi-metalomec-fe" | grep -v "staging" | awk '\''{print $3}'\'' | xargs -r sudo docker rmi -f
             '
 
 workflows:
