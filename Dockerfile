@@ -37,11 +37,10 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
 ENV NODE_ENV=staging
-ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
 ENV NEXTAUTH_URL=$NEXTAUTH_URL
 
-EXPOSE 3000 80
+# Expose port 80 (for Nginx proxy)
+EXPOSE 80
 
 # Install nginx and supervisor
 RUN apk add --no-cache nginx supervisor curl
