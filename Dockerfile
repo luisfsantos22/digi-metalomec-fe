@@ -43,12 +43,11 @@ ENV NEXTAUTH_URL=$NEXTAUTH_URL
 
 EXPOSE 3000 80
 
-# # Install nginx and supervisor
-# RUN apk add --no-cache nginx supervisor curl
-RUN apk add --no-cache supervisor
+# Install nginx and supervisor
+RUN apk add --no-cache nginx supervisor curl
 
-# # Copy configurations
-# COPY nginx.conf /etc/nginx/http.d/default.conf
+# Copy configurations
+COPY nginx.conf /etc/nginx/http.d/default.conf
 COPY supervisord.conf /etc/supervisord.conf
 
 # Create required directories
