@@ -45,13 +45,14 @@ EXPOSE 3000 80
 
 # # Install nginx and supervisor
 # RUN apk add --no-cache nginx supervisor curl
+RUN apk add --no-cache supervisor
 
 # # Copy configurations
 # COPY nginx.conf /etc/nginx/http.d/default.conf
-# COPY supervisord.conf /etc/supervisord.conf
+COPY supervisord.conf /etc/supervisord.conf
 
-# # Create required directories
-# RUN mkdir -p /var/log/supervisor
+# Create required directories
+RUN mkdir -p /var/log/supervisor
 
 # Start supervisord
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
