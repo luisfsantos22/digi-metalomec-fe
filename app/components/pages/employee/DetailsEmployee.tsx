@@ -24,17 +24,16 @@ import SkillsEmployee from './SkillsEmployee'
 
 type DetailsEmployeeProps = {
   session: Session | null
+  employeeId: string
 }
 
 export default function DetailsEmployee(props: DetailsEmployeeProps) {
-  const { session } = props
+  const { session, employeeId } = props
 
-  const searchParams = useSearchParams()
   const router = useRouter()
   const accessToken = session?.accessToken
 
   const [tabActive, setTabActive] = useAtom(mainPageActiveTab)
-  const employeeId = searchParams.get('id')
 
   const [activationTrigger, setActivationTrigger] = useState(0)
   const { loading, error, employee } = useGetEmployee(employeeId ?? '', [

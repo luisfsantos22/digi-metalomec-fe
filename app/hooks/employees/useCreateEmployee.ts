@@ -40,7 +40,7 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
         message: 'Colaborador criado com sucesso!',
         position: 'top-right',
       })
-      router.push(`/employee/details/${id}`)
+      router.push(`/employee/details/${id}/`)
 
       return id
     } catch {

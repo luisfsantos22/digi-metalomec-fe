@@ -159,7 +159,7 @@ export default function EditEmployee() {
         const result = await editEmployee(employeeId, data)
 
         if (result?.id) {
-          router.push(`/employee/details/${result.id}`)
+          router.push(`/employee/details/${result.id}/`)
         }
         stopLoading()
       } catch (err) {

@@ -243,7 +243,7 @@ const EmployeesSection = () => {
                   {employees.map((employee) => (
                     <Table.Tr
                       onClick={() =>
-                        router.push(`/employee/details/${employee.id}`)
+                        router.push(`/employee/details/${employee.id}/`)
                       }
                       key={employee.id}
                       className="hover:cursor-pointer hover:!bg-digiblue-hover-options"
