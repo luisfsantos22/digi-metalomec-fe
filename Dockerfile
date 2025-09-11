@@ -37,6 +37,7 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
 ENV NODE_ENV=staging
+ENV PORT=80
 ENV NEXTAUTH_URL=$NEXTAUTH_URL
 
 # Expose port 80 (for Nginx proxy)
