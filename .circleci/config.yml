@@ -51,22 +51,24 @@ jobs:
       - run:
           name: Debug env vars
           command: |
-            echo "NEXT_PUBLIC_API_URL is set? ${NEXT_PUBLIC_API_URL:+yes}"
+            echo "NEXT_PUBLIC_API_URL is set? ${NEXT_PUBLIC_API_URL}"
+            echo "NEXTAUTH_URL is set? ${NEXTAUTH_URL}"
       - run:
           name: Deploy over SSH
           command: |
-            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} '
-              docker pull gic2luis/digi-metalomec-fe-v1:staging;
-              docker container stop digi-metalomec-fe-v1-staging || true;
-              docker container rm digi-metalomec-fe-v1-staging || true;
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} "\
+              docker pull gic2luis/digi-metalomec-fe-v1:staging; \
+              docker container stop digi-metalomec-fe-v1-staging || true; \
+              docker container rm digi-metalomec-fe-v1-staging || true; \
               docker run --name digi-metalomec-fe-v1-staging -d -p 8089:80 \
-                -e NEXTAUTH_SECRET="${NEXTAUTH_SECRET}" \
-                -e NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
-                -e NEXTAUTH_URL=${NEXTAUTH_URL} \
-                gic2luis/digi-metalomec-fe-v1:staging && sleep 10;
-              sudo docker image prune -f --filter "label=stage=builder";
-              sudo docker images | grep "digi-metalomec-fe" | grep -v "staging" | awk '\''{print $3}'\'' | xargs -r sudo docker rmi -f
-            '
+                -e NEXTAUTH_SECRET='${NEXTAUTH_SECRET}' \
+                -e NEXT_PUBLIC_API_URL='${NEXT_PUBLIC_API_URL}' \
+                -e NEXTAUTH_URL='${NEXTAUTH_URL}' \
+                gic2luis/digi-metalomec-fe-v1:staging; \
+              sleep 10; \
+              sudo docker image prune -f --filter 'label=stage=builder'; \
+              sudo docker images | grep 'digi-metalomec-fe' | grep -v 'staging' | awk '{print \$3}' | xargs -r sudo docker rmi -f \
+            "
 
 workflows:
   version: 2
