@@ -1,25 +1,23 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const AUTH_COOKIES = ['sessionid']
-
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const isAuthPage = pathname.startsWith('/auth')
 
   // Check if any auth cookie exists
-  const hasAuthCookie = AUTH_COOKIES.some((cookie) =>
-    request.cookies.has(cookie)
-  )
+  // const hasAuthCookie = AUTH_COOKIES.some((cookie) =>
+  //   request.cookies.has(cookie)
+  // )
 
-  // 1. If not authenticated
-  if (!hasAuthCookie) {
-    if (!isAuthPage) {
-      return NextResponse.redirect(new URL('/auth/signin', request.url))
-    }
+  // // 1. If not authenticated
+  // if (!hasAuthCookie) {
+  //   if (!isAuthPage) {
+  //     return NextResponse.redirect(new URL('/auth/signin', request.url))
+  //   }
 
-    return NextResponse.next()
-  }
+  //   return NextResponse.next()
+  // }
 
   // 2. Prevent logged-in users from visiting /auth/*
   if (isAuthPage || pathname === '/') {
