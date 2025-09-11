@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const AUTH_COOKIES = [
-  'next-auth.session-token',
-  '__Secure-next-auth.session-token',
-]
+const AUTH_COOKIES = ['sessionid']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
