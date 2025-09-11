@@ -36,16 +36,20 @@ const SignInForm = () => {
     setError('')
     try {
       startLoading()
+      console.log('Logging in with:', { email, password })
       const result = await signIn('credentials', {
         redirect: false,
         email,
         password,
       })
+      console.log('Login result:', result)
 
       if (!result?.error && result?.ok) {
+        console.log('Login successful, redirecting to dashboard')
         router.push('/dashboard/?module=home')
         stopLoading()
       } else {
+        console.log('Login failed:', result?.error)
         setError('Credenciais inválidas')
         stopLoading()
       }
