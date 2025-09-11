@@ -17,6 +17,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/signin', request.url))
   }
 
+  if (token) {
+    try {
+      const accessToken = token.accessToken as string
+      if (!accessToken) {
+        return NextResponse.redirect(new URL('/auth/signin', request.url))
+      }
+    } catch (error) {
+      console.error('Error validating token:', error)
+
+      return NextResponse.redirect(new URL('/auth/signin', request.url))
+    }
+  }
+
   // // Check if any auth cookie exists
   // const hasAuthCookie = AUTH_COOKIES.some((cookie) =>
   //   request.cookies.has(cookie)
