@@ -55,14 +55,14 @@ jobs:
       - run:
           name: Deploy over SSH
           command: |
-            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} "
-              docker pull gic2luis/digi-metalomec-fe-v1:staging && \
-              docker container stop digi-metalomec-fe-v1-staging || true && \
-              docker container rm digi-metalomec-fe-v1-staging || true && \
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} '
+              docker pull gic2luis/digi-metalomec-fe-v1:staging;
+              docker container stop digi-metalomec-fe-v1-staging || true;
+              docker container rm digi-metalomec-fe-v1-staging || true;
               docker run --name digi-metalomec-fe-v1-staging -d -p 8089:80 \
-                -e NEXTAUTH_SECRET=${NEXTAUTH_SECRET} \
-                -e NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
-                -e NEXTAUTH_URL=${NEXTAUTH_URL} \
+                -e NEXTAUTH_SECRET='"'"${NEXTAUTH_SECRET}"'"' \
+                -e NEXT_PUBLIC_API_URL='"${NEXT_PUBLIC_API_URL}"' \
+                -e NEXTAUTH_URL='"${NEXTAUTH_URL}"' \
                 gic2luis/digi-metalomec-fe-v1:staging"
 
 workflows:
