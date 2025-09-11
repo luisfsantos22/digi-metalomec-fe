@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const AUTH_COOKIES = ['sessionid']
+const AUTH_COOKIES = [
+  'sessionid', // Django session
+  'next-auth.session-token', // NextAuth session
+  '__Secure-next-auth.session-token',
+]
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
