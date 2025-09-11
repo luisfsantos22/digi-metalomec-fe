@@ -6,11 +6,12 @@ import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 
 interface PageProps {
-  params: { id: string }
+  params?: Promise<{ id: string }>
 }
 
 const DetailEmployeePage = async ({ params }: PageProps) => {
-  const employeeId = params?.id ?? ''
+  const resolvedParams = await params
+  const employeeId = resolvedParams?.id ?? ''
 
   const session = await getServerSession(authOptions)
   if (!session) {
@@ -25,13 +26,13 @@ const DetailEmployeePage = async ({ params }: PageProps) => {
             { name: 'Colaboradores', href: '/dashboard?module=employees' },
             {
               name: 'Detalhes do Colaborador',
-              href: `/employee/details/${employeeId}/`,
+              href: `/employee/details/${employeeId}`,
             },
           ]}
         />
         <DetailsEmployee
-          session={session}
           employeeId={employeeId}
+          session={session}
         />
       </div>
     </GeneralLayout>
