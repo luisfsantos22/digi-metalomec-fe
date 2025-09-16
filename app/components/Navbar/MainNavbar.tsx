@@ -274,6 +274,17 @@ export default function MainNavbar() {
             type="button"
             onClick={() => handleTabChange('employees')}
           />
+          <Divider />
+          <div className="mt-8">
+            <NavbarMobileButton
+              id="signout"
+              text="Terminar Sessão"
+              isActive={false}
+              type="button"
+              onClick={() => signOut()}
+              secondary
+            />
+          </div>
         </div>
       )}
     </div>
