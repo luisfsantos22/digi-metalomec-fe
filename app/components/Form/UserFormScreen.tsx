@@ -1,4 +1,10 @@
-import { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form'
+import {
+  FieldErrors,
+  UseFormRegister,
+  UseFormSetError,
+  UseFormSetValue,
+  UseFormClearErrors,
+} from 'react-hook-form'
 import ContainerCard from '../Card/ContainerCard'
 import FormInput from '../Input/FormInput'
 import Row from '../Row/Row'
@@ -8,16 +14,15 @@ import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from '@/app/constants'
 import Separator from '../Separator/Separator'
 import UploadImage from '../Upload/UploadImage'
 import useUploadImage from '@/app/hooks/useUploadImage'
-
 type UserFormScreenProps = {
   formData: CreateEmployeeData
   register: UseFormRegister<CreateEmployeeData>
   setValue: UseFormSetValue<CreateEmployeeData>
   errors: FieldErrors<CreateEmployeeData>
+  clearErrors?: UseFormClearErrors<CreateEmployeeData>
 }
-
 const UserFormScreen = (props: UserFormScreenProps) => {
-  const { formData, register, setValue, errors } = props
+  const { formData, register, setValue, errors, clearErrors } = props
   const {
     user: { email, firstName, lastName, phoneNumber } = {},
     nif,
@@ -75,17 +80,6 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           label="Username (gerado automaticamente)"
           labelStyles="text-digiblack1420-semibold flex gap-1"
         />
-        <FormInput
-          query={email}
-          setQuery={(e) => setValue('user.email', e as unknown as string)}
-          error={errors.user?.email ? 'Email é obrigatório' : undefined}
-          placeholder="jose.carlos@email.com"
-          inputType="email"
-          mandatory={true}
-          label="Email"
-          labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('user.email', { required: true })}
-        />
       </Row>
       <Row>
         <FormInput
@@ -137,22 +131,38 @@ const UserFormScreen = (props: UserFormScreenProps) => {
       <Separator />
       <Row title="Contatos">
         <FormInput
+          query={email}
+          setQuery={(e) => setValue('user.email', e as unknown as string)}
+          error={errors.user?.email ? 'Email é obrigatório' : undefined}
+          placeholder="jose.carlos@email.com"
+          inputType="email"
+          mandatory={true}
+          label="Email"
+          labelStyles="text-digiblack1420-semibold flex gap-1"
+          {...register('user.email', { required: true })}
+          width="lg:w-3/4 w-full"
+        />
+        <FormInput
           query={phoneNumber ? phoneNumber : ''}
-          setQuery={(e) => setValue('user.phoneNumber', e as unknown as string)}
+          setQuery={setValue.bind(null, 'user.phoneNumber')}
           placeholder="912 345 678"
           inputType="tel"
-          mandatory={false}
+          mandatory={true}
           label="Número de Telemóvel"
-          width="lg:w-1/5 w-full"
+          labelStyles="text-digiblack1420-semibold flex gap-1"
+          width="lg:w-1/4 w-full"
         />
       </Row>
       <Row>
         <FormInput
           label="Nome do Contato de Emergência"
           query={name}
-          setQuery={(e) =>
+          setQuery={(e) => {
             setValue('emergencyContact.name', e as unknown as string)
-          }
+            if (errors?.emergencyContact?.name) {
+              clearErrors && clearErrors('emergencyContact.name')
+            }
+          }}
           placeholder="João Silva"
           inputType="text"
           mandatory={false}
@@ -172,9 +182,12 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         <FormInput
           label="Telemóvel de Emergência"
           query={phone ? phone : ''}
-          setQuery={(e) =>
+          setQuery={(e) => {
+            if (errors?.emergencyContact?.phone) {
+              clearErrors && clearErrors('emergencyContact.phone')
+            }
             setValue('emergencyContact.phone', e as unknown as string)
-          }
+          }}
           placeholder="912 345 678"
           inputType="tel"
           mandatory={false}
@@ -194,9 +207,12 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         <FormInput
           label="Relação do Contato de Emergência"
           query={relationship}
-          setQuery={(e) =>
+          setQuery={(e) => {
+            if (errors?.emergencyContact?.relationship) {
+              clearErrors && clearErrors('emergencyContact.relationship')
+            }
             setValue('emergencyContact.relationship', e as unknown as string)
-          }
+          }}
           placeholder="Pai"
           inputType="text"
           mandatory={false}

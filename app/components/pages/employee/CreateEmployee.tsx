@@ -47,6 +47,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
     handleSubmit,
     setValue,
     formState: { errors },
+    clearErrors,
   } = useForm<CreateEmployeeData>({
     defaultValues: {
       user: {
@@ -259,6 +260,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
                   register={register}
                   setValue={setValue}
                   errors={errors}
+                  clearErrors={clearErrors}
                 />
               ),
               2: (

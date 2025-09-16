@@ -89,6 +89,7 @@ export default function EditEmployee() {
     handleSubmit,
     setValue,
     formState: { errors },
+    clearErrors,
     reset,
   } = useForm<CreateEmployeeData>({
     defaultValues: employee as CreateEmployeeData | undefined,
@@ -228,6 +229,7 @@ export default function EditEmployee() {
                 register={register}
                 setValue={setValue}
                 errors={errors}
+                clearErrors={clearErrors}
               />
             ),
             2: (
