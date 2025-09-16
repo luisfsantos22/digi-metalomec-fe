@@ -51,7 +51,7 @@ COPY nginx.conf /etc/nginx/http.d/default.conf
 COPY supervisord.conf /etc/supervisord.conf
 
 # Create required directories
-RUN mkdir -p /var/log/supervisor
+RUN mkdir -p /var/log/supervisor /app/logs
 
 # Start supervisord
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
