@@ -129,6 +129,18 @@ export default function MainNavbar() {
               disabled={true}
             />
             <SecondaryButton
+              id="candidates"
+              text="Candidatos"
+              onClick={() => handleTabChange('candidates')}
+              active={tabActive === 'candidates'}
+              withImage
+              imageSrc={
+                tabActive === 'candidates'
+                  ? '/icons/candidate_white.svg'
+                  : '/icons/candidate.svg'
+              }
+            />
+            <SecondaryButton
               id="clients"
               text="Clientes"
               onClick={() => handleTabChange('clients')}

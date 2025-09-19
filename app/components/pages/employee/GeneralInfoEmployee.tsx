@@ -2,7 +2,6 @@ import { Employee } from '@/app/types/employee/employee'
 import Label from '../../Label/Label'
 import Row from '../../Row/Row'
 import { formatDate } from '@/app/utils'
-import Image from 'next/image'
 import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from '@/app/constants'
 
 type GeneralInfoEmployeeProps = {

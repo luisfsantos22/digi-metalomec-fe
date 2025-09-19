@@ -14,21 +14,18 @@ import DeleteButton from '../../Button/DeleteButton'
 import AreYouSureModal from '../../Modal/AreYouSureModal'
 import { useDeleteEmployee } from '@/app/hooks/employees/useDeleteEmployee'
 import ContainerCard from '../../Card/ContainerCard'
-import { EMPLOYEE_DETAILS_TABS } from '@/app/constants'
-import GeneralInfoEmployee from './GeneralInfoEmployee'
 import PrimaryButton from '../../Button/PrimaryButton'
 import { useActivationEmployee } from '@/app/hooks/employees/useActivationEmployee'
-import { classNames } from 'utils'
-import CertificationsEmployee from './CertificationsEmployee'
-import SkillsEmployee from './SkillsEmployee'
+import GeneralInfoCandidate from './GeneralInfoCandidate'
+import useGetCandidate from '@/app/hooks/candidates/useGetCandidate'
 
-type DetailsEmployeeProps = {
+type DetailsCandidateProps = {
   session: Session | null
-  employeeId: string
+  candidateId: string
 }
 
-export default function DetailsEmployee(props: DetailsEmployeeProps) {
-  const { session, employeeId } = props
+export default function DetailsCandidate(props: DetailsCandidateProps) {
+  const { session, candidateId } = props
 
   const router = useRouter()
   const accessToken = session?.accessToken
@@ -36,7 +33,7 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
   const [tabActive, setTabActive] = useAtom(mainPageActiveTab)
 
   const [activationTrigger, setActivationTrigger] = useState(0)
-  const { loading, error, employee } = useGetEmployee(employeeId ?? '', [
+  const { loading, error, candidate } = useGetCandidate(candidateId ?? '', [
     activationTrigger,
   ])
   const { deleteEmployee } = useDeleteEmployee()
@@ -50,20 +47,16 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
     useState<boolean>(false)
   const [areYouSureToActivateOpen, setAreYouSureToActivateOpen] =
     useState<boolean>(false)
-  const [tab, setTab] = useState<string>(
-    EMPLOYEE_DETAILS_TABS?.find((t) => t.value === 'general')?.value ||
-      EMPLOYEE_DETAILS_TABS[0]?.value
-  )
 
   useEffect(() => {
-    setTabActive('employees')
-    if (!employeeId || error) {
-      router.push('/dashboard?module=employees')
+    setTabActive('candidates')
+    if (!candidateId || error) {
+      router.push('/dashboard?module=candidates')
     }
-  }, [employeeId, error, router, setTabActive])
+  }, [candidateId, error, router, setTabActive])
 
   // Prevent hydration mismatch: only render after client-side data is ready
-  if (!employeeId || loading) {
+  if (!candidateId || loading) {
     return (
       <div className="flex justify-center self-center items-center p-4 h-full ">
         <Spinner />
@@ -81,13 +74,13 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
   }
 
   const handleBackToMenu = () => {
-    redirect('/dashboard?module=employees')
+    redirect('/dashboard?module=candidates')
   }
 
   const handleDelete = async (id: string, token: string) => {
     await deleteEmployee(id, token)
     setAreYouSureToDeleteOpen(false)
-    router.push('/dashboard?module=employees')
+    router.push('/dashboard?module=candidates')
   }
 
   const handleActivation = async (
@@ -106,7 +99,7 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
       <div className="flex lg:flex-row flex-col w-full items-center lg:gap-2 gap-4">
         <div className="lg:w-1/3 lg:block hidden">
           <BackButton
-            id="back-btn-create-employee"
+            id="back-btn-create-candidate"
             onClick={() => handleBackToMenu()}
             size="h-10 w-10"
           />
@@ -117,7 +110,7 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
             <span>
               Detalhes do{' '}
               <span className="font-bold underline">
-                {employee?.user?.fullName ?? ''}
+                {candidate?.user?.fullName ?? ''}
               </span>
             </span>
           }
@@ -125,34 +118,30 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
         />
         <div className="lg:w-1/3 w-full gap-2 flex items-center lg:justify-end justify-center">
           <PrimaryButton
-            id="handle-activate-employee"
+            id="handle-activate-candidate"
             onClick={() => {
               setAreYouSureToActivateOpen(true)
             }}
-            text={employee?.user?.isActive ? 'Desativar' : 'Ativar'}
+            text={'Atribuir Contrato'}
             type="button"
-            extraStyles={
-              employee?.user?.isActive
-                ? '!bg-digibrown hover:!bg-digibrown/60 !text-white'
-                : '!bg-digigreen hover:!bg-digigreen/60 !text-white'
-            }
+            extraStyles="!bg-digigreen hover:!bg-digigreen/60 !text-white"
           />
           <EditButton
-            id={`edit-${employee?.id}`}
+            id={`edit-${candidate?.id}`}
             onClick={() => {
-              router.push(`/employee/edit?id=${employee?.id}`)
+              router.push(`/candidate/edit?id=${candidate?.id}`)
             }}
-            tooltipText="Editar Colaborador"
+            tooltipText="Editar Candidato"
             hasTooltip
             typeBtn="text"
             extraStyles="bg-digiorange hover:bg-digiorange/60"
           />
           <DeleteButton
-            id={`delete-${employee?.id}`}
+            id={`delete-${candidate?.id}`}
             onClick={() => {
               setAreYouSureToDeleteOpen(true)
             }}
-            tooltipText="Remover Colaborador"
+            tooltipText="Remover Candidato"
             hasTooltip
             typeBtn="text"
             extraStyles="bg-digired hover:bg-digired/60"
@@ -161,14 +150,7 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
       </div>
       <ContainerCard
         padding="lg:p-8 p-4"
-        styles={classNames(
-          employee?.user?.isActive ? 'border-digigreen' : 'border-digibrown',
-          'flex flex-col gap-4 w-full rounded-xl border'
-        )}
-        withTabs
-        tabs={EMPLOYEE_DETAILS_TABS}
-        activeTab={tab}
-        onTabChange={setTab}
+        styles="flex flex-col gap-4 w-full rounded-xl border border-digibrown"
       >
         {/* Table */}
         {loading ? (
@@ -180,32 +162,19 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
             text={`Erro: ${error}`}
             styles="text-red-500 text-center"
           />
-        ) : tab === 'general' ? (
-          <GeneralInfoEmployee employee={employee} />
-        ) : tab === 'certifications' ? (
-          <CertificationsEmployee
-            employeeId={employee?.id}
-            certifications={employee?.certifications}
-            setActivationTrigger={setActivationTrigger}
-          />
-        ) : tab === 'technicalQualifications' ? (
-          <SkillsEmployee
-            employeeId={employee?.id}
-            skills={employee?.skills}
-            setActivationTrigger={setActivationTrigger}
-            companyId={employee?.user?.company}
-          />
-        ) : null}
+        ) : (
+          <GeneralInfoCandidate candidate={candidate} />
+        )}
       </ContainerCard>
 
       {areYouSureToDeleteOpen && (
         <AreYouSureModal
           isOpen={areYouSureToDeleteOpen}
-          title="Remover Colaborador"
-          message={`Tem a certeza que deseja remover o colaborador selecionado (${employee?.user?.fullName})?`}
+          title="Remover Candidato"
+          message={`Tem a certeza que deseja remover o candidato selecionado (${candidate?.user?.fullName})?`}
           onConfirm={() => {
-            if (employeeId && accessToken) {
-              handleDelete(employeeId, accessToken)
+            if (candidateId && accessToken) {
+              handleDelete(candidateId, accessToken)
             }
           }}
           onClose={() => {
@@ -217,21 +186,17 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
       {areYouSureToActivateOpen && (
         <AreYouSureModal
           isOpen={areYouSureToActivateOpen}
-          title={`${employee?.user?.isActive ? 'Desativar' : 'Ativar'} Colaborador`}
-          message={`Tem a certeza que deseja ${employee?.user?.isActive ? 'desativar' : 'ativar'} o colaborador selecionado (${employee?.user?.fullName})?`}
+          title={`Atribuir Contrato ao Candidato`}
+          message={`Tem a certeza que deseja atribuir contrato ao candidato selecionado (${candidate?.user?.fullName})?`}
           onConfirm={() => {
-            if (employeeId && accessToken) {
-              handleActivation(
-                employeeId,
-                employee?.user?.isActive ? false : true,
-                accessToken
-              )
+            if (candidateId && accessToken) {
+              handleActivation(candidateId, true, accessToken)
             }
           }}
           onClose={() => {
             setAreYouSureToActivateOpen(false)
           }}
-          primaryBtnText={employee?.user?.isActive ? 'Desativar' : 'Ativar'}
+          primaryBtnText="Atribuir Contrato"
         />
       )}
     </div>

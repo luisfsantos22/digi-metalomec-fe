@@ -73,6 +73,7 @@ type Employee = {
   district?: string
   country: string
   dateOfBirth?: Date
+  internalIdentifier?: number
 }
 
 type GenericEmployee = {
@@ -84,6 +85,7 @@ type GenericEmployee = {
   performanceRating?: number
   status: string
   availabilityStatus: string
+  internalIdentifier?: number
 }
 
 type CreateEmployeeData = {
@@ -121,7 +123,6 @@ type CreateEmployeeData = {
   dateOfBirth?: Date
   phoneNumber?: string
 }
-
 export type {
   GenericEmployee,
   EmployeeCertification,

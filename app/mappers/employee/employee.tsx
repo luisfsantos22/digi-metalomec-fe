@@ -23,8 +23,11 @@ export const mapGenericEmployee = (data: any): GenericEmployee => ({
 
 export const mapEmployee = (data: any): Employee => ({
   id: data?.id || '',
+  createdAt: data?.created_at || '',
+  updatedAt: data?.updated_at || '',
+  internalIdentifier: data?.internal_identifier || undefined,
   user: {
-    id: data?.id || '',
+    id: data?.user?.id || '',
     firstName: data?.user?.first_name || '',
     lastName: data?.user?.last_name || '',
     username: data?.user?.email ? data?.user?.email.split('@')[0] : '',
@@ -93,6 +96,4 @@ export const mapEmployee = (data: any): Employee => ({
   district: data?.district || '',
   country: data?.country || '',
   dateOfBirth: data?.date_of_birth || null,
-  createdAt: data?.created_at,
-  updatedAt: data?.updated_at,
 })
