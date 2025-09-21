@@ -154,7 +154,7 @@ export default function EditCandidate() {
         </div>
         <Text
           header="h1"
-          text={'Editar Colaborador'}
+          text={`Editar Colaborador - ${formData?.internalIdentifier}`}
           styles="lg:w-1/3 w-full lg:text-[32px] text-[20px] lg:leading-[40px] leading-[25px] font-semibold text-digiblack self-center text-center"
         />
         <div className="lg:w-1/3 lg:block hidden"></div>

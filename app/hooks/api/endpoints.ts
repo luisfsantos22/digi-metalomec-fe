@@ -18,6 +18,12 @@ export const CANDIDATE_ENDPOINTS = {
   getCandidateById: (id: string) => `api/v1/employees/candidates/${id}/`,
   getCandidatesPage: (page: number) =>
     `api/v1/employees/candidates/?page=${page}`,
+  getCandidatesIteractions: (candidateId?: string) =>
+    `api/v1/employees/iteractions/${candidateId ? `?employee=${candidateId}` : ''}`,
+  getCandidatesIteractionsPage: (candidateId: string, page: number) =>
+    `api/v1/employees/iteractions/?page=${page}&employee=${candidateId}`,
+  getCandidateIteractionById: (id: string) =>
+    `api/v1/employees/iteractions/${id}/`,
 }
 
 export const EMPLOYEE_ENDPOINTS = {

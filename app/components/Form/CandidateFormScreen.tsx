@@ -74,6 +74,7 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             placeholder="José"
             inputType="text"
             mandatory={true}
+            width="lg:w-1/3 w-full"
             label="Nome"
             labelStyles="text-digiblack1420-semibold flex gap-1"
             {...register('user.firstName', { required: true })}
@@ -86,18 +87,48 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             inputType="text"
             mandatory={true}
             label="Apelido"
+            width="lg:w-1/3 w-full"
             labelStyles="text-digiblack1420-semibold flex gap-1"
             {...register('user.lastName', { required: true })}
           />
-          <FormInput
-            query={email?.split('@')[0]}
-            setQuery={() => {}}
-            placeholder="jose.carlos"
-            inputType="text"
-            mandatory={true}
-            disabled
-            label="Username (gerado automaticamente)"
+          <SearchInput
+            query={search}
+            setQuery={setSearch}
+            placeholder="Pesquise ou crie um Cargo/Função"
+            data={searchedJobTitles}
+            dataIsLoading={jobTitlesLoading}
+            error={
+              jobTitlesError ??
+              (errors.jobTitles ? 'Cargo/Função é obrigatório' : undefined)
+            }
+            label="Cargo/Função"
             labelStyles="text-digiblack1420-semibold flex gap-1"
+            mandatory={true}
+            width="lg:w-1/3 w-full"
+            value={search}
+            setValue={(id) => {
+              const found = searchedJobTitles.find((jt) => jt.id === id)
+              if (found) {
+                setValue('jobTitles', [found])
+                setSelectedJobTitle(found)
+              }
+            }}
+            setSelectedObj={(obj) => {
+              if (obj) {
+                setValue('jobTitles', [obj])
+                setSelectedJobTitle(obj)
+              } else {
+                setValue('jobTitles', [])
+                setSelectedJobTitle(null)
+                setSearch('')
+              }
+            }}
+            seletectedObjValue={selectedJobTitle ? selectedJobTitle.name : ''}
+            setShowCreateModal={setShowCreateJobTitleModal}
+            createText="Crie um novo Cargo/Função"
+            source="JobTitle"
+            setIsDropdownOpen={setIsDropdownOpen}
+            isDropdownOpen={isDropdownOpen}
           />
         </Row>
         <Separator />
@@ -156,45 +187,6 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             labelStyles="text-digiblack1420-semibold flex gap-1"
             {...register('geographicAvailability', { required: false })}
             width="lg:w-1/3 w-full"
-          />
-          <SearchInput
-            query={search}
-            setQuery={setSearch}
-            placeholder="Pesquise ou crie um Cargo/Função"
-            data={searchedJobTitles}
-            dataIsLoading={jobTitlesLoading}
-            error={
-              jobTitlesError ??
-              (errors.jobTitles ? 'Cargo/Função é obrigatório' : undefined)
-            }
-            label="Cargo/Função"
-            labelStyles="text-digiblack1420-semibold flex gap-1"
-            mandatory={true}
-            width="lg:w-1/3 w-full"
-            value={search}
-            setValue={(id) => {
-              const found = searchedJobTitles.find((jt) => jt.id === id)
-              if (found) {
-                setValue('jobTitles', [found])
-                setSelectedJobTitle(found)
-              }
-            }}
-            setSelectedObj={(obj) => {
-              if (obj) {
-                setValue('jobTitles', [obj])
-                setSelectedJobTitle(obj)
-              } else {
-                setValue('jobTitles', [])
-                setSelectedJobTitle(null)
-                setSearch('')
-              }
-            }}
-            seletectedObjValue={selectedJobTitle ? selectedJobTitle.name : ''}
-            setShowCreateModal={setShowCreateJobTitleModal}
-            createText="Crie um novo Cargo/Função"
-            source="JobTitle"
-            setIsDropdownOpen={setIsDropdownOpen}
-            isDropdownOpen={isDropdownOpen}
           />
         </Row>
       </ContainerCard>

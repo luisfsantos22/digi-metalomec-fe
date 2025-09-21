@@ -2,7 +2,7 @@ import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import useDebouncedValue from '../useDebouncedValue'
 import axiosInstance from '../axiosInstance'
-import { CANDIDATE_ENDPOINTS, EMPLOYEE_ENDPOINTS } from '../api/endpoints'
+import { CANDIDATE_ENDPOINTS } from '../api/endpoints'
 import { GenericCandidate } from '@/app/types/candidate/candidate'
 import { mapGenericCandidate } from '@/app/mappers/candidate/candidate'
 

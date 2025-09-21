@@ -3,6 +3,7 @@ import Label from '../../Label/Label'
 import Row from '../../Row/Row'
 import { translateEmployeeAvailabilityStatus } from '@/app/utils'
 import { GenericCandidate } from '@/app/types/candidate/candidate'
+import { formatDate } from '../../../utils'
 
 type GeneralInfoCandidateProps = {
   candidate: GenericCandidate | null
@@ -26,12 +27,21 @@ export default function GeneralInfoCandidate(props: GeneralInfoCandidateProps) {
           label="Nome Completo"
           value={candidate?.user?.fullName}
         />
+      </Row>
+      <Row>
         <Label
           label="Cargo"
           value={
             candidate?.jobTitles && candidate.jobTitles.length > 0
               ? candidate.jobTitles.map((job) => job.name).join(', ')
               : undefined
+          }
+        />
+        <Label
+          label="Último Atualização"
+          type="text"
+          value={
+            candidate?.updatedAt ? formatDate(candidate?.updatedAt) : undefined
           }
         />
       </Row>

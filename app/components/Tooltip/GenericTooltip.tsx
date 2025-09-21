@@ -4,7 +4,7 @@ import { classNames } from 'utils'
 import { PlacesType, Tooltip } from 'react-tooltip'
 
 type GenericTooltipProps = {
-  text: string
+  text: string | undefined
   width?: string
   styles?: string
   position?: PlacesType

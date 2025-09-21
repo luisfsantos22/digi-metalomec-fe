@@ -19,4 +19,13 @@ export const mapGenericCandidate = (data: any): GenericCandidate => ({
   jobTitles: data?.job_titles || [],
   updatedAt: data?.updated_at || undefined,
   geographicAvailability: data?.geographic_availability || '',
+  lastIteraction: data?.last_iteraction || undefined,
+})
+
+export const mapGenericCandidateIteraction = (data: any) => ({
+  id: data?.id || '',
+  candidateId: data?.candidate || '',
+  description: data?.description || '',
+  createdAt: data?.created_at || undefined,
+  updatedAt: data?.updated_at || undefined,
 })

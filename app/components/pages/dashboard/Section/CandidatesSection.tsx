@@ -26,6 +26,7 @@ const IntlTelInput = dynamic(() => import('intl-tel-input/reactWithUtils'), {
 import 'intl-tel-input/styles'
 import dynamic from 'next/dynamic'
 import { GenericCandidate } from '@/app/types/candidate/candidate'
+import GenericTooltip from '@/app/components/Tooltip/GenericTooltip'
 
 const CandidatesSection = () => {
   const router = useRouter()
@@ -205,7 +206,7 @@ const CandidatesSection = () => {
                       Cargo
                     </Table.Th>
                     <Table.Th className="text-digiwhite1624-bold">
-                      Data de Alteração
+                      Última Alteração
                     </Table.Th>
                     <Table.Th className="text-digiwhite1624-bold">
                       Disponibilidade
@@ -214,7 +215,10 @@ const CandidatesSection = () => {
                       Nº de Telemóvel
                     </Table.Th>
                     <Table.Th className="text-digiwhite1624-bold">
-                      Disponibilidade Geográfica
+                      Disp. Geográfica
+                    </Table.Th>
+                    <Table.Th className="text-digiwhite1624-bold">
+                      Última Iteração
                     </Table.Th>
                     <Table.Th className="text-digiwhite1624-bold">
                       Ações
@@ -277,7 +281,7 @@ const CandidatesSection = () => {
                           inputProps={{
                             placeholder: 'Por Preencher...',
                             className:
-                              'text-digiblack1624-normal !pr-0 hover:cursor-pointer',
+                              'text-digiblack1624-normal w-40 !pr-0 hover:cursor-pointer',
                           }}
                           initOptions={{
                             allowDropdown: false,
@@ -296,6 +300,17 @@ const CandidatesSection = () => {
                                 'text-digired'
                             ) as string
                           }
+                        />
+                      </Table.Td>
+                      <Table.Td>
+                        <Text
+                          styles="text-digiblack1624-normal max-w-[200px] line-clamp-1"
+                          text={candidate.lastIteraction || 'N/A'}
+                          id={`last-interaction-${candidate.id}`}
+                        />
+                        <GenericTooltip
+                          text={candidate.lastIteraction || undefined}
+                          anchorSelect={`last-interaction-${candidate.id}`}
                         />
                       </Table.Td>
                       <Table.Td>

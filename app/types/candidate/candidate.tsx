@@ -9,6 +9,7 @@ type GenericCandidate = {
   updatedAt: Date
   availabilityStatus: string
   geographicAvailability: string
+  lastIteraction?: string
 }
 
 type CreateCandidateData = {
@@ -19,4 +20,22 @@ type CreateCandidateData = {
   internalIdentifier?: number
 }
 
-export type { GenericCandidate, CreateCandidateData }
+type CandidateIteraction = {
+  id: string
+  employee: string
+  description: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+type CreateCandidateIteraction = {
+  employee: string
+  description: string
+}
+
+export type {
+  GenericCandidate,
+  CreateCandidateData,
+  CreateCandidateIteraction,
+  CandidateIteraction,
+}

@@ -3,7 +3,6 @@
 import { Session } from 'next-auth'
 import { redirect, useRouter } from 'next/navigation'
 import Spinner from '../../Spinner/Spinner'
-import useGetEmployee from '@/app/hooks/employees/useGetEmployee'
 import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
 import { useEffect, useState } from 'react'
@@ -18,6 +17,8 @@ import PrimaryButton from '../../Button/PrimaryButton'
 import { useActivationEmployee } from '@/app/hooks/employees/useActivationEmployee'
 import GeneralInfoCandidate from './GeneralInfoCandidate'
 import useGetCandidate from '@/app/hooks/candidates/useGetCandidate'
+import { CANDIDATE_DETAILS_TABS } from '@/app/constants'
+import Candidateiteractions from './CandidateIterations'
 
 type DetailsCandidateProps = {
   session: Session | null
@@ -47,6 +48,10 @@ export default function DetailsCandidate(props: DetailsCandidateProps) {
     useState<boolean>(false)
   const [areYouSureToActivateOpen, setAreYouSureToActivateOpen] =
     useState<boolean>(false)
+  const [tab, setTab] = useState<string>(
+    CANDIDATE_DETAILS_TABS?.find((t) => t.value === 'general')?.value ||
+      CANDIDATE_DETAILS_TABS[0]?.value
+  )
 
   useEffect(() => {
     setTabActive('candidates')
@@ -151,6 +156,10 @@ export default function DetailsCandidate(props: DetailsCandidateProps) {
       <ContainerCard
         padding="lg:p-8 p-4"
         styles="flex flex-col gap-4 w-full rounded-xl border border-digibrown"
+        withTabs
+        tabs={CANDIDATE_DETAILS_TABS}
+        activeTab={tab}
+        onTabChange={setTab}
       >
         {/* Table */}
         {loading ? (
@@ -162,9 +171,14 @@ export default function DetailsCandidate(props: DetailsCandidateProps) {
             text={`Erro: ${error}`}
             styles="text-red-500 text-center"
           />
-        ) : (
+        ) : tab === 'general' ? (
           <GeneralInfoCandidate candidate={candidate} />
-        )}
+        ) : tab === 'iterations' ? (
+          <Candidateiteractions
+            setActivationTrigger={setActivationTrigger}
+            candidateId={candidate ? candidate.id : ''}
+          />
+        ) : null}
       </ContainerCard>
 
       {areYouSureToDeleteOpen && (
