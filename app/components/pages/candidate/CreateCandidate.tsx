@@ -69,7 +69,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
 
   // UseEffects
   useEffect(() => {
-    setTabActive('employees')
+    setTabActive('candidates')
   }, [])
 
   useEffect(() => {

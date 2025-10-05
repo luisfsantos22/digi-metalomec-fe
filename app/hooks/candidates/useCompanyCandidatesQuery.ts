@@ -15,7 +15,7 @@ interface useCompanyCandidatesQueryResult {
   hasPreviousPage?: boolean
 }
 
-const useCompanyEmployeesQuery = (
+const useCompanyCandidatesQuery = (
   page: number,
   searchQuery: string = '',
   jobTitleFilter: string = '',
@@ -30,6 +30,7 @@ const useCompanyEmployeesQuery = (
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 1000)
   const debouncedJobTitleFilter = useDebouncedValue(jobTitleFilter, 1000)
+  const debouncedPhoneFilter = useDebouncedValue(phoneFilter, 1000)
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -42,7 +43,8 @@ const useCompanyEmployeesQuery = (
           params.keyword = debouncedSearchQuery
         if (debouncedJobTitleFilter && debouncedJobTitleFilter.trim() !== '')
           params.job_title = debouncedJobTitleFilter
-        if (phoneFilter && phoneFilter.trim() !== '') params.phone = phoneFilter
+        if (debouncedPhoneFilter && debouncedPhoneFilter.trim() !== '')
+          params.phone = debouncedPhoneFilter
 
         const response = await axiosInstance.get(
           CANDIDATE_ENDPOINTS.getCandidatesPage(page),
@@ -74,11 +76,11 @@ const useCompanyEmployeesQuery = (
     page,
     debouncedSearchQuery,
     debouncedJobTitleFilter,
-    phoneFilter,
+    debouncedPhoneFilter,
     refreshFlag,
   ])
 
   return { candidates, loading, error, count }
 }
 
-export default useCompanyEmployeesQuery
+export default useCompanyCandidatesQuery

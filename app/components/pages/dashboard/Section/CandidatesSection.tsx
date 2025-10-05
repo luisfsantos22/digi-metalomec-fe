@@ -158,10 +158,21 @@ const CandidatesSection = () => {
             styles="text-red-500 text-center"
           />
         ) : count === 0 ? (
-          <Text
-            text="Nenhum candidato encontrado"
-            styles="text-digiblack1624-semibold text-center"
-          />
+          <div className="flex flex-col gap-4 items-center justify-center">
+            <Text
+              text="Nenhum candidato encontrado"
+              styles="text-digiblack1624-semibold text-center"
+            />
+            <AddButton
+              id="add-candidate-button"
+              tooltipText="Adicionar um novo candidato"
+              onClick={() => {
+                setTabActive('candidates')
+                router.push('/candidate/add')
+              }}
+              size="w-20 h-20 lg:w-30 lg:h-30"
+            />
+          </div>
         ) : (
           <div className="flex flex-col gap-4 w-full overflow-y-auto">
             <div className="flex justify-between items-center">

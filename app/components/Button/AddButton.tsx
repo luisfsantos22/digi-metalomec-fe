@@ -17,7 +17,7 @@ const AddButton = (props: AddButtonProps) => {
     id,
     tooltipText = '',
     size = 'lg:h-32 lg:w-32 w-10 h-10',
-    widthTooltip = 'auto',
+    widthTooltip = '200',
     position = 'bottom',
   } = props
 

@@ -14,11 +14,11 @@ import AreYouSureModal from '../../Modal/AreYouSureModal'
 import { useDeleteEmployee } from '@/app/hooks/employees/useDeleteEmployee'
 import ContainerCard from '../../Card/ContainerCard'
 import PrimaryButton from '../../Button/PrimaryButton'
-import { useActivationEmployee } from '@/app/hooks/employees/useActivationEmployee'
 import GeneralInfoCandidate from './GeneralInfoCandidate'
 import useGetCandidate from '@/app/hooks/candidates/useGetCandidate'
 import { CANDIDATE_DETAILS_TABS } from '@/app/constants'
 import Candidateiteractions from './CandidateIterations'
+import { useActivationCandidate } from '@/app/hooks/candidates/useActivationCandidate'
 
 type DetailsCandidateProps = {
   session: Session | null
@@ -39,10 +39,10 @@ export default function DetailsCandidate(props: DetailsCandidateProps) {
   ])
   const { deleteEmployee } = useDeleteEmployee()
   const {
-    activationEmployee,
+    activationCandidate,
     loading: activatingLoading,
     error: activatingError,
-  } = useActivationEmployee()
+  } = useActivationCandidate()
 
   const [areYouSureToDeleteOpen, setAreYouSureToDeleteOpen] =
     useState<boolean>(false)
@@ -93,9 +93,8 @@ export default function DetailsCandidate(props: DetailsCandidateProps) {
     isActive: boolean,
     token: string
   ) => {
-    await activationEmployee(id, isActive, token)
+    await activationCandidate(id, isActive, token)
     setAreYouSureToActivateOpen(false)
-    setActivationTrigger((prev) => prev + 1)
   }
 
   return (

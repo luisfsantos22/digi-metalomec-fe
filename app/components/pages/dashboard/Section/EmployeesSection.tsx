@@ -175,10 +175,21 @@ const EmployeesSection = () => {
             styles="text-red-500 text-center"
           />
         ) : count === 0 ? (
-          <Text
-            text="Nenhum colaborador encontrado"
-            styles="text-digiblack1624-semibold text-center"
-          />
+          <div className="flex flex-col gap-4 items-center justify-center">
+            <Text
+              text="Nenhum colaborador encontrado"
+              styles="text-digiblack1624-semibold text-center"
+            />
+            <AddButton
+              id="add-employee-button"
+              tooltipText="Adicionar um novo colaborador"
+              onClick={() => {
+                setTabActive('employees')
+                router.push('/employee/add')
+              }}
+              size="w-20 h-20 lg:w-30 lg:h-30"
+            />
+          </div>
         ) : (
           <div className="flex flex-col gap-4 w-full overflow-y-auto">
             <div className="flex justify-between items-center">

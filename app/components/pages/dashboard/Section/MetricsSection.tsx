@@ -5,26 +5,26 @@ export default function MetricsSection() {
     <div className="flex lg:flex-row flex-col lg:gap-5 gap-4 w-full items-center justify-between">
       <MetricCard
         label="Receita Total"
-        value={24500}
-        variation={12}
+        value={0}
+        variation={0}
         type="currency"
       />
       <MetricCard
         label="Gastos Totais"
-        value={12}
-        variation={-2}
+        value={0}
+        variation={0}
         type="currency"
       />
       <MetricCard
         label="Clientes Ativos"
-        value={145}
-        variation={8}
+        value={'N/A'}
+        variation={0}
         type="client"
       />
       <MetricCard
         label="Colaboradores Ativos"
-        value={12}
-        variation={-2}
+        value={'N/A'}
+        variation={0}
         type="employee"
       />
     </div>
