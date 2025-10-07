@@ -90,7 +90,11 @@ jobs:
       - run:
           name: Deploy staging over SSH
           command: |
-            ssh -o StrictHostKeyChecking=no ${SSH_USER_STAGING}@${SSH_HOST_STAGING} 'docker pull gic2luis/digi-metalomec-fe-v1:staging && docker container stop digi-metalomec-fe-staging || true && docker container rm digi-metalomec-fe-staging || true && docker run --name digi-metalomec-fe-staging -d -p 8089:80 -e NEXTAUTH_SECRET="'${NEXTAUTH_SECRET_STAGING}'" -e NEXT_PUBLIC_API_URL="'${NEXT_PUBLIC_API_URL_STAGING}'" -e NEXTAUTH_URL="'${NEXTAUTH_URL_STAGING}'" -e NEXT_PUBLIC_DESKTOP_WIDTH=1024 -e NODE_ENV=staging gic2luis/digi-metalomec-fe-v1:staging && sleep 10 && sudo docker image prune -f'
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_STAGING}@${SSH_HOST_STAGING} "docker pull gic2luis/digi-metalomec-fe-v1:staging"
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_STAGING}@${SSH_HOST_STAGING} "docker container stop digi-metalomec-fe-staging || true"
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_STAGING}@${SSH_HOST_STAGING} "docker container rm digi-metalomec-fe-staging || true"
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_STAGING}@${SSH_HOST_STAGING} "docker run --name digi-metalomec-fe-staging -d -p 8089:80 -e NEXTAUTH_SECRET='${NEXTAUTH_SECRET_STAGING}' -e NEXT_PUBLIC_API_URL='${NEXT_PUBLIC_API_URL_STAGING}' -e NEXTAUTH_URL='${NEXTAUTH_URL_STAGING}' -e NEXT_PUBLIC_DESKTOP_WIDTH=1024 -e NODE_ENV=staging gic2luis/digi-metalomec-fe-v1:staging"
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_STAGING}@${SSH_HOST_STAGING} "sleep 10 && sudo docker image prune -f"
 
   deploy-production:
     machine:
@@ -108,7 +112,11 @@ jobs:
       - run:
           name: Deploy production over SSH
           command: |
-            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} 'docker pull gic2luis/digi-metalomec-fe-v1:prod && docker container stop digi-metalomec-fe-v1-prod || true && docker container rm digi-metalomec-fe-v1-prod || true && docker run --name digi-metalomec-fe-v1-prod -d -p 8087:80 -e NEXTAUTH_SECRET="'${NEXTAUTH_SECRET_PROD}'" -e NEXT_PUBLIC_API_URL="'${NEXT_PUBLIC_API_URL_PROD}'" -e NEXTAUTH_URL="'${NEXTAUTH_URL_PROD}'" -e NEXT_PUBLIC_DESKTOP_WIDTH=1024 -e NODE_ENV=production gic2luis/digi-metalomec-fe-v1:prod && sleep 10 && sudo docker image prune -f'
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} "docker pull gic2luis/digi-metalomec-fe-v1:prod"
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} "docker container stop digi-metalomec-fe-v1-prod || true"
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} "docker container rm digi-metalomec-fe-v1-prod || true"
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} "docker run --name digi-metalomec-fe-v1-prod -d -p 8087:80 -e NEXTAUTH_SECRET='${NEXTAUTH_SECRET_PROD}' -e NEXT_PUBLIC_API_URL='${NEXT_PUBLIC_API_URL_PROD}' -e NEXTAUTH_URL='${NEXTAUTH_URL_PROD}' -e NEXT_PUBLIC_DESKTOP_WIDTH=1024 -e NODE_ENV=production gic2luis/digi-metalomec-fe-v1:prod"
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} "sleep 10 && sudo docker image prune -f"
 
 workflows:
   version: 2
