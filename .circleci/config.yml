@@ -6,7 +6,7 @@ executors:
       - image: cimg/node:20.19.1
 
 jobs:
-  build:
+  build-staging:
     executor: docker-executor
     working_directory: ~/repo
     steps:
@@ -18,7 +18,7 @@ jobs:
             sudo apt-get install -y docker-compose
       - setup_remote_docker
       - run:
-          name: Build project
+          name: Build staging project
           command: |
             docker-compose -f docker-compose-staging.yml build
       - run:
@@ -35,12 +35,46 @@ jobs:
               sleep 10
             done
       - run:
-          name: Push Docker Image
+          name: Push Docker Image (Staging)
           command: |
             echo "Pushing image gic2luis/digi-metalomec-fe-v1:staging..."
             docker push gic2luis/digi-metalomec-fe-v1:staging
 
-  deploy:
+  build-production:
+    executor: docker-executor
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: Install Docker Compose
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y docker-compose
+      - setup_remote_docker
+      - run:
+          name: Build production project
+          command: |
+            docker-compose build
+      - run:
+          name: Docker Login
+          command: |
+            for i in 1 2 3; do
+              echo "Attempt $i: Docker login..."
+              echo "User: $DOCKERHUB_USER"
+              echo "$DOCKERHUB_PASS" | docker login --username "$DOCKERHUB_USER" --password-stdin && break
+              if [ $i -eq 3 ]; then
+                echo "Docker login failed after 3 attempts"
+                exit 1
+              fi
+              sleep 10
+            done
+      - run:
+          name: Push Docker Image (Production)
+          command: |
+            echo "Pushing image gic2luis/digi-metalomec-fe-v1:prod..."
+            docker push gic2luis/digi-metalomec-fe-v1:prod
+
+  deploy-staging:
     machine:
       image: default
     steps:
@@ -49,38 +83,83 @@ jobs:
           fingerprints:
             - '20:38:99:33:01:01:74:f5:eb:6b:6b:24:dc:ef:c9:1c'
       - run:
-          name: Debug env vars
+          name: Debug staging env vars
           command: |
-            echo "NEXT_PUBLIC_API_URL is set? ${NEXT_PUBLIC_API_URL}"
-            echo "NEXTAUTH_URL is set? ${NEXTAUTH_URL}"
+            echo "NEXT_PUBLIC_API_URL_STAGING is set? ${NEXT_PUBLIC_API_URL_STAGING}"
+            echo "NEXTAUTH_URL_STAGING is set? ${NEXTAUTH_URL_STAGING}"
       - run:
-          name: Deploy over SSH
+          name: Deploy staging over SSH
           command: |
-            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} "\
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_STAGING}@${SSH_HOST_STAGING} "\
               docker pull gic2luis/digi-metalomec-fe-v1:staging; \
               docker container stop digi-metalomec-fe-v1-staging || true; \
               docker container rm digi-metalomec-fe-v1-staging || true; \
               docker run --name digi-metalomec-fe-v1-staging -d -p 8089:80 \
-                -e NEXTAUTH_SECRET='${NEXTAUTH_SECRET}' \
-                -e NEXT_PUBLIC_API_URL='${NEXT_PUBLIC_API_URL}' \
-                -e NEXTAUTH_URL='${NEXTAUTH_URL}' \
+                -e NEXTAUTH_SECRET='${NEXTAUTH_SECRET_STAGING}' \
+                -e NEXT_PUBLIC_API_URL='${NEXT_PUBLIC_API_URL_STAGING}' \
+                -e NEXTAUTH_URL='${NEXTAUTH_URL_STAGING}' \
+                -e NEXT_PUBLIC_DESKTOP_WIDTH=1024 \
+                -e NODE_ENV=staging \
                 gic2luis/digi-metalomec-fe-v1:staging; \
               sleep 10; \
-              sudo docker image prune -f --filter 'label=stage=builder'; \
-              sudo docker images | grep 'digi-metalomec-fe' | grep -v 'staging' | awk '{print \$3}' | xargs -r sudo docker rmi -f \
+              sudo docker image prune -f; \
+            "
+
+  deploy-production:
+    machine:
+      image: default
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - '20:38:99:33:01:01:74:f5:eb:6b:6b:24:dc:ef:c9:1c'
+      - run:
+          name: Debug production env vars
+          command: |
+            echo "NEXT_PUBLIC_API_URL_PROD is set? ${NEXT_PUBLIC_API_URL_PROD}"
+            echo "NEXTAUTH_URL_PROD is set? ${NEXTAUTH_URL_PROD}"
+      - run:
+          name: Deploy production over SSH
+          command: |
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} "\
+              docker pull gic2luis/digi-metalomec-fe-v1:prod; \
+              docker container stop digi-metalomec-fe-v1-prod || true; \
+              docker container rm digi-metalomec-fe-v1-prod || true; \
+              docker run --name digi-metalomec-fe-v1-prod -d -p 8087:80 \
+                -e NEXTAUTH_SECRET='${NEXTAUTH_SECRET_PROD}' \
+                -e NEXT_PUBLIC_API_URL='${NEXT_PUBLIC_API_URL_PROD}' \
+                -e NEXTAUTH_URL='${NEXTAUTH_URL_PROD}' \
+                -e NEXT_PUBLIC_DESKTOP_WIDTH=1024 \
+                -e NODE_ENV=production \
+                gic2luis/digi-metalomec-fe-v1:prod; \
+              sleep 10; \
+              sudo docker image prune -f; \
             "
 
 workflows:
   version: 2
   deploy-staging:
     jobs:
-      - build:
+      - build-staging:
           filters:
             branches:
               only: develop
-      - deploy:
+      - deploy-staging:
           requires:
-            - build
+            - build-staging
           filters:
             branches:
               only: develop
+
+  deploy-production:
+    jobs:
+      - build-production:
+          filters:
+            branches:
+              only: main
+      - deploy-production:
+          requires:
+            - build-production
+          filters:
+            branches:
+              only: main

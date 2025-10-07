@@ -47,7 +47,7 @@ EXPOSE 80
 RUN apk add --no-cache nginx supervisor curl
 
 # Copy configurations
-COPY nginx.conf /etc/nginx/http.d/default.conf
+COPY nginx/staging/nginx.conf /etc/nginx/http.d/default.conf
 COPY supervisord.conf /etc/supervisord.conf
 
 # Create required directories

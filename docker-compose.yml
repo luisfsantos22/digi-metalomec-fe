@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  app:
+    image: gic2luis/digi-metalomec-fe-v1:prod
+    build:
+      context: .
+      dockerfile: Dockerfile/prod/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL_PROD}
+        NEXTAUTH_SECRET: ${NEXTAUTH_SECRET_PROD}
+        NEXTAUTH_URL: ${NEXTAUTH_URL_PROD}
+        NEXT_PUBLIC_DESKTOP_WIDTH: 1024
+    ports:
+      - '8087:80'
+    environment:
+      - NODE_ENV=production
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET_PROD}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL_PROD}
+      - NEXT_PUBLIC_DESKTOP_WIDTH=1024
+      - NEXTAUTH_URL=${NEXTAUTH_URL_PROD}
+    restart: always
+    container_name: digi-metalomec-fe-v1-prod
