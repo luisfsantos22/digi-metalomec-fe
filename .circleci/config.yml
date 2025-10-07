@@ -131,17 +131,34 @@ jobs:
           command: |
             echo "NEXT_PUBLIC_API_URL_PROD is set? ${NEXT_PUBLIC_API_URL_PROD}"
             echo "NEXTAUTH_URL_PROD is set? ${NEXTAUTH_URL_PROD}"
+            echo "NEXTAUTH_SECRET_PROD is set? ${NEXTAUTH_SECRET_PROD}"
       - run:
           name: Deploy production over SSH
           command: |
-            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} \<< 'EOF'
-            docker pull gic2luis/digi-metalomec-fe-v1:prod
-            docker container stop digi-metalomec-fe-v1-prod || true
-            docker container rm digi-metalomec-fe-v1-prod || true
-            docker run --name digi-metalomec-fe-v1-prod -d -p 8087:80 -e NEXTAUTH_SECRET="${NEXTAUTH_SECRET_PROD}" -e NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL_PROD}" -e NEXTAUTH_URL="${NEXTAUTH_URL_PROD}" -e NEXT_PUBLIC_DESKTOP_WIDTH=1024 -e NODE_ENV=production gic2luis/digi-metalomec-fe-v1:prod
-            sleep 10
+            # Set variables locally first
+            NEXTAUTH_SECRET_VAL="${NEXTAUTH_SECRET_PROD}"
+            NEXT_PUBLIC_API_URL_VAL="${NEXT_PUBLIC_API_URL_PROD}"
+            NEXTAUTH_URL_VAL="${NEXTAUTH_URL_PROD}"
+
+            echo "Deploying production with:"
+            echo "NEXTAUTH_SECRET: $NEXTAUTH_SECRET_VAL"
+            echo "NEXT_PUBLIC_API_URL: $NEXT_PUBLIC_API_URL_VAL"
+            echo "NEXTAUTH_URL: $NEXTAUTH_URL_VAL"
+
+            ssh -o StrictHostKeyChecking=no ${SSH_USER_PROD}@${SSH_HOST_PROD} "
+            docker pull gic2luis/digi-metalomec-fe-v1:prod &&
+            docker container stop digi-metalomec-fe-v1-prod || true &&
+            docker container rm digi-metalomec-fe-v1-prod || true &&
+            docker run --name digi-metalomec-fe-v1-prod -d -p 8087:80 \\
+              -e NEXTAUTH_SECRET='$NEXTAUTH_SECRET_VAL' \\
+              -e NEXT_PUBLIC_API_URL='$NEXT_PUBLIC_API_URL_VAL' \\
+              -e NEXTAUTH_URL='$NEXTAUTH_URL_VAL' \\
+              -e NEXT_PUBLIC_DESKTOP_WIDTH=1024 \\
+              -e NODE_ENV=production \\
+              gic2luis/digi-metalomec-fe-v1:prod &&
+            sleep 10 &&
             sudo docker image prune -f
-            EOF
+            "
 
 workflows:
   version: 2
