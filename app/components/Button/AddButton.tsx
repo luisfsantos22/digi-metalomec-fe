@@ -1,4 +1,4 @@
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import GenericTooltip from '../Tooltip/GenericTooltip'
 import Image from 'next/image'
 
@@ -17,7 +17,7 @@ const AddButton = (props: AddButtonProps) => {
     id,
     tooltipText = '',
     size = 'lg:h-32 lg:w-32 w-10 h-10',
-    widthTooltip = 'auto',
+    widthTooltip = '200',
     position = 'bottom',
   } = props
 

@@ -26,33 +26,6 @@ export function translateRole(role) {
   return 'Utilizador'
 }
 
-export function translateVehicleValue(vehicle, withLicensePlate = true) {
-  if (!vehicle) return ''
-  let formattedVehicle = `${vehicle?.brand} ${vehicle?.model}`
-  if (withLicensePlate) {
-    formattedVehicle += ` | ${vehicle?.licensePlate}`
-  }
-
-  return formattedVehicle
-}
-
-export function translateRepairStateValue(text) {
-  switch (text) {
-    case 'WAITING_MATERIAL':
-      return 'A Aguardar Material'
-    case 'DIAGNOSIS':
-      return 'Em Diagnóstico'
-    case 'IN_REPAIR':
-      return 'Em Reparação'
-    case 'TO_PAY':
-      return 'A Pagamento'
-    case 'DELIVERED':
-      return 'Entregue'
-    default:
-      return 'N/A'
-  }
-}
-
 export function requiredSpan() {
   return <span className="text-red-800">*</span>
 }

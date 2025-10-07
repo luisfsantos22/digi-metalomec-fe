@@ -89,6 +89,7 @@ export default function EditEmployee() {
     handleSubmit,
     setValue,
     formState: { errors },
+    clearErrors,
     reset,
   } = useForm<CreateEmployeeData>({
     defaultValues: employee as CreateEmployeeData | undefined,
@@ -159,7 +160,7 @@ export default function EditEmployee() {
         const result = await editEmployee(employeeId, data)
 
         if (result?.id) {
-          router.push(`/employee/details?id=${result.id}`)
+          router.push(`/employee/details/${result.id}/`)
         }
         stopLoading()
       } catch (err) {
@@ -228,6 +229,7 @@ export default function EditEmployee() {
                 register={register}
                 setValue={setValue}
                 errors={errors}
+                clearErrors={clearErrors}
               />
             ),
             2: (

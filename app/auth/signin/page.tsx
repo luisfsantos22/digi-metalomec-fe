@@ -22,7 +22,7 @@ import authOptions from '@/app/api/auth/[...nextauth]/auth'
 const SignInPage = async () => {
   const session = await getServerSession(authOptions)
   if (session) {
-    redirect('/workshop-module/repair')
+    redirect('/dashboard/?module=home')
   }
 
   return (

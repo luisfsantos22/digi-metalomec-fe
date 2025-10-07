@@ -8,10 +8,19 @@ type NavbarMobileButtonProps = {
   isActive: boolean
   disabled?: boolean
   id: string
+  secondary?: boolean
 }
 
 const NavbarMobileButton = (props: NavbarMobileButtonProps) => {
-  const { onClick, text, type, isActive, disabled = false, id } = props
+  const {
+    onClick,
+    text,
+    type,
+    isActive,
+    disabled = false,
+    id,
+    secondary = false,
+  } = props
 
   return (
     <>
@@ -21,9 +30,11 @@ const NavbarMobileButton = (props: NavbarMobileButtonProps) => {
         type={type}
         disabled={disabled}
         className={classNames(
-          isActive
-            ? 'bg-digiblue text-digiwhite1624-semibold'
-            : 'bg-white text-digiblack1624-semibold',
+          secondary
+            ? 'bg-digired1624 text-digired1624-normal '
+            : isActive
+              ? 'bg-digiblue text-digiwhite1624-semibold'
+              : 'bg-white text-digiblack1624-semibold',
           'flex self-center w-full px-4 py-2  justify-center items-center cursor-pointer',
           'disabled:!text-gray-200 disabled:cursor-not-allowed',
           'rounded-xs'

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import axiosInstance from '../axiosInstance'
 import { GenericJobTitle } from '@/app/types/utils/job-title'
 import { mapGenericJobTitle } from '@/app/mappers/utils/job-title'
+import { EMPLOYEE_ENDPOINTS } from '../api/endpoints'
 
 export const useJobTitlesQuery = () => {
   const { data: session } = useSession()
@@ -15,14 +16,11 @@ export const useJobTitlesQuery = () => {
       setLoading(true)
       setError(null)
       try {
-        const response = await axiosInstance.get(
-          '/api/v1/employees/job-titles/',
-          {
-            headers: {
-              Authorization: `Bearer ${session?.accessToken}`,
-            },
-          }
-        )
+        const response = await axiosInstance.get(EMPLOYEE_ENDPOINTS.jobTitles, {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+        })
         const dataResults = response.data || []
         const mappedResults = dataResults.map((job: GenericJobTitle) =>
           mapGenericJobTitle(job)

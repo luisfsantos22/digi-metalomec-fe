@@ -1,7 +1,7 @@
 'use client'
 
 import { Session } from 'next-auth'
-import { redirect, useRouter, useSearchParams } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
 import Spinner from '../../Spinner/Spinner'
 import useGetEmployee from '@/app/hooks/employees/useGetEmployee'
 import { useAtom } from 'jotai'
@@ -18,23 +18,22 @@ import { EMPLOYEE_DETAILS_TABS } from '@/app/constants'
 import GeneralInfoEmployee from './GeneralInfoEmployee'
 import PrimaryButton from '../../Button/PrimaryButton'
 import { useActivationEmployee } from '@/app/hooks/employees/useActivationEmployee'
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import CertificationsEmployee from './CertificationsEmployee'
 import SkillsEmployee from './SkillsEmployee'
 
 type DetailsEmployeeProps = {
   session: Session | null
+  employeeId: string
 }
 
 export default function DetailsEmployee(props: DetailsEmployeeProps) {
-  const { session } = props
+  const { session, employeeId } = props
 
-  const searchParams = useSearchParams()
   const router = useRouter()
   const accessToken = session?.accessToken
 
   const [tabActive, setTabActive] = useAtom(mainPageActiveTab)
-  const employeeId = searchParams.get('id')
 
   const [activationTrigger, setActivationTrigger] = useState(0)
   const { loading, error, employee } = useGetEmployee(employeeId ?? '', [

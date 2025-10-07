@@ -22,7 +22,7 @@ import AreYouSureModal from '@/app/components/Modal/AreYouSureModal'
 import { useSession } from 'next-auth/react'
 import { useDeleteEmployee } from '@/app/hooks/employees/useDeleteEmployee'
 import Image from 'next/image'
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import AddButton from '@/app/components/Button/AddButton'
 import FormCheckbox from '@/app/components/Form/FormCheckbox'
 import { AVAILABILITY_STATUS, EMPLOYEE_STATUS } from '@/app/constants'
@@ -175,10 +175,21 @@ const EmployeesSection = () => {
             styles="text-red-500 text-center"
           />
         ) : count === 0 ? (
-          <Text
-            text="Nenhum colaborador encontrado"
-            styles="text-digiblack1624-semibold text-center"
-          />
+          <div className="flex flex-col gap-4 items-center justify-center">
+            <Text
+              text="Nenhum colaborador encontrado"
+              styles="text-digiblack1624-semibold text-center"
+            />
+            <AddButton
+              id="add-employee-button"
+              tooltipText="Adicionar um novo colaborador"
+              onClick={() => {
+                setTabActive('employees')
+                router.push('/employee/add')
+              }}
+              size="w-20 h-20 lg:w-30 lg:h-30"
+            />
+          </div>
         ) : (
           <div className="flex flex-col gap-4 w-full overflow-y-auto">
             <div className="flex justify-between items-center">
@@ -243,7 +254,7 @@ const EmployeesSection = () => {
                   {employees.map((employee) => (
                     <Table.Tr
                       onClick={() =>
-                        router.push(`/employee/details?id=${employee.id}`)
+                        router.push(`/employee/details/${employee.id}/`)
                       }
                       key={employee.id}
                       className="hover:cursor-pointer hover:!bg-digiblue-hover-options"

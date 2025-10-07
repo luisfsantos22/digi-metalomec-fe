@@ -6,6 +6,18 @@ export function formatDate(date: Date) {
   return moment(date).format('L')
 }
 
+export function formatPhoneNumber(phoneNumber: string) {
+  // remover prefixo internacional (+351)
+  if (phoneNumber && phoneNumber.startsWith('+351')) {
+    phoneNumber = phoneNumber.slice(4)
+
+    // adicionar espaço de 3 em 3 dígitos
+    phoneNumber = phoneNumber.replace(/(\d{3})(?=\d)/g, '$1 ')
+  }
+
+  return phoneNumber
+}
+
 export function translateEmployeeStatus(status: string) {
   switch (status) {
     case 'Contract with Right Term':

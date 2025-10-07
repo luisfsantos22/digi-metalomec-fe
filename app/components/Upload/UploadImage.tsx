@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import React from 'react'
 import Image from 'next/image'
 import Text from '../Text/Text'
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 
 interface UploadImageProps {
   imageUrl?: string

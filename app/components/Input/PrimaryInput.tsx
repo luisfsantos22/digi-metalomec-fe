@@ -1,4 +1,4 @@
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import Text from '../Text/Text'
 
 type PrimaryInputProps = {
@@ -30,7 +30,7 @@ const PrimaryInput = (props: PrimaryInputProps) => {
         required={mandatory}
         className={classNames(
           error ? 'border-digired' : 'border-gray-300',
-          'border  p-2 rounded-xl w-full'
+          'border text-digiblack p-2 rounded-xl w-full'
         )}
       />
       {error && (

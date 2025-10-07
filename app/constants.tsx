@@ -76,3 +76,8 @@ export const EMPLOYEE_DETAILS_TABS = [
   },
   { label: 'Performance', value: 'performance', disabled: true },
 ]
+
+export const CANDIDATE_DETAILS_TABS = [
+  { label: 'Geral', value: 'general', disabled: false },
+  { label: 'Iterações', value: 'iterations', disabled: false },
+]

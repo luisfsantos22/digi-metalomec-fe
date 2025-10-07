@@ -1,4 +1,4 @@
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import { NumericFormat, numericFormatter } from 'react-number-format'
 
 type TextProps = {

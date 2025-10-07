@@ -1,4 +1,4 @@
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import Text from '../Text/Text'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
@@ -7,6 +7,7 @@ const IntlTelInput = dynamic(() => import('intl-tel-input/reactWithUtils'), {
   ssr: false,
 })
 import 'intl-tel-input/styles'
+import { formatPhoneNumber } from '@/app/utils'
 
 type FormInputProps = {
   query: string | number | undefined
@@ -27,7 +28,7 @@ const FormInput = (props: FormInputProps) => {
     query,
     setQuery,
     placeholder,
-    error,
+    error = null,
     inputType = 'text',
     mandatory = false,
     label = '',
@@ -40,7 +41,7 @@ const FormInput = (props: FormInputProps) => {
   const [internalErrorStyles, setInternalErrorStyles] = useState(!!error)
 
   useEffect(() => {
-    if (inputType !== 'tel') {
+    if (error && inputType !== 'tel') {
       setInternalErrorStyles(!!error)
     }
   }, [error])
@@ -49,7 +50,8 @@ const FormInput = (props: FormInputProps) => {
     <div
       className={classNames(
         width,
-        'flex flex-col items-start justify-start gap-2'
+        inputType === 'tel' ? 'gap-[1.375rem]' : 'gap-2',
+        'flex flex-col items-start justify-start'
       )}
     >
       <Text
@@ -63,51 +65,50 @@ const FormInput = (props: FormInputProps) => {
       />
       <div className="flex flex-col gap-0.5 w-full">
         <div className="relative w-full">
-          {/* {inputType === 'tel' ? (
+          {inputType === 'tel' ? (
             <IntlTelInput
+              initialValue={
+                typeof query === 'string' ? formatPhoneNumber(query) : ''
+              }
               initOptions={{
                 containerClass: classNames(
-                  error && internalErrorStyles
-                    ? 'border-b-digired'
-                    : query
-                      ? 'border-b-digibrown'
-                      : 'border-b-gray-300',
+                  query ? 'border-b-digibrown' : 'border-b-gray-300',
                   'border-b text-digibrown1624-semibold focus:outline-none focus:border-b-digibrown focus:ring-0',
                   'disabled:cursor-not-allowed disabled:text-gray-400 outline-none'
                 ),
                 i18n: pt,
+                initialCountry: 'pt',
               }}
               inputProps={{
-                placeholder: placeholder,
+                placeholder,
               }}
               onChangeNumber={(value) => {
-                console.log(value, '<PhoneNumber>')
-                if (value?.length > 0 && query !== value) {
+                if (value !== query) {
                   setQuery(value)
                 }
               }}
             />
-          ) : ( */}
-          <input
-            type={inputType}
-            disabled={disabled}
-            placeholder={placeholder}
-            value={query ? query : ''}
-            onChange={(e) => {
-              setInternalErrorStyles(false)
-              setQuery(e.target.value)
-            }}
-            className={classNames(
-              error && internalErrorStyles
-                ? 'border-b-digired'
-                : query
-                  ? 'border-b-digibrown'
-                  : 'border-b-gray-300',
-              'border-b p-2 text-digibrown1624-semibold  w-full focus:outline-none focus:border-b-digibrown focus:ring-0',
-              'disabled:cursor-not-allowed disabled:text-gray-400 line-clamp-1 text-left'
-            )}
-          />
-          {/* )} */}
+          ) : (
+            <input
+              type={inputType}
+              disabled={disabled}
+              placeholder={placeholder}
+              value={query ? query : ''}
+              onChange={(e) => {
+                setInternalErrorStyles(false)
+                setQuery(e.target.value)
+              }}
+              className={classNames(
+                error && internalErrorStyles
+                  ? 'border-b-digired'
+                  : query
+                    ? 'border-b-digibrown'
+                    : 'border-b-gray-300',
+                'border-b p-2 text-digibrown1624-semibold  w-full focus:outline-none focus:border-b-digibrown focus:ring-0',
+                'disabled:cursor-not-allowed disabled:text-gray-400 line-clamp-1 text-left'
+              )}
+            />
+          )}
           {clearable && query && query?.toString().length > 0 && (
             <button
               type="button"

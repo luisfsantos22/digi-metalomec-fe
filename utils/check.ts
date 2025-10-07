@@ -1,7 +1,9 @@
 export const checkIfEveryObjectHasAValue = (
   obj: Record<string, any>
 ): boolean => {
-  if (Object.keys(obj).length === 0) return false
+  if (Object.keys(obj).length === 0) {
+    return false
+  }
 
   return Object.values(obj).every(
     (value) =>
@@ -17,7 +19,9 @@ export const checkIfEveryObjectHasAValue = (
 export const checkIfAtLeastOneObjectHasAValue = (
   obj: Record<string, any>
 ): boolean => {
-  if (Object.keys(obj).length === 0) return false
+  if (Object.keys(obj).length === 0) {
+    return false
+  }
 
   return Object.values(obj).some(
     (value) =>

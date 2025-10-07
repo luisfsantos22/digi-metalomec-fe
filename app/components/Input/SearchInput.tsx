@@ -1,4 +1,4 @@
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import Text from '../Text/Text'
 import Spinner from '../Spinner/Spinner'
 import useOutsideClick from '@/app/hooks/utils/useOutsideClick'

@@ -1,19 +1,18 @@
 import './css/globals.css'
-import type { Metadata } from 'next'
 import React from 'react'
 import GlobalLoadingWrapper from './components/Wrapper/GlobalLoadingWrapper'
 import { Providers } from './components/providers'
+
+export interface LayoutProps {
+  children?: React.ReactNode
+}
 
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="en">
       <head>

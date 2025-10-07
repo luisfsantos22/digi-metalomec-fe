@@ -1,4 +1,4 @@
-import { classNames } from '@/utils'
+import { classNames } from 'utils'
 import GenericTooltip from '../Tooltip/GenericTooltip'
 import Image from 'next/image'
 import Text from '../Text/Text'

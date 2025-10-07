@@ -10,7 +10,7 @@ import { signOut, useSession } from 'next-auth/react'
 import GenericTooltip from '../Tooltip/GenericTooltip'
 import { useIsTruncated, useWindowSize } from '@/utils/hooks'
 import { Divider, Menu } from '@mantine/core'
-import { classNames, isDesktopSize, translateRole } from '@/utils'
+import { classNames, isDesktopSize, translateRole } from 'utils'
 import NavbarMobileButton from '../Button/NavbarMobileButton'
 import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
@@ -127,6 +127,18 @@ export default function MainNavbar() {
                   : '/icons/insights.svg'
               }
               disabled={true}
+            />
+            <SecondaryButton
+              id="candidates"
+              text="Candidatos"
+              onClick={() => handleTabChange('candidates')}
+              active={tabActive === 'candidates'}
+              withImage
+              imageSrc={
+                tabActive === 'candidates'
+                  ? '/icons/candidate_white.svg'
+                  : '/icons/candidate.svg'
+              }
             />
             <SecondaryButton
               id="clients"
@@ -274,6 +286,17 @@ export default function MainNavbar() {
             type="button"
             onClick={() => handleTabChange('employees')}
           />
+          <Divider />
+          <div className="mt-8">
+            <NavbarMobileButton
+              id="signout"
+              text="Terminar Sessão"
+              isActive={false}
+              type="button"
+              onClick={() => signOut()}
+              secondary
+            />
+          </div>
         </div>
       )}
     </div>

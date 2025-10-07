@@ -5,6 +5,7 @@ import { mainPageActiveTab } from '@/app/atoms'
 import MetricsSection from './Section/MetricsSection'
 import ChartsSection from './Section/ChartsSection'
 import EmployeesSection from './Section/EmployeesSection'
+import CandidatesSection from './Section/CandidatesSection'
 
 export default function DashboardContent() {
   const [tabActive, setTabActive] = useAtom(mainPageActiveTab)
@@ -17,5 +18,7 @@ export default function DashboardContent() {
     </div>
   ) : tabActive === 'employees' ? (
     <EmployeesSection />
+  ) : tabActive === 'candidates' ? (
+    <CandidatesSection />
   ) : null
 }
