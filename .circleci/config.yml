@@ -108,6 +108,10 @@ jobs:
             docker container stop digi-metalomec-fe-v1-staging || true &&
             docker container rm digi-metalomec-fe-v1-staging || true &&
             docker run --name digi-metalomec-fe-v1-staging -d -p 8089:80 \
+              --restart=unless-stopped \
+              --memory=300m \
+              --memory-swap=500m \
+              --oom-kill-disable=false \
               -e NEXTAUTH_SECRET='$NEXTAUTH_SECRET_VAL' \
               -e NEXT_PUBLIC_API_URL='$NEXT_PUBLIC_API_URL_VAL' \
               -e NEXTAUTH_URL='$NEXTAUTH_URL_VAL' \
@@ -149,12 +153,16 @@ jobs:
             docker pull gic2luis/digi-metalomec-fe-v1:prod &&
             docker container stop digi-metalomec-fe-v1-prod || true &&
             docker container rm digi-metalomec-fe-v1-prod || true &&
-            docker run --name digi-metalomec-fe-v1-prod -d -p 8087:80 \\
-              -e NEXTAUTH_SECRET='$NEXTAUTH_SECRET_VAL' \\
-              -e NEXT_PUBLIC_API_URL='$NEXT_PUBLIC_API_URL_VAL' \\
-              -e NEXTAUTH_URL='$NEXTAUTH_URL_VAL' \\
-              -e NEXT_PUBLIC_DESKTOP_WIDTH=1024 \\
-              -e NODE_ENV=production \\
+            docker run --name digi-metalomec-fe-v1-prod -d -p 8087:80 \
+              --restart=unless-stopped \
+              --memory=300m \
+              --memory-swap=500m \
+              --oom-kill-disable=false \
+              -e NEXTAUTH_SECRET='$NEXTAUTH_SECRET_VAL' \
+              -e NEXT_PUBLIC_API_URL='$NEXT_PUBLIC_API_URL_VAL' \
+              -e NEXTAUTH_URL='$NEXTAUTH_URL_VAL' \
+              -e NEXT_PUBLIC_DESKTOP_WIDTH=1024 \
+              -e NODE_ENV=production \
               gic2luis/digi-metalomec-fe-v1:prod &&
             sleep 10 &&
             sudo docker image prune -f
