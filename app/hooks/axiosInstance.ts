@@ -48,15 +48,40 @@ const handleResponseError = async (error) => {
     headers: error.response?.headers,
   })
 
-  // Don't attempt refresh if this is the login endpoint
-  if (error.config?.url?.includes(AUTH_ENDPOINTS.login)) {
+  // Don't attempt refresh if this is the login or refresh endpoint
+  if (
+    error.config?.url?.includes(AUTH_ENDPOINTS.login) ||
+    error.config?.url?.includes(AUTH_ENDPOINTS.refreshToken)
+  ) {
+    // If refresh token endpoint fails, sign out immediately
+    if (error.config?.url?.includes(AUTH_ENDPOINTS.refreshToken)) {
+      console.error('Refresh token expired or invalid, signing out...')
+      await signOut({ callbackUrl: '/auth/signin', redirect: true })
+    }
+
     return Promise.reject(error)
   }
 
   const originalRequest = error.config
-  if (error.response?.status === 401 && !originalRequest._retry) {
+  const status = error.response?.status
+  const isInvalidToken =
+    (status === 401 || status === 406) && !originalRequest._retry
+
+  // Check if response indicates invalid token
+  const hasInvalidTokenMessage =
+    error.response?.data?.detail?.toLowerCase().includes('invalid token') ||
+    error.response?.data?.message?.toLowerCase().includes('invalid token')
+
+  if (isInvalidToken || hasInvalidTokenMessage) {
     originalRequest._retry = true
     const session = await getSession()
+
+    if (!session?.refreshToken) {
+      console.error('No refresh token available, signing out...')
+      await signOut({ callbackUrl: '/auth/signin', redirect: true })
+
+      return Promise.reject(error)
+    }
 
     try {
       const { data } = await axiosInstance.post(AUTH_ENDPOINTS.refreshToken, {
@@ -67,12 +92,18 @@ const handleResponseError = async (error) => {
         originalRequest.headers['Authorization'] = `Bearer ${data.access}`
 
         return axiosInstance(originalRequest)
-      }
-    } catch (error) {
-      console.error('Refresh token error:', error)
-      await signOut({ callbackUrl: '/auth/signin' })
+      } else {
+        // No access token in response, sign out
+        console.error('No access token received, signing out...')
+        await signOut({ callbackUrl: '/auth/signin', redirect: true })
 
-      return Promise.reject(error)
+        return Promise.reject(new Error('Failed to refresh token'))
+      }
+    } catch (refreshError) {
+      console.error('Refresh token error:', refreshError)
+      await signOut({ callbackUrl: '/auth/signin', redirect: true })
+
+      return Promise.reject(refreshError)
     }
   }
 
