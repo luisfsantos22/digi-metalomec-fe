@@ -1,5 +1,9 @@
 import { CreateUserData, User } from '../user'
 import { GenericJobTitle } from '../utils/job-title'
+import {
+  GeographicLocationInput,
+  GeographicLocationOutput,
+} from '../geolocation'
 
 type GenericCandidate = {
   id: string
@@ -9,6 +13,7 @@ type GenericCandidate = {
   updatedAt: Date
   availabilityStatus: string
   geographicAvailability: string
+  geographicLocation?: GeographicLocationOutput
   lastIteraction?: string
 }
 
@@ -17,6 +22,7 @@ type CreateCandidateData = {
   jobTitles: GenericJobTitle[]
   availabilityStatus: string
   geographicAvailability: string
+  geographicLocation?: GeographicLocationInput
   internalIdentifier?: number
 }
 

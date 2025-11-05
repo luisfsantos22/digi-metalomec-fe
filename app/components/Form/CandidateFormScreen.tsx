@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react'
 import { GenericJobTitle } from '@/app/types/utils/job-title'
 import CreateJobTitleModal from '../Modal/CreateJobTitleModal'
 import { CreateCandidateData } from '@/app/types/candidate/candidate'
+import GeographicLocationInput from './GeographicLocationInput'
 
 type CandidateFormScreenProps = {
   formData: CreateCandidateData
@@ -44,6 +45,9 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
     geographicAvailability,
     jobTitles,
   } = formData
+
+  // geographicLocation may be a nested object in newer API models; access safely
+  const { geographicLocation } = formData as any
 
   const {
     jobTitles: searchedJobTitles,
@@ -175,19 +179,14 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             labelStyles="text-digiblack1420-semibold flex gap-1"
             width="lg:w-1/3 w-full"
           />
-          <FormInput
-            query={geographicAvailability}
-            setQuery={(e) =>
-              setValue('geographicAvailability', e as unknown as string)
-            }
-            placeholder="Lisboa"
-            inputType="text"
-            mandatory={true}
-            label="Disponibilidade Geográfica"
-            labelStyles="text-digiblack1420-semibold flex gap-1"
-            {...register('geographicAvailability', { required: false })}
-            width="lg:w-1/3 w-full"
-          />
+          <div className="lg:w-1/3 w-full">
+            <GeographicLocationInput
+              register={register}
+              setValue={setValue}
+              errors={errors}
+              initial={geographicLocation ?? undefined}
+            />
+          </div>
         </Row>
       </ContainerCard>
       {showCreateJobTitleModal && (
