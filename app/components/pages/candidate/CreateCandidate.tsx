@@ -45,7 +45,15 @@ export default function CreateCandidate(props: CreateCandidateProps) {
         phoneNumber: '',
       },
       jobTitles: [],
-      geographicAvailability: undefined,
+      geographicLocation: {
+        city: '',
+        municipality: '',
+        locality: '',
+        parish: '',
+        latitude: null,
+        longitude: null,
+        addressFull: null,
+      },
       availabilityStatus: AVAILABILITY_STATUS.find(
         (status) => status.value === 'AVAILABLE'
       )?.value,
@@ -81,7 +89,6 @@ export default function CreateCandidate(props: CreateCandidateProps) {
     const mandatoryEmployeeFields = [
       formData?.jobTitles?.length > 0 ? formData?.jobTitles[0] : undefined,
       formData?.availabilityStatus,
-      formData?.geographicAvailability,
     ]
 
     // Check if all mandatory fields are filled

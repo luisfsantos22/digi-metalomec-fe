@@ -39,21 +39,27 @@ export const mapGeographicLocationFromApi = (
 export const mapNominatimToGeographicLocation = (
   nominatimResponse: any
 ): Partial<GeographicLocationInput> => {
-  const { address = {}, display_name = '' } = nominatimResponse
+  const { address = {}, display_name = '', lat, lon } = nominatimResponse
 
   // Heuristics to map OSM address components to our geographic fields
-  const city =
-    address.city || address.town || address.village || address.county || ''
+  const city = address.city || address.town || address.county || ''
   const municipality = address.county || address.state || ''
   const locality =
-    address.suburb || address.neighbourhood || address.hamlet || ''
-  const parish = address.parish || address.city_district || ''
+    address.suburb ||
+    address.neighbourhood ||
+    address.hamlet ||
+    address.residential ||
+    ''
+  const parish =
+    address.parish || address.city_district || address.village || ''
 
   return {
     city,
     municipality,
     locality,
     parish,
+    latitude: lat ? parseFloat(lat) : null,
+    longitude: lon ? parseFloat(lon) : null,
     addressFull: display_name,
   }
 }

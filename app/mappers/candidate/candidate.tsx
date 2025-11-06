@@ -18,7 +18,15 @@ export const mapGenericCandidate = (data: any): GenericCandidate => ({
   },
   jobTitles: data?.job_titles || [],
   updatedAt: data?.updated_at || undefined,
-  geographicAvailability: data?.geographic_availability || '',
+  geographicLocation: {
+    city: data?.geographic_location?.city || '',
+    municipality: data?.geographic_location?.municipality || '',
+    locality: data?.geographic_location?.locality || '',
+    parish: data?.geographic_location?.parish || '',
+    latitude: data?.geographic_location?.latitude || null,
+    longitude: data?.geographic_location?.longitude || null,
+    addressFull: data?.geographic_location?.address_full || null,
+  },
   lastIteraction: data?.last_iteraction || undefined,
 })
 

@@ -72,12 +72,8 @@ export default function GeneralInfoCandidate(props: GeneralInfoCandidateProps) {
           }
         />
         <Label
-          label="Disponibilidade Geográfica"
-          value={
-            candidate?.geographicAvailability
-              ? candidate?.geographicAvailability
-              : undefined
-          }
+          label="Localização"
+          value={candidate?.geographicLocation?.addressFull ?? undefined}
         />
       </Row>
     </div>

@@ -42,12 +42,9 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
   const {
     user: { email, firstName, lastName, phoneNumber } = {},
     availabilityStatus,
-    geographicAvailability,
+    geographicLocation,
     jobTitles,
   } = formData
-
-  // geographicLocation may be a nested object in newer API models; access safely
-  const { geographicLocation } = formData as any
 
   const {
     jobTitles: searchedJobTitles,
@@ -161,6 +158,27 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
           />
         </Row>
         <Separator />
+        <Row title="Localização">
+          <GeographicLocationInput
+            register={register}
+            setValue={setValue}
+            errors={errors}
+            initial={
+              geographicLocation
+                ? {
+                    city: geographicLocation.city,
+                    municipality: geographicLocation.municipality,
+                    locality: geographicLocation.locality ?? undefined,
+                    parish: geographicLocation.parish ?? undefined,
+                    latitude: geographicLocation.latitude ?? undefined,
+                    longitude: geographicLocation.longitude ?? undefined,
+                    addressFull: geographicLocation.addressFull ?? undefined,
+                  }
+                : undefined
+            }
+          />
+        </Row>
+        <Separator />
         <Row title="Informação Profissional">
           <FormDropdown
             label="Disponibilidade"
@@ -179,14 +197,6 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             labelStyles="text-digiblack1420-semibold flex gap-1"
             width="lg:w-1/3 w-full"
           />
-          <div className="lg:w-1/3 w-full">
-            <GeographicLocationInput
-              register={register}
-              setValue={setValue}
-              errors={errors}
-              initial={geographicLocation ?? undefined}
-            />
-          </div>
         </Row>
       </ContainerCard>
       {showCreateJobTitleModal && (

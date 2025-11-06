@@ -12,7 +12,6 @@ type GenericCandidate = {
   jobTitles: GenericJobTitle[]
   updatedAt: Date
   availabilityStatus: string
-  geographicAvailability: string
   geographicLocation?: GeographicLocationOutput
   lastIteraction?: string
 }
@@ -21,7 +20,6 @@ type CreateCandidateData = {
   user: CreateUserData
   jobTitles: GenericJobTitle[]
   availabilityStatus: string
-  geographicAvailability: string
   geographicLocation?: GeographicLocationInput
   internalIdentifier?: number
 }

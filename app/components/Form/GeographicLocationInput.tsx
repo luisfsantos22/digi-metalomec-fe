@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import FormInput from '../Input/FormInput'
+import SearchInput from '../Input/SearchInput'
 import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form'
 import { mapNominatimToGeographicLocation } from '@/app/mappers/geolocation/geolocation'
 
@@ -37,7 +38,8 @@ export default function GeographicLocationInput({
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
-  const [showDropdown, setShowDropdown] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [selectedLocation, setSelectedLocation] = useState<string>('')
   const skipSearchRef = useRef(false)
 
   // Debounced search function
@@ -51,7 +53,7 @@ export default function GeographicLocationInput({
 
     if (!searchQuery || searchQuery.length < 3) {
       setSearchResults([])
-      setShowDropdown(false)
+      setIsDropdownOpen(false)
 
       return
     }
@@ -75,7 +77,7 @@ export default function GeographicLocationInput({
         )
 
         setSearchResults(uniqueResults)
-        setShowDropdown(uniqueResults.length > 0)
+        setIsDropdownOpen(uniqueResults.length > 0)
       } catch (error) {
         console.error('Search error:', error)
         setSearchResults([])
@@ -109,47 +111,48 @@ export default function GeographicLocationInput({
     // Update search query with the display name and close dropdown
     skipSearchRef.current = true
     setSearchQuery(result.display_name)
-    setShowDropdown(false)
+    setSelectedLocation(result.display_name)
+    setIsDropdownOpen(false)
+  }
+
+  const handleClearFields = () => {
+    setValue('geographicLocation.city', '')
+    setValue('geographicLocation.municipality', '')
+    setValue('geographicLocation.locality', '')
+    setValue('geographicLocation.parish', '')
+    setValue('geographicLocation.latitude', null)
+    setValue('geographicLocation.longitude', null)
+    setValue('geographicLocation.addressFull', '')
   }
 
   return (
-    <div className="w-full">
+    <div className="flex flex-col gap-4 w-full">
       {/* Location Search Input */}
-      <div className="mb-4 relative">
-        <label className="text-digiblack1420-semibold mb-2 block">
-          Pesquisar Localização
-        </label>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Pesquise por cidade, concelho ou localidade..."
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        {isSearching && (
-          <div className="absolute right-3 top-11 text-gray-400">
-            Pesquisando...
+      <SearchInput
+        query={searchQuery}
+        setQuery={setSearchQuery}
+        placeholder="Pesquise por cidade, concelho ou localidade..."
+        label="Pesquisar Localização"
+        labelStyles="text-digiblack1420-semibold"
+        mandatory={true}
+        data={searchResults}
+        dataIsLoading={isSearching}
+        value={selectedLocation}
+        setValue={setSelectedLocation}
+        setSelectedObj={() => {}}
+        source="Location"
+        setIsDropdownOpen={setIsDropdownOpen}
+        isDropdownOpen={isDropdownOpen}
+        showCreateOption={false}
+        renderItem={(result: SearchResult) => (
+          <div className="text-sm font-medium text-gray-900">
+            {result.display_name}
           </div>
         )}
-
-        {/* Dropdown with search results */}
-        {showDropdown && searchResults.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-            {searchResults.map((result) => (
-              <button
-                key={result.place_id}
-                type="button"
-                onClick={() => handleSelectLocation(result)}
-                className="w-full text-left px-4 py-2 hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
-              >
-                <div className="text-sm font-medium text-gray-900">
-                  {result.display_name}
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+        onItemSelect={handleSelectLocation}
+        helperText="Pesquise por uma localização acima para preencher automaticamente os campos de localização."
+        clearAdditionalFields={handleClearFields}
+      />
 
       <div className="grid lg:grid-cols-4 grid-cols-1 gap-4">
         <FormInput
@@ -159,6 +162,8 @@ export default function GeographicLocationInput({
           inputType="text"
           label="Cidade"
           {...register('geographicLocation.city')}
+          disabled
+          labelStyles="text-digiblack1420-semibold"
         />
         <FormInput
           query={initial?.municipality ?? ''}
@@ -169,6 +174,8 @@ export default function GeographicLocationInput({
           inputType="text"
           label="Concelho / Município"
           {...register('geographicLocation.municipality')}
+          disabled
+          labelStyles="text-digiblack1420-semibold"
         />
         <FormInput
           query={initial?.locality ?? ''}
@@ -177,6 +184,8 @@ export default function GeographicLocationInput({
           inputType="text"
           label="Localidade"
           {...register('geographicLocation.locality')}
+          disabled
+          labelStyles="text-digiblack1420-semibold"
         />
         <FormInput
           query={initial?.parish ?? ''}
@@ -185,6 +194,8 @@ export default function GeographicLocationInput({
           inputType="text"
           label="Freguesia"
           {...register('geographicLocation.parish')}
+          disabled
+          labelStyles="text-digiblack1420-semibold"
         />
       </div>
 

@@ -69,7 +69,6 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
       gender: undefined,
       maritalStatus: undefined,
       transportAvailable: undefined,
-      geographicAvailability: undefined,
       preferredWorkLocation: undefined,
       emergencyContact: {
         name: undefined,

@@ -211,6 +211,10 @@ body {
   @apply text-digibrown text-[12px] leading-[12px] font-bold;
 }
 
+.text-digibrown1212-normal {
+  @apply text-digibrown text-[12px] leading-[12px] font-normal;
+}
+
 /* Digired */
 .text-digired4040-bold {
   @apply text-digired text-[40px] leading-[40px] font-bold;

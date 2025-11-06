@@ -27,6 +27,7 @@ import 'intl-tel-input/styles'
 import dynamic from 'next/dynamic'
 import { GenericCandidate } from '@/app/types/candidate/candidate'
 import GenericTooltip from '@/app/components/Tooltip/GenericTooltip'
+import LocationRadiusSearch from '@/app/components/Input/LocationRadiusSearch'
 
 const CandidatesSection = () => {
   const router = useRouter()
@@ -41,6 +42,11 @@ const CandidatesSection = () => {
   )
   const [phoneFilter, setPhoneFilter] = useState('')
 
+  // Location-based search states
+  const [useLocationSearch, setUseLocationSearch] = useState(false)
+  const [locationPlace, setLocationPlace] = useState('')
+  const [locationRadius, setLocationRadius] = useState<number | null>(null)
+
   // State for modal and selected employee
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [activePage, setActivePage] = useState(1)
@@ -52,14 +58,17 @@ const CandidatesSection = () => {
     useState<GenericCandidate | null>(null)
   // State to force refresh
   const [refreshFlag, setRefreshFlag] = useState(false)
+  const [searchLocationQuery, setSearchLocationQuery] = useState('')
 
-  // useQueries
+  // Single useQuery for both regular and location-based search
   const { candidates, loading, error, count } = useCompanyCandidatesQuery(
     activePage,
     searchQuery,
     jobTitleFilter,
     phoneFilter,
-    refreshFlag
+    refreshFlag,
+    locationPlace,
+    locationRadius
   )
 
   // Employee deletion function
@@ -70,7 +79,25 @@ const CandidatesSection = () => {
     setJobTitleFilter('')
     setSearchQuery('')
     setPhoneFilter('')
+    setLocationPlace('')
+    setLocationRadius(null)
     setActivePage(1)
+    setSearchLocationQuery('')
+  }
+
+  // Toggle search mode
+  const handleToggleSearchMode = () => {
+    setUseLocationSearch(!useLocationSearch)
+    setActivePage(1)
+    // Clear opposite mode filters
+    if (!useLocationSearch) {
+      setSearchQuery('')
+      setJobTitleFilter('')
+      setPhoneFilter('')
+    } else {
+      setLocationPlace('')
+      setLocationRadius(null)
+    }
   }
 
   const handleDelete = async (id: string, token: string) => {
@@ -87,36 +114,83 @@ const CandidatesSection = () => {
         styles="flex flex-col gap-4 w-full rounded-xl"
       >
         <div className="flex flex-col gap-2">
-          <Text
-            text="Candidatos"
-            header="h1"
-            styles="text-digibrown3240-bold"
-          />
+          <div className="flex items-center gap-2">
+            <Text
+              text="Candidatos"
+              header="h1"
+              styles="text-digibrown3240-bold"
+            />
+          </div>
           <Text
             text="Gerencie os candidatos da sua empresa, adicione novos e visualize informações detalhadas."
             styles="text-digiblack1624-normal"
           />
+          {useLocationSearch && locationPlace && locationRadius && (
+            <span className="bg-digiblue w-full xl:w-fit text-white px-3 py-1 rounded-full text-xs font-semibold">
+              📍 Pesquisa por Raio: {locationPlace} ({locationRadius}km)
+            </span>
+          )}
         </div>
         <Row>
-          {/* Search Bar */}
-          <FormInput
-            query={searchQuery}
-            setQuery={(e) => setSearchQuery(e ? String(e) : '')}
-            placeholder="Pesquisar candidatos..."
-            clearable
-            inputType="text"
-          />
-          {/* Filters button */}
-          <SecondaryButton
-            id="candidate-filters-button"
-            text={filtersOpen ? 'Fechar filtros' : 'Abrir filtros'}
-            type="button"
-            onClick={() => setFiltersOpen(!filtersOpen)}
-            extraStyles="flex flex-none"
-          />
+          <div className="flex xl:flex-row flex-col xl:justify-between gap-2 w-full">
+            {/* Search Mode Toggle */}
+            <SecondaryButton
+              id="toggle-search-mode-button"
+              text={
+                useLocationSearch
+                  ? 'Pesquisa Normal'
+                  : 'Pesquisa por Localização'
+              }
+              type="button"
+              onClick={handleToggleSearchMode}
+              extraStyles="flex flex-none"
+            />
+            {/* Filters button */}
+            {!useLocationSearch && (
+              <SecondaryButton
+                id="candidate-filters-button"
+                text={filtersOpen ? 'Fechar filtros' : 'Abrir filtros'}
+                type="button"
+                onClick={() => setFiltersOpen(!filtersOpen)}
+                extraStyles="flex flex-none"
+              />
+            )}
+            {useLocationSearch && (
+              <ClearAllFiltersButton
+                onClick={handleClearFilters}
+                id="clear-location-filters"
+                label="Limpar Filtros"
+                width="w-auto"
+              />
+            )}
+          </div>
         </Row>
 
-        {filtersOpen && (
+        <Row>
+          {useLocationSearch ? (
+            /* Location-based Search */
+            <LocationRadiusSearch
+              place={locationPlace}
+              setPlace={setLocationPlace}
+              radius={locationRadius}
+              setRadius={setLocationRadius}
+              helperText="Pesquise candidatos próximos a uma localização específica. Ex: Matosinhos com raio de 20km"
+              searchQuery={searchLocationQuery}
+              setSearchQuery={setSearchLocationQuery}
+            />
+          ) : (
+            /* Regular Search Bar */
+            <FormInput
+              query={searchQuery}
+              setQuery={(e) => setSearchQuery(e ? String(e) : '')}
+              placeholder="Pesquisar candidatos..."
+              clearable
+              inputType="text"
+            />
+          )}
+        </Row>
+
+        {filtersOpen && !useLocationSearch && (
           <Row>
             <FormInput
               placeholder="Cargo"
@@ -303,11 +377,13 @@ const CandidatesSection = () => {
                       </Table.Td>
                       <Table.Td>
                         <Text
-                          text={candidate.geographicAvailability || 'N/A'}
+                          text={
+                            candidate.geographicLocation?.addressFull || 'N/A'
+                          }
                           styles={
                             classNames(
                               'text-digiblack1624-normal',
-                              !candidate.geographicAvailability &&
+                              !candidate.geographicLocation?.addressFull &&
                                 'text-digired'
                             ) as string
                           }

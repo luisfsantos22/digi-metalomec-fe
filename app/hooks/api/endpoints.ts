@@ -26,6 +26,7 @@ export const CANDIDATE_ENDPOINTS = {
     `api/v1/employees/iteractions/?page=${page}&employee=${candidateId}`,
   getCandidateIteractionById: (id: string) =>
     `api/v1/employees/iteractions/${id}/`,
+  searchByLocation: 'api/v1/employees/candidates/search-by-location/',
 }
 
 export const EMPLOYEE_ENDPOINTS = {
