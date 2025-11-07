@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import FormInput from './FormInput'
 import SearchInput from './SearchInput'
 import Text from '../Text/Text'
@@ -48,9 +48,17 @@ const LocationRadiusSearch: React.FC<LocationRadiusSearchProps> = ({
   const [isSearching, setIsSearching] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [selectedLocation, setSelectedLocation] = useState<string>('')
+  const skipSearchRef = useRef(false)
 
   // Debounced search for Nominatim
   useEffect(() => {
+    // Don't search if we just selected a location
+    if (skipSearchRef.current) {
+      skipSearchRef.current = false
+
+      return
+    }
+
     if (!searchQuery || searchQuery.length < 3) {
       setSearchResults([])
       setIsDropdownOpen(false)
@@ -83,8 +91,10 @@ const LocationRadiusSearch: React.FC<LocationRadiusSearchProps> = ({
   const handleSelectLocation = (result: NominatimResult) => {
     setPlace(result.display_name)
     setSelectedLocation(result.display_name)
+    skipSearchRef.current = true
     setSearchQuery(result.display_name)
     setIsDropdownOpen(false)
+    setSearchResults([])
   }
   const handleRadiusChange = (value: string | number | Date | undefined) => {
     if (value === '' || value === null || value === undefined) {

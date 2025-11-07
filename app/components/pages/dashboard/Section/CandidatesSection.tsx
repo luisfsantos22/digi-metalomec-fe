@@ -28,6 +28,7 @@ import dynamic from 'next/dynamic'
 import { GenericCandidate } from '@/app/types/candidate/candidate'
 import GenericTooltip from '@/app/components/Tooltip/GenericTooltip'
 import LocationRadiusSearch from '@/app/components/Input/LocationRadiusSearch'
+import LocationSearchBadge from '@/app/components/Badge/LocationSearchBadge'
 
 const CandidatesSection = () => {
   const router = useRouter()
@@ -126,9 +127,10 @@ const CandidatesSection = () => {
             styles="text-digiblack1624-normal"
           />
           {useLocationSearch && locationPlace && locationRadius && (
-            <span className="bg-digiblue w-full xl:w-fit text-white px-3 py-1 rounded-full text-xs font-semibold">
-              📍 Pesquisa por Raio: {locationPlace} ({locationRadius}km)
-            </span>
+            <LocationSearchBadge
+              locationPlace={locationPlace}
+              locationRadius={locationRadius}
+            />
           )}
         </div>
         <Row>
