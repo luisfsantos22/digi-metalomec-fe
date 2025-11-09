@@ -89,6 +89,8 @@ export default function CreateCandidate(props: CreateCandidateProps) {
     const mandatoryEmployeeFields = [
       formData?.jobTitles?.length > 0 ? formData?.jobTitles[0] : undefined,
       formData?.availabilityStatus,
+      formData?.geographicLocation?.city,
+      formData?.geographicLocation?.municipality,
     ]
 
     // Check if all mandatory fields are filled

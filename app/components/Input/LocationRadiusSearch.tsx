@@ -72,7 +72,16 @@ const LocationRadiusSearch: React.FC<LocationRadiusSearchProps> = ({
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
           searchQuery
         )},Portugal&addressdetails=1&limit=5`
-        const response = await fetch(url)
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': 'DigiMetalomec/1.0',
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('Geocoding failed')
+        }
+
         const data = await response.json()
 
         setSearchResults(data || [])

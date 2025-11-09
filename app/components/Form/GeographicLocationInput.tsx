@@ -65,10 +65,17 @@ export default function GeographicLocationInput({
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
           searchQuery
         )},Portugal&addressdetails=1&limit=5`
-        const response = await fetch(url)
-        const data = await response.json()
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': 'DigiMetalomec/1.0',
+          },
+        })
 
-        console.log('Nominatim search results:', data)
+        if (!response.ok) {
+          throw new Error('Geocoding failed')
+        }
+
+        const data = await response.json()
 
         // Remove duplicates based on place_id
         const uniqueResults = data.filter(
@@ -84,7 +91,7 @@ export default function GeographicLocationInput({
       } finally {
         setIsSearching(false)
       }
-    }, 500) // Debounce 500ms
+    }, 1000) // Debounce 1000ms
 
     return () => clearTimeout(timer)
   }, [searchQuery])

@@ -68,10 +68,19 @@ const LazyLeafletMap = ({
           const reverseGeocode = async (lat: number, lng: number) => {
             try {
               const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
-              const res = await fetch(url)
+              const res = await fetch(url, {
+                headers: {
+                  'User-Agent': 'DigiMetalomec/1.0',
+                },
+              })
               if (!res.ok) return null
 
-              return await res.json()
+              try {
+                return await res.json()
+              } catch {
+                // Handle JSON parsing errors
+                return null
+              }
             } catch {
               return null
             }

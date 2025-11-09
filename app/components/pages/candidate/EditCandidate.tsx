@@ -79,7 +79,8 @@ export default function EditCandidate() {
     const mandatoryCandidateFields = [
       formData?.jobTitles?.length > 0 ? formData?.jobTitles[0] : undefined,
       formData?.availabilityStatus,
-      formData?.geographicLocation,
+      formData?.geographicLocation?.city,
+      formData?.geographicLocation?.municipality,
     ]
     const isCandidateDataValid = mandatoryCandidateFields?.every(
       (field) => field !== '' && field !== undefined && field !== null

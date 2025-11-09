@@ -96,7 +96,7 @@ const useCompanyCandidatesQuery = (
               return
             }
 
-            const { lat, lon, display_name } = geoData[0]
+            const { lat, lon } = geoData[0]
 
             endpoint = CANDIDATE_ENDPOINTS.searchByLocation
             // send only radius and precise coordinates (no place param)
