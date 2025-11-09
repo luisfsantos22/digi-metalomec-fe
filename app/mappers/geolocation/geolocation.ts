@@ -1,6 +1,7 @@
 import {
   GeographicLocationInput,
   GeographicLocationOutput,
+  NominatimResponse,
 } from '@/app/types/geolocation'
 
 /**
@@ -37,7 +38,7 @@ export const mapGeographicLocationFromApi = (
  * Uses heuristics to extract city/municipality/locality/parish from OSM address components
  */
 export const mapNominatimToGeographicLocation = (
-  nominatimResponse: any
+  nominatimResponse: NominatimResponse
 ): Partial<GeographicLocationInput> => {
   const { address = {}, display_name = '', lat, lon } = nominatimResponse
 

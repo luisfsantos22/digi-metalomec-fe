@@ -3,8 +3,14 @@
 import React, { useState, useEffect, useRef } from 'react'
 import FormInput from '../Input/FormInput'
 import SearchInput from '../Input/SearchInput'
-import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form'
+import {
+  UseFormRegister,
+  UseFormSetValue,
+  FieldErrors,
+  UseFormWatch,
+} from 'react-hook-form'
 import { mapNominatimToGeographicLocation } from '@/app/mappers/geolocation/geolocation'
+import { NominatimResponse } from '@/app/types/geolocation'
 
 type Props = {
   register: UseFormRegister<any>
@@ -19,14 +25,12 @@ type Props = {
     longitude?: number | null
     addressFull?: string | null
   }
+  // Optional watch function from react-hook-form to keep displayed values in sync
+  watch?: UseFormWatch<any>
 }
 
-type SearchResult = {
+type SearchResult = NominatimResponse & {
   place_id: string
-  display_name: string
-  lat: string
-  lon: string
-  address: any
 }
 
 export default function GeographicLocationInput({
@@ -34,6 +38,7 @@ export default function GeographicLocationInput({
   setValue,
   errors,
   initial,
+  watch,
 }: Props) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
@@ -41,6 +46,20 @@ export default function GeographicLocationInput({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [selectedLocation, setSelectedLocation] = useState<string>('')
   const skipSearchRef = useRef(false)
+
+  // Use watch if provided so disabled inputs display current form values
+  const watchedCity =
+    (typeof watch === 'function' && watch('geographicLocation.city')) ||
+    undefined
+  const watchedMunicipality =
+    (typeof watch === 'function' && watch('geographicLocation.municipality')) ||
+    undefined
+  const watchedLocality =
+    (typeof watch === 'function' && watch('geographicLocation.locality')) ||
+    undefined
+  const watchedParish =
+    (typeof watch === 'function' && watch('geographicLocation.parish')) ||
+    undefined
 
   // Debounced search function
   useEffect(() => {
@@ -146,7 +165,6 @@ export default function GeographicLocationInput({
         dataIsLoading={isSearching}
         value={selectedLocation}
         setValue={setSelectedLocation}
-        setSelectedObj={() => {}}
         source="Location"
         setIsDropdownOpen={setIsDropdownOpen}
         isDropdownOpen={isDropdownOpen}
@@ -163,7 +181,7 @@ export default function GeographicLocationInput({
 
       <div className="grid lg:grid-cols-4 grid-cols-1 gap-4">
         <FormInput
-          query={initial?.city ?? ''}
+          query={watchedCity ?? initial?.city ?? ''}
           setQuery={(e) => setValue('geographicLocation.city', e as string)}
           placeholder="Cidade"
           inputType="text"
@@ -173,7 +191,7 @@ export default function GeographicLocationInput({
           labelStyles="text-digiblack1420-semibold"
         />
         <FormInput
-          query={initial?.municipality ?? ''}
+          query={watchedMunicipality ?? initial?.municipality ?? ''}
           setQuery={(e) =>
             setValue('geographicLocation.municipality', e as string)
           }
@@ -185,7 +203,7 @@ export default function GeographicLocationInput({
           labelStyles="text-digiblack1420-semibold"
         />
         <FormInput
-          query={initial?.locality ?? ''}
+          query={watchedLocality ?? initial?.locality ?? ''}
           setQuery={(e) => setValue('geographicLocation.locality', e as string)}
           placeholder="Freguesia / Localidade"
           inputType="text"
@@ -195,7 +213,7 @@ export default function GeographicLocationInput({
           labelStyles="text-digiblack1420-semibold"
         />
         <FormInput
-          query={initial?.parish ?? ''}
+          query={watchedParish ?? initial?.parish ?? ''}
           setQuery={(e) => setValue('geographicLocation.parish', e as string)}
           placeholder="Freguesia"
           inputType="text"

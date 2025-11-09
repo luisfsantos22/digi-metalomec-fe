@@ -169,6 +169,7 @@ export default function EditCandidate() {
           register={register}
           setValue={setValue}
           errors={errors}
+          watch={watch}
         />
         <div className="flex flex-row gap-4 lg:gap-8 w-full items-center justify-center lg:justify-end">
           <SecondaryButton

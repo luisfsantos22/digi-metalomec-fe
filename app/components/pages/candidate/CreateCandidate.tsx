@@ -171,6 +171,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
           setValue={setValue}
           errors={errors}
           clearErrors={clearErrors}
+          watch={watch}
         />
         <div className="flex flex-row gap-4 lg:gap-8 w-full items-center justify-center lg:justify-end">
           <SecondaryButton

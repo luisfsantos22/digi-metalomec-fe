@@ -92,7 +92,7 @@ const LocationRadiusSearch: React.FC<LocationRadiusSearchProps> = ({
       } finally {
         setIsSearching(false)
       }
-    }, 500)
+    }, 1000)
 
     return () => clearTimeout(timer)
   }, [searchQuery])
@@ -140,7 +140,6 @@ const LocationRadiusSearch: React.FC<LocationRadiusSearchProps> = ({
             dataIsLoading={isSearching}
             value={selectedLocation}
             setValue={setSelectedLocation}
-            setSelectedObj={() => {}}
             source="Location"
             setIsDropdownOpen={setIsDropdownOpen}
             isDropdownOpen={isDropdownOpen}

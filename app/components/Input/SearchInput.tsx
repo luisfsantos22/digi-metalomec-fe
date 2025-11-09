@@ -19,7 +19,7 @@ type SearchInputProps = {
   labelStyles?: string
   value: string
   setValue: (value: string) => void
-  setSelectedObj: (obj: any) => void
+  setSelectedObj?: (obj: any) => void
   setShowCreateModal?: (show: boolean) => void
   createText?: string
   source: 'JobTitle' | 'Location'
@@ -70,7 +70,7 @@ const SearchInput = (props: SearchInputProps) => {
       onItemSelect(item)
     } else if (source === 'JobTitle') {
       setValue(item.id)
-      setSelectedObj(item)
+      setSelectedObj?.(item)
       setQuery(item.name)
     }
     setIsDropdownOpen(false)
@@ -139,7 +139,7 @@ const SearchInput = (props: SearchInputProps) => {
               onClick={() => {
                 setQuery('')
                 setValue?.('')
-                setSelectedObj(null)
+                setSelectedObj?.(null)
                 setIsDropdownOpen(false)
                 if (clearAdditionalFields) {
                   clearAdditionalFields()

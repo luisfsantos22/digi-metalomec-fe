@@ -3,6 +3,7 @@ import {
   UseFormRegister,
   UseFormSetValue,
   UseFormClearErrors,
+  UseFormWatch,
 } from 'react-hook-form'
 import ContainerCard from '../Card/ContainerCard'
 import FormInput from '../Input/FormInput'
@@ -24,10 +25,11 @@ type CandidateFormScreenProps = {
   setValue: UseFormSetValue<CreateCandidateData>
   errors: FieldErrors<CreateCandidateData>
   clearErrors?: UseFormClearErrors<CreateCandidateData>
+  watch?: UseFormWatch<any>
 }
 
 const CandidateFormScreen = (props: CandidateFormScreenProps) => {
-  const { formData, register, setValue, errors, clearErrors } = props
+  const { formData, register, setValue, errors, clearErrors, watch } = props
 
   const [selectedJobTitle, setSelectedJobTitle] =
     useState<GenericJobTitle | null>(null)
@@ -163,6 +165,7 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             register={register}
             setValue={setValue}
             errors={errors}
+            watch={watch}
             initial={
               geographicLocation
                 ? {
