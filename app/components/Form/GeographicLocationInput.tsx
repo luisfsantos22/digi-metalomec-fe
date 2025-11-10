@@ -61,6 +61,14 @@ export default function GeographicLocationInput({
     (typeof watch === 'function' && watch('geographicLocation.parish')) ||
     undefined
 
+  // Initialize searchQuery and selectedLocation from initial?.addressFull on mount
+  useEffect(() => {
+    if (initial?.addressFull) {
+      setSearchQuery(initial.addressFull)
+      setSelectedLocation(initial.addressFull)
+    }
+  }, [initial?.addressFull])
+
   // Debounced search function
   useEffect(() => {
     // Don't search if we just selected a location

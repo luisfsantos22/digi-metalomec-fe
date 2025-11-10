@@ -59,8 +59,8 @@ export const mapNominatimToGeographicLocation = (
     municipality,
     locality,
     parish,
-    latitude: lat ? parseFloat(lat) : null,
-    longitude: lon ? parseFloat(lon) : null,
+    latitude: lat ? (isNaN(parseFloat(lat)) ? null : parseFloat(lat)) : null,
+    longitude: lon ? (isNaN(parseFloat(lon)) ? null : parseFloat(lon)) : null,
     addressFull: display_name,
   }
 }

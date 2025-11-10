@@ -15,6 +15,36 @@ interface useCompanyCandidatesQueryResult {
   hasPreviousPage?: boolean
 }
 
+// Rate limiter for Nominatim API (1 request per second)
+let lastGeocodingRequest = 0
+const GEOCODING_MIN_INTERVAL = 1000 // 1 second in milliseconds
+
+const rateLimitedGeocoding = async (place: string): Promise<any> => {
+  const now = Date.now()
+  const timeSinceLastRequest = now - lastGeocodingRequest
+
+  // If less than 1 second has passed, wait for the remaining time
+  if (timeSinceLastRequest < GEOCODING_MIN_INTERVAL) {
+    const waitTime = GEOCODING_MIN_INTERVAL - timeSinceLastRequest
+    await new Promise((resolve) => setTimeout(resolve, waitTime))
+  }
+
+  lastGeocodingRequest = Date.now()
+
+  const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+    place
+  )}&addressdetails=1&limit=1`
+
+  const geoResp = await fetch(geocodeUrl, {
+    headers: {
+      Accept: 'application/json',
+      'User-Agent': 'digi-metalomec-fe', // Nominatim requires a User-Agent header
+    },
+  })
+
+  return geoResp.json()
+}
+
 const useCompanyCandidatesQuery = (
   page: number,
   searchQuery: string = '',
@@ -48,15 +78,19 @@ const useCompanyCandidatesQuery = (
       // Check if both location fields are empty (should fall back to regular search)
       const bothLocationFieldsEmpty =
         (!debouncedLocationPlace || debouncedLocationPlace.trim() === '') &&
-        (!debouncedLocationRadius || debouncedLocationRadius <= 0)
+        (debouncedLocationRadius === null ||
+          debouncedLocationRadius === undefined ||
+          debouncedLocationRadius <= 0)
 
       // Don't fetch if only one field is filled (wait for both) - just return without changing state
       if (
         !bothLocationFieldsEmpty &&
         ((debouncedLocationPlace &&
           debouncedLocationPlace.trim() !== '' &&
-          !debouncedLocationRadius) ||
-          (debouncedLocationRadius &&
+          (debouncedLocationRadius === null ||
+            debouncedLocationRadius === undefined)) ||
+          (debouncedLocationRadius !== null &&
+            debouncedLocationRadius !== undefined &&
             debouncedLocationRadius > 0 &&
             (!debouncedLocationPlace || debouncedLocationPlace.trim() === '')))
       ) {
@@ -76,13 +110,7 @@ const useCompanyCandidatesQuery = (
         if (useLocationSearch) {
           // Location-based search: first try geocoding client-side to get precise coords
           try {
-            const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-              debouncedLocationPlace
-            )}&addressdetails=1&limit=1`
-            const geoResp = await fetch(geocodeUrl, {
-              headers: { Accept: 'application/json' },
-            })
-            const geoData = await geoResp.json()
+            const geoData = await rateLimitedGeocoding(debouncedLocationPlace)
 
             if (!geoData || geoData.length === 0) {
               // No geocoding result — show friendly error and skip backend call
