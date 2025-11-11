@@ -168,6 +168,71 @@ jobs:
             sudo docker image prune -f
             "
 
+  cleanup-dockerhub:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Cleanup Old Docker Hub Images
+          command: |
+            # Install jq for JSON parsing
+            sudo apt-get update && sudo apt-get install -y jq curl
+
+            # Determine which tag to keep based on branch
+            if [ "$CIRCLE_BRANCH" = "main" ]; then
+              TAG_TO_KEEP="prod"
+            elif [ "$CIRCLE_BRANCH" = "develop" ]; then
+              TAG_TO_KEEP="staging"
+            else
+              echo "Skipping cleanup for branch: $CIRCLE_BRANCH"
+              exit 0
+            fi
+
+            echo "Keeping tag: $TAG_TO_KEEP"
+            echo "Getting Docker Hub token..."
+
+            # Get Docker Hub API token
+            TOKEN=$(curl -s -X POST \
+              -H "Content-Type: application/json" \
+              -d '{"username": "'"${DOCKERHUB_USER}"'", "password": "'"${DOCKERHUB_PASS}"'"}' \
+              https://hub.docker.com/v2/users/login/ | jq -r .token)
+
+            if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+              echo "Failed to get Docker Hub token"
+              exit 1
+            fi
+
+            echo "Fetching tags for repository: gic2luis/digi-metalomec-fe-v1"
+
+            # Get all tags except the one we want to keep
+            TAGS=$(curl -s -H "Authorization: JWT ${TOKEN}" \
+              https://hub.docker.com/v2/repositories/gic2luis/digi-metalomec-fe-v1/tags/?page_size=100 \
+              | jq -r ".results[] | select(.name != \"${TAG_TO_KEEP}\") | .name")
+
+            if [ -z "$TAGS" ]; then
+              echo "No old tags to delete"
+              exit 0
+            fi
+
+            echo "Tags to delete:"
+            echo "$TAGS"
+
+            # Delete each old tag
+            for TAG in $TAGS; do
+              echo "Deleting tag: $TAG"
+              RESPONSE=$(curl -s -X DELETE \
+                -H "Authorization: JWT ${TOKEN}" \
+                https://hub.docker.com/v2/repositories/gic2luis/digi-metalomec-fe-v1/tags/${TAG}/)
+
+              if [ $? -eq 0 ]; then
+                echo "Successfully deleted tag: $TAG"
+              else
+                echo "Failed to delete tag: $TAG"
+              fi
+            done
+
+            echo "Docker Hub cleanup completed!"
+
 workflows:
   version: 2
   deploy-staging:
@@ -182,6 +247,12 @@ workflows:
           filters:
             branches:
               only: develop
+      - cleanup-dockerhub:
+          requires:
+            - deploy-staging
+          filters:
+            branches:
+              only: develop
 
   deploy-production:
     jobs:
@@ -192,6 +263,12 @@ workflows:
       - deploy-production:
           requires:
             - build-production
+          filters:
+            branches:
+              only: main
+      - cleanup-dockerhub:
+          requires:
+            - deploy-production
           filters:
             branches:
               only: main
