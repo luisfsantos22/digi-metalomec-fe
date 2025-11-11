@@ -42,7 +42,6 @@ const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
     departmentName,
     collaborationStartDate,
     transportAvailable,
-    geographicAvailability,
     preferredWorkLocation,
     needsHousing,
     housingProvided,
@@ -192,16 +191,6 @@ const EmployeeFormScreen = (props: EmployeeFormScreenProps) => {
             label="Local de Trabalho Preferencial"
             labelStyles="text-digiblack1420-semibold flex gap-1"
             {...register('preferredWorkLocation', { required: false })}
-          />
-          <FormInput
-            query={geographicAvailability ?? ''}
-            setQuery={(e) => setValue('geographicAvailability', String(e))}
-            placeholder="Norte de Portugal"
-            inputType="text"
-            mandatory={false}
-            label="Disponibilidade Geográfica"
-            labelStyles="text-digiblack1420-semibold flex gap-1"
-            {...register('geographicAvailability', { required: false })}
           />
         </Row>
         <Row>

@@ -79,7 +79,8 @@ export default function EditCandidate() {
     const mandatoryCandidateFields = [
       formData?.jobTitles?.length > 0 ? formData?.jobTitles[0] : undefined,
       formData?.availabilityStatus,
-      formData?.geographicAvailability,
+      formData?.geographicLocation?.city,
+      formData?.geographicLocation?.municipality,
     ]
     const isCandidateDataValid = mandatoryCandidateFields?.every(
       (field) => field !== '' && field !== undefined && field !== null
@@ -168,6 +169,7 @@ export default function EditCandidate() {
           register={register}
           setValue={setValue}
           errors={errors}
+          watch={watch}
         />
         <div className="flex flex-row gap-4 lg:gap-8 w-full items-center justify-center lg:justify-end">
           <SecondaryButton

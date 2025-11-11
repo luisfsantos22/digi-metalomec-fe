@@ -3,6 +3,7 @@ import {
   UseFormRegister,
   UseFormSetValue,
   UseFormClearErrors,
+  UseFormWatch,
 } from 'react-hook-form'
 import ContainerCard from '../Card/ContainerCard'
 import FormInput from '../Input/FormInput'
@@ -16,6 +17,7 @@ import { useEffect, useState } from 'react'
 import { GenericJobTitle } from '@/app/types/utils/job-title'
 import CreateJobTitleModal from '../Modal/CreateJobTitleModal'
 import { CreateCandidateData } from '@/app/types/candidate/candidate'
+import GeographicLocationInput from './GeographicLocationInput'
 
 type CandidateFormScreenProps = {
   formData: CreateCandidateData
@@ -23,10 +25,11 @@ type CandidateFormScreenProps = {
   setValue: UseFormSetValue<CreateCandidateData>
   errors: FieldErrors<CreateCandidateData>
   clearErrors?: UseFormClearErrors<CreateCandidateData>
+  watch?: UseFormWatch<any>
 }
 
 const CandidateFormScreen = (props: CandidateFormScreenProps) => {
-  const { formData, register, setValue, errors, clearErrors } = props
+  const { formData, register, setValue, errors, clearErrors, watch } = props
 
   const [selectedJobTitle, setSelectedJobTitle] =
     useState<GenericJobTitle | null>(null)
@@ -41,7 +44,7 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
   const {
     user: { email, firstName, lastName, phoneNumber } = {},
     availabilityStatus,
-    geographicAvailability,
+    geographicLocation,
     jobTitles,
   } = formData
 
@@ -157,6 +160,28 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
           />
         </Row>
         <Separator />
+        <Row title="Localização">
+          <GeographicLocationInput
+            register={register}
+            setValue={setValue}
+            errors={errors}
+            watch={watch}
+            initial={
+              geographicLocation
+                ? {
+                    city: geographicLocation.city,
+                    municipality: geographicLocation.municipality,
+                    locality: geographicLocation.locality ?? undefined,
+                    parish: geographicLocation.parish ?? undefined,
+                    latitude: geographicLocation.latitude ?? undefined,
+                    longitude: geographicLocation.longitude ?? undefined,
+                    addressFull: geographicLocation.addressFull ?? undefined,
+                  }
+                : undefined
+            }
+          />
+        </Row>
+        <Separator />
         <Row title="Informação Profissional">
           <FormDropdown
             label="Disponibilidade"
@@ -173,19 +198,6 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             }
             mandatory={true}
             labelStyles="text-digiblack1420-semibold flex gap-1"
-            width="lg:w-1/3 w-full"
-          />
-          <FormInput
-            query={geographicAvailability}
-            setQuery={(e) =>
-              setValue('geographicAvailability', e as unknown as string)
-            }
-            placeholder="Lisboa"
-            inputType="text"
-            mandatory={true}
-            label="Disponibilidade Geográfica"
-            labelStyles="text-digiblack1420-semibold flex gap-1"
-            {...register('geographicAvailability', { required: false })}
             width="lg:w-1/3 w-full"
           />
         </Row>

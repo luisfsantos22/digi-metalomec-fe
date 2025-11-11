@@ -3,6 +3,7 @@ import { Language, UserLanguage } from '@/app/types/utils/language'
 import { EmployeeSkill } from './skill'
 import { GenericJobTitle } from '../utils/job-title'
 import { EducationalQualification } from '../utils/educational-qualification'
+import { GeographicLocationInput } from '../geolocation'
 
 type EmergencyContact = {
   name?: string
@@ -49,7 +50,7 @@ type Employee = {
   gender?: string
   maritalStatus?: string
   transportAvailable?: boolean
-  geographicAvailability?: string
+  geographicLocation?: GeographicLocationInput
   preferredWorkLocation?: string
   emergencyContact?: EmergencyContact
   educationQualification?: EducationalQualification
@@ -100,7 +101,7 @@ type CreateEmployeeData = {
   gender?: string
   maritalStatus?: string
   transportAvailable?: boolean
-  geographicAvailability?: string
+  geographicLocation?: GeographicLocationInput
   preferredWorkLocation?: string
   emergencyContact?: EmergencyContact
   educationQualification?: string

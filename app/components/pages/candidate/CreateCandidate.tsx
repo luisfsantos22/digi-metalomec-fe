@@ -45,7 +45,15 @@ export default function CreateCandidate(props: CreateCandidateProps) {
         phoneNumber: '',
       },
       jobTitles: [],
-      geographicAvailability: undefined,
+      geographicLocation: {
+        city: '',
+        municipality: '',
+        locality: '',
+        parish: '',
+        latitude: null,
+        longitude: null,
+        addressFull: null,
+      },
       availabilityStatus: AVAILABILITY_STATUS.find(
         (status) => status.value === 'AVAILABLE'
       )?.value,
@@ -81,7 +89,8 @@ export default function CreateCandidate(props: CreateCandidateProps) {
     const mandatoryEmployeeFields = [
       formData?.jobTitles?.length > 0 ? formData?.jobTitles[0] : undefined,
       formData?.availabilityStatus,
-      formData?.geographicAvailability,
+      formData?.geographicLocation?.city,
+      formData?.geographicLocation?.municipality,
     ]
 
     // Check if all mandatory fields are filled
@@ -162,6 +171,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
           setValue={setValue}
           errors={errors}
           clearErrors={clearErrors}
+          watch={watch}
         />
         <div className="flex flex-row gap-4 lg:gap-8 w-full items-center justify-center lg:justify-end">
           <SecondaryButton

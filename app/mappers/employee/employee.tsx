@@ -48,7 +48,15 @@ export const mapEmployee = (data: any): Employee => ({
   gender: data?.gender || '',
   maritalStatus: data?.marital_status || '',
   transportAvailable: data?.transport_available || undefined,
-  geographicAvailability: data?.geographic_availability || '',
+  geographicLocation: {
+    city: data?.geographic_location?.city || '',
+    municipality: data?.geographic_location?.municipality || '',
+    locality: data?.geographic_location?.locality || '',
+    parish: data?.geographic_location?.parish || '',
+    latitude: data?.geographic_location?.latitude || null,
+    longitude: data?.geographic_location?.longitude || null,
+    addressFull: data?.geographic_location?.address_full || null,
+  },
   preferredWorkLocation: data?.preferred_work_location || '',
   emergencyContact: data?.emergency_contact || undefined,
   educationQualification: data?.education_qualification
