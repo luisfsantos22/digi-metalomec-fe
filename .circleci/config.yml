@@ -173,22 +173,18 @@ jobs:
       - image: cimg/base:stable
     steps:
       - run:
-          name: Cleanup Old Docker Hub Images
+          name: Delete Docker Hub Repository
           command: |
             # Install jq for JSON parsing
             sudo apt-get update && sudo apt-get install -y jq curl
 
-            # Determine which tag to keep based on branch
-            if [ "$CIRCLE_BRANCH" = "main" ]; then
-              TAG_TO_KEEP="prod"
-            elif [ "$CIRCLE_BRANCH" = "develop" ]; then
-              TAG_TO_KEEP="staging"
-            else
+            # Only run cleanup on main or develop branches
+            if [ "$CIRCLE_BRANCH" != "main" ] && [ "$CIRCLE_BRANCH" != "develop" ]; then
               echo "Skipping cleanup for branch: $CIRCLE_BRANCH"
               exit 0
             fi
 
-            echo "Keeping tag: $TAG_TO_KEEP"
+            echo "Deleting Docker Hub repository: gic2luis/digi-metalomec-fe-v1"
             echo "Getting Docker Hub token..."
 
             # Get Docker Hub API token
@@ -202,36 +198,24 @@ jobs:
               exit 1
             fi
 
-            echo "Fetching tags for repository: gic2luis/digi-metalomec-fe-v1"
+            # Delete the entire repository
+            echo "Deleting repository..."
+            RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X DELETE \
+              -H "Authorization: JWT ${TOKEN}" \
+              https://hub.docker.com/v2/repositories/gic2luis/digi-metalomec-fe-v1/)
 
-            # Get all tags except the one we want to keep
-            TAGS=$(curl -s -H "Authorization: JWT ${TOKEN}" \
-              https://hub.docker.com/v2/repositories/gic2luis/digi-metalomec-fe-v1/tags/?page_size=100 \
-              | jq -r ".results[] | select(.name != \"${TAG_TO_KEEP}\") | .name")
+            HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d: -f2)
 
-            if [ -z "$TAGS" ]; then
-              echo "No old tags to delete"
-              exit 0
+            if [ "$HTTP_STATUS" = "204" ] || [ "$HTTP_STATUS" = "202" ] || [ "$HTTP_STATUS" = "200" ]; then
+              echo "Successfully deleted repository: gic2luis/digi-metalomec-fe-v1"
+              echo "Repository will be recreated automatically on next push"
+            else
+              echo "Failed to delete repository (HTTP status: $HTTP_STATUS)"
+              echo "Response: $RESPONSE"
+              exit 1
             fi
 
-            echo "Tags to delete:"
-            echo "$TAGS"
-
-            # Delete each old tag
-            for TAG in $TAGS; do
-              echo "Deleting tag: $TAG"
-              RESPONSE=$(curl -s -X DELETE \
-                -H "Authorization: JWT ${TOKEN}" \
-                https://hub.docker.com/v2/repositories/gic2luis/digi-metalomec-fe-v1/tags/${TAG}/)
-
-              if [ $? -eq 0 ]; then
-                echo "Successfully deleted tag: $TAG"
-              else
-                echo "Failed to delete tag: $TAG"
-              fi
-            done
-
-            echo "Docker Hub cleanup completed!"
+            echo "Docker Hub cleanup completed - repository deleted!"
 
 workflows:
   version: 2
