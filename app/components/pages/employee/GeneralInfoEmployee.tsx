@@ -79,6 +79,14 @@ export default function GeneralInfoEmployee(props: GeneralInfoEmployeeProps) {
           label="Cartão de Cidadão"
           value={employee?.nationalId ? employee?.nationalId : undefined}
         />
+        <Label
+          label="Cartão Europeu de Seguro de Doença"
+          value={
+            employee?.europeanHealthInsuranceCard
+              ? employee?.europeanHealthInsuranceCard
+              : undefined
+          }
+        />
       </Row>
       <Row>
         <Label

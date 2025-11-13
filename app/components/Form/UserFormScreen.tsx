@@ -323,6 +323,18 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           labelStyles="text-digiblack1420-semibold flex gap-1"
           {...register('socialSecurityNumber', { required: false })}
         />
+        <FormInput
+          query={formData?.europeanHealthInsuranceCard}
+          setQuery={(e) =>
+            setValue('europeanHealthInsuranceCard', e as unknown as string)
+          }
+          placeholder="123456789"
+          inputType="text"
+          mandatory={false}
+          label="Cartão Europeu de Seguro de Doença"
+          labelStyles="text-digiblack1420-semibold flex gap-1"
+          {...register('europeanHealthInsuranceCard', { required: false })}
+        />
       </Row>
     </ContainerCard>
   )
