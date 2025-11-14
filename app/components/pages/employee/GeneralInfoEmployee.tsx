@@ -3,6 +3,7 @@ import Label from '../../Label/Label'
 import Row from '../../Row/Row'
 import { formatDate } from '@/app/utils'
 import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from '@/app/constants'
+import Separator from '../../Separator/Separator'
 
 type GeneralInfoEmployeeProps = {
   employee: Employee | null
@@ -44,16 +45,6 @@ export default function GeneralInfoEmployee(props: GeneralInfoEmployeeProps) {
           }
         />
         <Label
-          label="Estado Civil"
-          value={
-            employee?.maritalStatus
-              ? MARITAL_STATUS_OPTIONS.find(
-                  (option) => option.value === employee?.maritalStatus
-                )?.label
-              : undefined
-          }
-        />
-        <Label
           label="Data de Nascimento"
           value={
             employee?.dateOfBirth
@@ -61,11 +52,15 @@ export default function GeneralInfoEmployee(props: GeneralInfoEmployeeProps) {
               : undefined
           }
         />
-      </Row>
-      <Row>
         <Label
           label="NIF"
           value={employee?.nif ? employee?.nif : undefined}
+        />
+      </Row>
+      <Row>
+        <Label
+          label="Cartão de Cidadão"
+          value={employee?.nationalId ? employee?.nationalId : undefined}
         />
         <Label
           label="Número de Segurança Social"
@@ -76,10 +71,6 @@ export default function GeneralInfoEmployee(props: GeneralInfoEmployeeProps) {
           }
         />
         <Label
-          label="Cartão de Cidadão"
-          value={employee?.nationalId ? employee?.nationalId : undefined}
-        />
-        <Label
           label="Cartão Europeu de Seguro de Doença"
           value={
             employee?.europeanHealthInsuranceCard
@@ -88,6 +79,7 @@ export default function GeneralInfoEmployee(props: GeneralInfoEmployeeProps) {
           }
         />
       </Row>
+      <Separator />
       <Row>
         <Label
           label="País"
@@ -118,20 +110,15 @@ export default function GeneralInfoEmployee(props: GeneralInfoEmployeeProps) {
           }
         />
       </Row>
+      <Separator />
       <Row>
         <Label
-          label="Linguagens"
+          label="Estado Civil"
           value={
-            employee?.languages && employee?.languages?.length > 0
-              ? employee?.languages?.map((lang) => lang.name).join(', ')
-              : undefined
-          }
-        />
-        <Label
-          label="Qualificação Educacional"
-          value={
-            employee?.educationQualification?.name
-              ? employee?.educationQualification?.name
+            employee?.maritalStatus
+              ? MARITAL_STATUS_OPTIONS.find(
+                  (option) => option.value === employee?.maritalStatus
+                )?.label
               : undefined
           }
         />
@@ -142,6 +129,14 @@ export default function GeneralInfoEmployee(props: GeneralInfoEmployeeProps) {
               ? GENDER_OPTIONS.find(
                   (option) => option.value === employee?.gender
                 )?.label
+              : undefined
+          }
+        />
+        <Label
+          label="Linguagens"
+          value={
+            employee?.languages && employee?.languages?.length > 0
+              ? employee?.languages?.map((lang) => lang.name).join(', ')
               : undefined
           }
         />
@@ -165,10 +160,10 @@ export default function GeneralInfoEmployee(props: GeneralInfoEmployeeProps) {
           }
         />
         <Label
-          label="Relação com o Contato de Emergência"
+          label="Qualificação Educacional"
           value={
-            employee?.emergencyContact?.relationship
-              ? employee?.emergencyContact?.relationship
+            employee?.educationQualification?.name
+              ? employee?.educationQualification?.name
               : undefined
           }
         />
