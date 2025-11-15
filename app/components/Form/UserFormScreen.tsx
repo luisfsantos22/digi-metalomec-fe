@@ -283,7 +283,6 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           placeholder="1000-000"
           inputType="text"
           width="lg:w-40 w-full"
-          mandatory={false}
           label="Código Postal"
           labelStyles="text-digiblack1420-semibold flex gap-1"
           {...register('postalCode', { required: false })}
@@ -295,8 +294,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           query={nif}
           setQuery={(e) => setValue('nif', e as unknown as string)}
           placeholder="123456789"
-          inputType="text"
-          mandatory={false}
+          inputType="number"
           label="NIF"
           labelStyles="text-digiblack1420-semibold flex gap-1"
           {...register('nif', { required: false })}
@@ -305,8 +303,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           query={nationalId}
           setQuery={(e) => setValue('nationalId', e as unknown as string)}
           placeholder="123456789"
-          inputType="text"
-          mandatory={false}
+          inputType="number"
           label="Número de Identificação Nacional (CC)"
           labelStyles="text-digiblack1420-semibold flex gap-1"
           {...register('nationalId', { required: false })}
@@ -317,8 +314,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
             setValue('socialSecurityNumber', e as unknown as string)
           }
           placeholder="123456789"
-          inputType="text"
-          mandatory={false}
+          inputType="number"
           label="Número de Segurança Social"
           labelStyles="text-digiblack1420-semibold flex gap-1"
           {...register('socialSecurityNumber', { required: false })}
@@ -329,8 +325,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
             setValue('europeanHealthInsuranceCard', e as unknown as string)
           }
           placeholder="123456789"
-          inputType="text"
-          mandatory={false}
+          inputType="number"
           label="Cartão Europeu de Seguro de Doença"
           labelStyles="text-digiblack1420-semibold flex gap-1"
           {...register('europeanHealthInsuranceCard', { required: false })}
