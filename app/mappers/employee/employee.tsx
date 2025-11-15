@@ -44,6 +44,8 @@ export const mapEmployee = (data: any): Employee => ({
   nationalId: data?.national_id || undefined,
   nif: data?.nif || undefined,
   socialSecurityNumber: data?.social_security_number || undefined,
+  europeanHealthInsuranceCard:
+    data?.european_health_insurance_card || undefined,
   collaborationStartDate: data?.collaboration_start_date || undefined,
   gender: data?.gender || '',
   maritalStatus: data?.marital_status || '',

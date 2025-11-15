@@ -46,6 +46,7 @@ type Employee = {
   nationalId?: string
   nif?: string
   socialSecurityNumber?: string
+  europeanHealthInsuranceCard?: string
   collaborationStartDate?: Date
   gender?: string
   maritalStatus?: string
@@ -97,6 +98,7 @@ type CreateEmployeeData = {
   nationalId?: string
   nif?: string
   socialSecurityNumber?: string
+  europeanHealthInsuranceCard?: string
   collaborationStartDate?: string
   gender?: string
   maritalStatus?: string
