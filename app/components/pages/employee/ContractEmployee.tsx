@@ -3,7 +3,7 @@ import { Employee } from '@/app/types/employee/employee'
 import Spinner from '../../Spinner/Spinner'
 import Text from '../../Text/Text'
 import { useSession } from 'next-auth/react'
-import { useState } from 'react'
+import { useState, useEffect, use } from 'react'
 import { EmployeeContract } from '@/app/types/utils/contract'
 import Collapsible from '../../Collapsible/Collapsible'
 import Row from '../../Row/Row'
@@ -13,6 +13,17 @@ import { formatDate } from '@/app/utils'
 import EditButton from '../../Button/EditButton'
 import DeleteButton from '../../Button/DeleteButton'
 import Separator from '../../Separator/Separator'
+import DisplayDocumentButton from '../../Button/DisplayDocumentButton'
+import useGetEmployeeDocument from '@/app/hooks/employees/documents/useGetDocument'
+import useDownloadDocument from '@/app/hooks/employees/documents/useDownloadDocument'
+import useCreateContract from '@/app/hooks/employees/documents/useCreateContract'
+import { useEditContract } from '@/app/hooks/employees/documents/useEditContract'
+import { useDeleteContract } from '@/app/hooks/employees/documents/useDeleteContract'
+import DownloadDocumentButton from '../../Button/DownloadDocumentButton'
+import GenericTooltip from '../../Tooltip/GenericTooltip'
+import { useWindowSize } from '@/utils/hooks'
+import { classNames, isDesktopSize } from '@/utils'
+import AreYouSureModal from '../../Modal/AreYouSureModal'
 
 type ContractEmployeeProps = {
   employee: Employee | null
@@ -23,6 +34,8 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
 
   const { data: session } = useSession()
   const accessToken = session?.accessToken || ''
+  const screenSize = useWindowSize()
+  const isDesktop = isDesktopSize(screenSize)
 
   const [areYouSureToDeleteOpen, setAreYouSureToDeleteOpen] = useState(false)
   const [actionModal, setActionModal] = useState<'add' | 'edit'>('add')
@@ -32,10 +45,24 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
   )
   const [contractToDelete, setContractToDelete] =
     useState<EmployeeContract | null>(null)
+  const [contractDocumentId, setContractDocumentId] = useState<string>('')
+  const [activationTrigger, setActivationTrigger] = useState(0)
 
   const { contracts, error, loading, count } = useGetEmployeeContracts(
-    employee?.id || ''
+    employee?.id || '',
+    [activationTrigger]
   )
+
+  const {
+    document: documentFile,
+    error: documentError,
+    loading: documentLoading,
+  } = useGetEmployeeDocument(contractDocumentId)
+
+  const { downloadDocument } = useDownloadDocument()
+  const { createContract } = useCreateContract()
+  const { editContract } = useEditContract()
+  const { deleteContract } = useDeleteContract()
 
   const handleOpenAddModal = () => {
     setActionModal('add')
@@ -48,14 +75,32 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
     setOpenHandleContractModal(true)
   }
 
+  const handleDeleteContract = async () => {
+    if (!contractToDelete) return
+
+    const result = await deleteContract(contractToDelete.id, accessToken)
+    if (result) {
+      setActivationTrigger((prev) => prev + 1)
+      setAreYouSureToDeleteOpen(false)
+    }
+  }
+
   const handleOpenAreYouSureModal = (contract: EmployeeContract) => {
     setContractToDelete(contract)
     setAreYouSureToDeleteOpen(true)
   }
 
-  //   const { createEmployeeContract } = useCreateContract()
-  //   const { editContract } = useEditContract()
-  //   const { deleteContract } = useDeleteContract()
+  const handleDownloadContract = (contract: EmployeeContract) => {
+    downloadDocument(contract?.id || '', contract?.fileName || 'document')
+  }
+
+  useEffect(() => {
+    if (documentFile?.downloadUrl && contractDocumentId) {
+      const viewUrl = documentFile.downloadUrl
+      window.open(viewUrl, '_blank', 'noopener,noreferrer')
+      setContractDocumentId('') // Reset to prevent reopening
+    }
+  }, [documentFile, contractDocumentId])
 
   return (
     <div className="flex flex-col gap-4">
@@ -64,7 +109,6 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
           <Spinner />
         </div>
       ) : (
-        // Render contracts or a message if no contracts are available
         <div className="flex flex-col gap-4 ">
           <Text
             text={'Contratos'}
@@ -82,7 +126,7 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
                       Total de Contratos: <strong>{count || 0}</strong>
                       <span className="text-digiblack1212-semibold">
                         {' '}
-                        (Lista de Contratos já associadas a este colaborador)
+                        (Lista de Contratos já associados a este colaborador)
                       </span>
                     </span>
                   }
@@ -100,70 +144,131 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
                 {contracts?.map((contract, index) => (
                   <div
                     key={contract?.id}
-                    className="flex flex-col gap-4"
+                    className={classNames(
+                      !contract?.expiryDate && 'bg-digiblue/20',
+                      'flex flex-col gap-4 rounded-2xl '
+                    )}
                   >
                     <Collapsible
                       header={
-                        <div className="flex flex-row items-start lg:items-center justify-between gap-2">
-                          <Row extraStyles="flex-1">
+                        <div className="flex flex-col xl:flex-row items-start lg:items-center justify-between gap-2 px-2">
+                          <Row extraStyles="flex-1 w-full">
                             <Label
                               label="Título"
                               value={contract?.title || undefined}
                             />
                             <Label
-                              label="Nome do Ficheiro"
+                              label="Ficheiro"
                               value={contract?.fileName || undefined}
+                              extraContent={
+                                <div className="flex gap-2">
+                                  <DownloadDocumentButton
+                                    fileType={
+                                      (contract?.fileType as
+                                        | 'pdf'
+                                        | 'png'
+                                        | 'jpg'
+                                        | 'jpeg') || 'pdf'
+                                    }
+                                    tooltipText="Download Contrato"
+                                    hasTooltip
+                                    id={`download-contract-${contract?.id}`}
+                                    onClick={() =>
+                                      handleDownloadContract(contract)
+                                    }
+                                  />
+                                  <DisplayDocumentButton
+                                    fileType={
+                                      (contract?.fileType as
+                                        | 'pdf'
+                                        | 'png'
+                                        | 'jpg'
+                                        | 'jpeg') || 'pdf'
+                                    }
+                                    tooltipText="Visualizar Contrato"
+                                    hasTooltip
+                                    id={`display-contract-${contract?.id}`}
+                                    onClick={() =>
+                                      setContractDocumentId(contract?.id || '')
+                                    }
+                                  />
+                                </div>
+                              }
                             />
-
                             <Label
-                              label="Tamanho do Ficheiro"
+                              label="Criado Em"
                               value={
-                                contract?.fileSize
-                                  ? `${(contract.fileSize / 1024).toFixed(
-                                      2
-                                    )} KB`
+                                contract?.createdAt
+                                  ? formatDate(contract.createdAt)
                                   : undefined
                               }
                             />
-                          </Row>
-                          <div className="flex flex-row gap-2 pt-2 lg:pt-0">
-                            <EditButton
-                              id={`edit-contract-${contract?.id}`}
-                              onClick={() => handleOpenEditModal(contract)}
-                              tooltipText="Editar Contrato"
-                              hasTooltip={true}
-                            />
-                            <DeleteButton
-                              id={`delete-contract-${contract?.id}`}
-                              onClick={() =>
-                                handleOpenAreYouSureModal(contract)
+                            <Label
+                              label="Expira Em"
+                              value={
+                                contract?.expiryDate
+                                  ? formatDate(
+                                      contract.expiryDate as unknown as Date
+                                    )
+                                  : undefined
                               }
-                              tooltipText="Remover Contrato"
-                              hasTooltip={true}
+                              placeholder="Por definir"
                             />
-                          </div>
+                          </Row>
+                          {isDesktop && (
+                            <div className="flex flex-row gap-2 pt-2 lg:pt-0 justify-end">
+                              <EditButton
+                                id={`edit-contract-${contract?.id}`}
+                                onClick={() => handleOpenEditModal(contract)}
+                                tooltipText="Editar Contrato"
+                                hasTooltip={true}
+                              />
+                              <DeleteButton
+                                id={`delete-contract-${contract?.id}`}
+                                onClick={() =>
+                                  handleOpenAreYouSureModal(contract)
+                                }
+                                tooltipText="Remover Contrato"
+                                hasTooltip={true}
+                              />
+                            </div>
+                          )}
                         </div>
                       }
                       buttonId={`toggle-contract-${contract?.id}`}
                       fullWidth
                     >
-                      <Row>
+                      <Row extraStyles="px-2">
                         <Label
                           label="Tipo de Ficheiro"
                           value={contract?.fileType || undefined}
                         />
-                      </Row>
-                      <Row>
                         <Label
-                          label="Criado Em"
+                          label="Tamanho do Ficheiro"
                           value={
-                            contract?.createdAt
-                              ? formatDate(contract.createdAt)
+                            contract?.fileSize
+                              ? `${(contract.fileSize / 1024).toFixed(2)} KB`
                               : undefined
                           }
                         />
                       </Row>
                     </Collapsible>
+                    {!isDesktop && (
+                      <div className="flex flex-row gap-2 pb-2 w-full justify-center">
+                        <EditButton
+                          id={`edit-contract-${contract?.id}`}
+                          onClick={() => handleOpenEditModal(contract)}
+                          tooltipText="Editar Contrato"
+                          hasTooltip={true}
+                        />
+                        <DeleteButton
+                          id={`delete-contract-${contract?.id}`}
+                          onClick={() => handleOpenAreYouSureModal(contract)}
+                          tooltipText="Remover Contrato"
+                          hasTooltip={true}
+                        />
+                      </div>
+                    )}
                     {index < count - 1 && <Separator />}
                   </div>
                 ))}
@@ -186,6 +291,24 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
             </div>
           )}
         </div>
+      )}
+      <GenericTooltip
+        id="download-tooltip"
+        withArrow={false}
+      />
+      <GenericTooltip
+        id="display-tooltip"
+        withArrow={false}
+      />
+      {areYouSureToDeleteOpen && (
+        <AreYouSureModal
+          isOpen={areYouSureToDeleteOpen}
+          title="Remover Contrato"
+          message="Tem a certeza que deseja remover este contrato? Esta ação não pode ser desfeita."
+          onConfirm={handleDeleteContract}
+          primaryBtnText="Remover"
+          onClose={() => setAreYouSureToDeleteOpen(false)}
+        />
       )}
     </div>
   )

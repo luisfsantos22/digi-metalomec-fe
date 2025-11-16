@@ -5,7 +5,7 @@ import axiosInstance from '../../axiosInstance'
 import { mapContract } from '@/app/mappers/utils/contract'
 import { EmployeeContract } from '@/app/types/utils/contract'
 
-const useGetEmployeeContracts = (employeeId: string) => {
+const useGetEmployeeContracts = (employeeId: string, deps: any[] = []) => {
   const { data: session } = useSession()
   const [contracts, setContracts] = useState<EmployeeContract[]>([])
   const [loading, setLoading] = useState(false)
@@ -40,7 +40,7 @@ const useGetEmployeeContracts = (employeeId: string) => {
       }
     }
     fetchQualifications()
-  }, [session?.accessToken])
+  }, [session?.accessToken, employeeId, ...deps])
 
   return { loading, error, contracts, count }
 }
