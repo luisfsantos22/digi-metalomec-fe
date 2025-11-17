@@ -24,6 +24,13 @@ import { useWindowSize } from '@/utils/hooks'
 import { classNames, isDesktopSize } from 'utils'
 import AreYouSureModal from '../../Modal/AreYouSureModal'
 import DocumentUploadModal from '../../Modal/DocumentUploadModal'
+import { Modal } from '@mantine/core'
+import { Viewer, Worker } from '@react-pdf-viewer/core'
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout'
+import '@react-pdf-viewer/core/lib/styles/index.css'
+import '@react-pdf-viewer/default-layout/lib/styles/index.css'
+import Image from 'next/image'
+import DocumentPreviewModal from '../../Modal/DocumentPreviewModal'
 
 type ContractEmployeeProps = {
   employee: Employee | null
@@ -45,8 +52,13 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
   )
   const [contractToDelete, setContractToDelete] =
     useState<EmployeeContract | null>(null)
+  const [contractToPreview, setContractToPreview] =
+    useState<EmployeeContract | null>(null)
+  const [previewFileUrl, setPreviewFileUrl] = useState<string | null>(null)
+  const [openPreviewModal, setOpenPreviewModal] = useState(false)
   const [contractDocumentId, setContractDocumentId] = useState<string>('')
   const [activationTrigger, setActivationTrigger] = useState(0)
+  const defaultLayoutPluginInstance = defaultLayoutPlugin()
 
   const { contracts, error, loading, count } = useGetEmployeeContracts(
     employee?.id || '',
@@ -92,13 +104,23 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
     downloadDocument(contract?.id || '', contract?.fileName || 'document')
   }
 
+  const handleDisplayContract = async (contract: EmployeeContract) => {
+    setContractToPreview(contract)
+    setContractDocumentId(contract?.id || '')
+    setOpenPreviewModal(true)
+  }
+
   useEffect(() => {
-    if (documentFile?.downloadUrl && contractDocumentId) {
-      const viewUrl = documentFile.downloadUrl
-      window.open(viewUrl, '_blank', 'noopener,noreferrer')
+    if (
+      documentFile?.downloadUrl &&
+      contractDocumentId &&
+      contractToPreview &&
+      openPreviewModal
+    ) {
+      setPreviewFileUrl(documentFile.downloadUrl)
       setContractDocumentId('') // Reset to prevent reopening
     }
-  }, [documentFile, contractDocumentId])
+  }, [documentFile, contractDocumentId, contractToPreview, openPreviewModal])
 
   return (
     <div className="flex flex-col gap-4">
@@ -187,9 +209,7 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
                                       hasTooltip
                                       id={`display-contract-${contract?.id}`}
                                       onClick={() =>
-                                        setContractDocumentId(
-                                          contract?.id || ''
-                                        )
+                                        handleDisplayContract(contract)
                                       }
                                     />
                                   </div>
@@ -316,6 +336,16 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
           }}
           employeeId={employee?.id || ''}
           documentType="contract"
+        />
+      )}
+      {/* Preview Modal */}
+      {openPreviewModal && documentFile && (
+        <DocumentPreviewModal
+          isOpen={openPreviewModal}
+          onClose={() => setOpenPreviewModal(false)}
+          document={documentFile}
+          isLoading={documentLoading}
+          isError={!!documentError}
         />
       )}
     </div>

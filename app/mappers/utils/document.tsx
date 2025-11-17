@@ -1,4 +1,4 @@
-import { EmployeeDocument } from '@/app/types/utils/document'
+import { EmployeeDocument } from '@/app/types/employee/document'
 
 export const mapDocument = (data: any): EmployeeDocument => {
   return {
