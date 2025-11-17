@@ -4,13 +4,14 @@ import { classNames } from 'utils'
 import { PlacesType, Tooltip } from 'react-tooltip'
 
 type GenericTooltipProps = {
-  text: string | undefined
+  text?: string | undefined
   width?: string
   styles?: string
   position?: PlacesType
   hidden?: boolean
-  anchorSelect: string
+  anchorSelect?: string
   withArrow?: boolean
+  id?: string
 }
 
 export default function GenericTooltip(props: GenericTooltipProps) {
@@ -22,16 +23,18 @@ export default function GenericTooltip(props: GenericTooltipProps) {
     hidden = false,
     anchorSelect,
     withArrow = true,
+    id,
   } = props
 
   return (
     <Tooltip
+      id={id}
       place={position}
       content={text}
       border={'1px solid gray'}
       className={classNames(styles, '!rounded-xl z-50')}
       hidden={hidden}
-      anchorSelect={`#${anchorSelect}`}
+      anchorSelect={anchorSelect ? `#${anchorSelect}` : undefined}
       noArrow={!withArrow}
       style={{ width: width }}
     />

@@ -8,9 +8,11 @@ type EditButtonProps = {
   hasTooltip?: boolean
   id: string
   onClick: () => void
-  size?: string
+  sizeContainer?: string
   extraStyles?: string
   typeBtn?: 'text' | 'icon'
+  widthIcon?: number
+  heightIcon?: number
 }
 
 const EditButton = (props: EditButtonProps) => {
@@ -19,19 +21,21 @@ const EditButton = (props: EditButtonProps) => {
     hasTooltip = false,
     id,
     onClick,
-    size = 'h-6 w-6',
+    sizeContainer = 'h-8 w-8',
     extraStyles = '',
     typeBtn = 'icon',
+    widthIcon = 24,
+    heightIcon = 24,
   } = props
 
   return (
     <>
       <div
         className={classNames(
-          typeBtn === 'icon' ? size : 'px-4 py-2',
+          typeBtn === 'icon' ? sizeContainer : 'px-4 py-2',
           extraStyles,
           typeBtn === 'text' && 'rounded-2xl',
-          'flex flex-none items-center relative hover:cursor-pointer'
+          'flex flex-none items-center justify-center relative hover:cursor-pointer hover:bg-digiblue-hover-options rounded-full'
         )}
         onClick={(e) => {
           e.stopPropagation()
@@ -43,8 +47,8 @@ const EditButton = (props: EditButtonProps) => {
           <Image
             src={'/icons/edit.svg'}
             alt={'Logo Edit'}
-            style={{ objectFit: 'contain' }}
-            fill
+            width={widthIcon}
+            height={heightIcon}
           />
         ) : (
           <Text

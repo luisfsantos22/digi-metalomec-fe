@@ -29,6 +29,18 @@ export const CANDIDATE_ENDPOINTS = {
   searchByLocation: 'api/v1/employees/candidates/search-by-location/',
 }
 
+export const EMPLOYEE_DOCUMENTS_ENDPOINTS = {
+  documents: 'api/v1/employees/employee-documents/',
+  bulkUpload: 'api/v1/employees/employee-documents/bulk-upload/',
+  getDocumentById: (id: string) => `api/v1/employees/employee-documents/${id}/`,
+  getDocumentsByEmployeeId: (employeeId: string) =>
+    `api/v1/employees/employee-documents/by-employee/${employeeId}/`,
+  downloadDocumentFile: (id: string) =>
+    `api/v1/employees/employee-documents/${id}/download/`,
+  getEmployeeDocumentsByType: (employeeId: string, documentType: string) =>
+    `api/v1/employees/employee-documents/by-employee/${employeeId}/?document_type=${documentType}`,
+}
+
 export const EMPLOYEE_ENDPOINTS = {
   employees: 'api/v1/employees/employees/',
   getEmployeesPage: (page: number) =>

@@ -1,0 +1,35 @@
+<svg
+    width="64"
+    height="64"
+    viewBox="0 0 64 64"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M48 40L32 24L16 40"
+      stroke="#478ac9"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M32 24V50"
+      stroke="#478ac9"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <path
+      d="M52 48C54.7 46.5 56.7 44.1 57.5 41.2C58.3 38.3 57.9 35.2 56.3 32.6C54.7 30 52.1 28.2 49.1 27.5C48.3 21.9 45.2 17 40.5 14C35.8 11 30.2 10.3 25 12C19.8 13.7 15.5 17.5 13.2 22.5C10.9 27.5 10.8 33.2 13 38.3"
+      stroke="#478ac9"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M48 48L32 32L16 48"
+      stroke="#478ac9"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+</svg>
