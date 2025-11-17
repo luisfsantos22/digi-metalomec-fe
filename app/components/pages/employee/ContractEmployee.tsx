@@ -10,7 +10,6 @@ import Row from '../../Row/Row'
 import Label from '../../Label/Label'
 import AddButton from '../../Button/AddButton'
 import { formatDate } from '@/app/utils'
-import EditButton from '../../Button/EditButton'
 import DeleteButton from '../../Button/DeleteButton'
 import Separator from '../../Separator/Separator'
 import DisplayDocumentButton from '../../Button/DisplayDocumentButton'
@@ -24,6 +23,8 @@ import GenericTooltip from '../../Tooltip/GenericTooltip'
 import { useWindowSize } from '@/utils/hooks'
 import { classNames, isDesktopSize } from '@/utils'
 import AreYouSureModal from '../../Modal/AreYouSureModal'
+import DocumentUploadModal from '../../Modal/DocumentUploadModal'
+import { DocumentUploadData } from '@/app/types/employee/document'
 
 type ContractEmployeeProps = {
   employee: Employee | null
@@ -144,131 +145,139 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
                 {contracts?.map((contract, index) => (
                   <div
                     key={contract?.id}
-                    className={classNames(
-                      !contract?.expiryDate && 'bg-digiblue/20',
-                      'flex flex-col gap-4 rounded-2xl '
-                    )}
+                    className="flex flex-col gap-4"
                   >
-                    <Collapsible
-                      header={
-                        <div className="flex flex-col xl:flex-row items-start lg:items-center justify-between gap-2 px-2">
-                          <Row extraStyles="flex-1 w-full">
-                            <Label
-                              label="Título"
-                              value={contract?.title || undefined}
-                            />
-                            <Label
-                              label="Ficheiro"
-                              value={contract?.fileName || undefined}
-                              extraContent={
-                                <div className="flex gap-2">
-                                  <DownloadDocumentButton
-                                    fileType={
-                                      (contract?.fileType as
-                                        | 'pdf'
-                                        | 'png'
-                                        | 'jpg'
-                                        | 'jpeg') || 'pdf'
-                                    }
-                                    tooltipText="Download Contrato"
-                                    hasTooltip
-                                    id={`download-contract-${contract?.id}`}
-                                    onClick={() =>
-                                      handleDownloadContract(contract)
-                                    }
-                                  />
-                                  <DisplayDocumentButton
-                                    fileType={
-                                      (contract?.fileType as
-                                        | 'pdf'
-                                        | 'png'
-                                        | 'jpg'
-                                        | 'jpeg') || 'pdf'
-                                    }
-                                    tooltipText="Visualizar Contrato"
-                                    hasTooltip
-                                    id={`display-contract-${contract?.id}`}
-                                    onClick={() =>
-                                      setContractDocumentId(contract?.id || '')
-                                    }
-                                  />
-                                </div>
-                              }
-                            />
-                            <Label
-                              label="Criado Em"
-                              value={
-                                contract?.createdAt
-                                  ? formatDate(contract.createdAt)
-                                  : undefined
-                              }
-                            />
-                            <Label
-                              label="Expira Em"
-                              value={
-                                contract?.expiryDate
-                                  ? formatDate(
-                                      contract.expiryDate as unknown as Date
-                                    )
-                                  : undefined
-                              }
-                              placeholder="Por definir"
-                            />
-                          </Row>
-                          {isDesktop && (
-                            <div className="flex flex-row gap-2 pt-2 lg:pt-0 justify-end">
-                              <EditButton
-                                id={`edit-contract-${contract?.id}`}
-                                onClick={() => handleOpenEditModal(contract)}
-                                tooltipText="Editar Contrato"
-                                hasTooltip={true}
-                              />
-                              <DeleteButton
-                                id={`delete-contract-${contract?.id}`}
-                                onClick={() =>
-                                  handleOpenAreYouSureModal(contract)
-                                }
-                                tooltipText="Remover Contrato"
-                                hasTooltip={true}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      }
-                      buttonId={`toggle-contract-${contract?.id}`}
-                      fullWidth
+                    <div
+                      className={classNames(
+                        !contract?.expiryDate &&
+                          index === 0 &&
+                          'bg-digiblue/20 border border-digiblue border-dashed',
+                        ' rounded-2xl '
+                      )}
                     >
-                      <Row extraStyles="px-2">
-                        <Label
-                          label="Tipo de Ficheiro"
-                          value={contract?.fileType || undefined}
-                        />
-                        <Label
-                          label="Tamanho do Ficheiro"
-                          value={
-                            contract?.fileSize
-                              ? `${(contract.fileSize / 1024).toFixed(2)} KB`
-                              : undefined
-                          }
-                        />
-                      </Row>
-                    </Collapsible>
-                    {!isDesktop && (
-                      <div className="flex flex-row gap-2 pb-2 w-full justify-center">
-                        <EditButton
-                          id={`edit-contract-${contract?.id}`}
-                          onClick={() => handleOpenEditModal(contract)}
-                          tooltipText="Editar Contrato"
-                          hasTooltip={true}
-                        />
-                        <DeleteButton
-                          id={`delete-contract-${contract?.id}`}
-                          onClick={() => handleOpenAreYouSureModal(contract)}
-                          tooltipText="Remover Contrato"
-                          hasTooltip={true}
-                        />
-                      </div>
-                    )}
+                      <Collapsible
+                        header={
+                          <div className="flex flex-col xl:flex-row items-start lg:items-center justify-between gap-2 px-2">
+                            <Row extraStyles="flex-1 w-full">
+                              <Label
+                                label="Título"
+                                value={contract?.title || undefined}
+                              />
+                              <Label
+                                label="Ficheiro"
+                                value={contract?.fileName || undefined}
+                                extraContent={
+                                  <div className="flex gap-2">
+                                    <DownloadDocumentButton
+                                      fileType={
+                                        (contract?.fileType as
+                                          | 'pdf'
+                                          | 'png'
+                                          | 'jpg'
+                                          | 'jpeg') || 'pdf'
+                                      }
+                                      tooltipText="Download Contrato"
+                                      hasTooltip
+                                      id={`download-contract-${contract?.id}`}
+                                      onClick={() =>
+                                        handleDownloadContract(contract)
+                                      }
+                                    />
+                                    <DisplayDocumentButton
+                                      fileType={
+                                        (contract?.fileType as
+                                          | 'pdf'
+                                          | 'png'
+                                          | 'jpg'
+                                          | 'jpeg') || 'pdf'
+                                      }
+                                      tooltipText="Visualizar Contrato"
+                                      hasTooltip
+                                      id={`display-contract-${contract?.id}`}
+                                      onClick={() =>
+                                        setContractDocumentId(
+                                          contract?.id || ''
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                }
+                              />
+                              <Label
+                                label="Criado Em"
+                                value={
+                                  contract?.createdAt
+                                    ? formatDate(contract.createdAt)
+                                    : undefined
+                                }
+                              />
+                              <Label
+                                label="Expira Em"
+                                value={
+                                  contract?.expiryDate
+                                    ? formatDate(
+                                        contract.expiryDate as unknown as Date
+                                      )
+                                    : undefined
+                                }
+                                placeholder="Por definir"
+                              />
+                            </Row>
+                            {isDesktop && (
+                              <div className="flex flex-row gap-2 pt-2 lg:pt-0 justify-end">
+                                {/* <EditButton
+                                  id={`edit-contract-${contract?.id}`}
+                                  onClick={() => handleOpenEditModal(contract)}
+                                  tooltipText="Editar Contrato"
+                                  hasTooltip={true}
+                                /> */}
+                                <DeleteButton
+                                  id={`delete-contract-${contract?.id}`}
+                                  onClick={() =>
+                                    handleOpenAreYouSureModal(contract)
+                                  }
+                                  tooltipText="Remover Contrato"
+                                  hasTooltip={true}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        }
+                        buttonId={`toggle-contract-${contract?.id}`}
+                        fullWidth
+                      >
+                        <Row extraStyles="px-2">
+                          <Label
+                            label="Tipo de Ficheiro"
+                            value={contract?.fileType || undefined}
+                          />
+                          <Label
+                            label="Tamanho do Ficheiro"
+                            value={
+                              contract?.fileSize
+                                ? `${(contract.fileSize / 1024).toFixed(2)} KB`
+                                : undefined
+                            }
+                          />
+                        </Row>
+                      </Collapsible>
+                      {!isDesktop && (
+                        <div className="flex flex-row gap-2 pb-2 w-full justify-center">
+                          {/* <EditButton
+                            id={`edit-contract-${contract?.id}`}
+                            onClick={() => handleOpenEditModal(contract)}
+                            tooltipText="Editar Contrato"
+                            hasTooltip={true}
+                          /> */}
+                          <DeleteButton
+                            id={`delete-contract-${contract?.id}`}
+                            onClick={() => handleOpenAreYouSureModal(contract)}
+                            tooltipText="Remover Contrato"
+                            hasTooltip={true}
+                          />
+                        </div>
+                      )}
+                    </div>
                     {index < count - 1 && <Separator />}
                   </div>
                 ))}
@@ -309,6 +318,68 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
           primaryBtnText="Remover"
           onClose={() => setAreYouSureToDeleteOpen(false)}
         />
+      )}
+      {openHandleContractModal && (
+        <DocumentUploadModal
+          isOpen={openHandleContractModal}
+          onClose={() => setOpenHandleContractModal(false)}
+          onUpload={async (data: DocumentUploadData) => {
+            let result: boolean | null = null
+            const formData = new FormData()
+            if (data.title) {
+              formData.append('title', data.title)
+            }
+            if (data.file) {
+              formData.append('file', data.file)
+            }
+
+            if (actionModal === 'edit' && contractToEdit) {
+              result = await editContract(
+                contractToEdit?.id || '',
+                employee?.id || '',
+                formData,
+                accessToken
+              )
+            } else {
+              result = await createContract(employee?.id || '', formData)
+            }
+            if (result) {
+              setActivationTrigger((prev) => prev + 1)
+              setOpenHandleContractModal(false)
+
+              return true
+            }
+
+            return false
+          }}
+          loading={documentLoading}
+        />
+        // <ContractModal
+        //   isOpen={openHandleContractModal}
+        //   action={actionModal}
+        //   contract={contractToEdit}
+        //   employeeId={employee?.id || ''}
+        //   onClose={() => setOpenHandleContractModal(false)}
+        //   onConfirm={async (data) => {
+        //     if (data) {
+        //       let result: boolean | null = null
+        //       if (actionModal === 'edit') {
+        //         result = await editContract(
+        //           contractToEdit?.id || '',
+        //           employee?.id || '',
+        //           data,
+        //           accessToken
+        //         )
+        //       } else {
+        //         result = await createContract(employee?.id || '', data)
+        //       }
+        //       if (result && setActivationTrigger) {
+        //         setActivationTrigger((prev) => prev + 1)
+        //         setOpenHandleContractModal(false)
+        //       }
+        //     }
+        //   }}
+        // />
       )}
     </div>
   )

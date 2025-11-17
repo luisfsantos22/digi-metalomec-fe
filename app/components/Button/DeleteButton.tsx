@@ -13,6 +13,8 @@ type DeleteButtonProps = {
   typeBtn?: 'text' | 'icon'
   widthIcon?: number
   heightIcon?: number
+  theme?: 'light' | 'dark'
+  size?: 'small' | 'medium' | 'large'
 }
 
 const DeleteButton = (props: DeleteButtonProps) => {
@@ -26,16 +28,28 @@ const DeleteButton = (props: DeleteButtonProps) => {
     typeBtn = 'icon',
     widthIcon = 24,
     heightIcon = 24,
+    theme = 'light',
+    size = 'medium',
   } = props
 
   return (
     <>
       <div
         className={classNames(
-          typeBtn === 'icon' ? sizeContainer : 'px-4 py-2',
+          theme === 'light' &&
+            (typeBtn === 'icon' ? sizeContainer : 'px-4 py-2'),
           extraStyles,
-          typeBtn === 'text' && 'rounded-2xl',
-          'flex flex-none items-center justify-center relative hover:cursor-pointer hover:bg-digiblue-hover-options rounded-full'
+          typeBtn === 'text' ? 'rounded-2xl' : 'rounded-full',
+          theme === 'dark'
+            ? 'bg-digired/70 hover:bg-digired/90'
+            : 'hover:bg-digiblue-hover-options',
+          theme === 'dark' &&
+            (size === 'small'
+              ? 'p-1'
+              : size === 'medium'
+                ? 'p-2'
+                : size === 'large' && 'p-3'),
+          'flex flex-none items-center justify-center relative hover:cursor-pointer '
         )}
         onClick={(e) => {
           e.stopPropagation()
@@ -45,7 +59,9 @@ const DeleteButton = (props: DeleteButtonProps) => {
       >
         {typeBtn === 'icon' ? (
           <Image
-            src={'/icons/delete-red.svg'}
+            src={
+              theme === 'dark' ? '/icons/delete.svg' : '/icons/delete-red.svg'
+            }
             alt={'Logo Delete'}
             width={widthIcon}
             height={heightIcon}
