@@ -271,7 +271,7 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
               <Text
                 header="h2"
                 styles="text-digired2025-semibold text-center"
-                text="Nenhuma certificação encontrada"
+                text="Nenhum documento encontrado"
               />
               <AddButton
                 id="add-document"
