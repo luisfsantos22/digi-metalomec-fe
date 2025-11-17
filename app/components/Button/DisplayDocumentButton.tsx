@@ -54,7 +54,7 @@ const DisplayDocumentButton = (props: DisplayDocumentButtonProps) => {
         />
       ) : (
         <Text
-          text="Remover"
+          text="Visualizar"
           styles="lg:text-digiwhite1825-semibold text-digiwhite1420-semibold"
         />
       )}

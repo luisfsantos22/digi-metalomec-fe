@@ -26,7 +26,7 @@ const useDownloadDocument = () => {
 
       const downloadUrl = response.data.download_url
 
-      window.open(downloadUrl, '_blank')
+      window.open(downloadUrl, '_blank', 'noopener,noreferrer')
     } catch (err) {
       console.error('Failed to download document:', err)
       setError('Failed to download document')
