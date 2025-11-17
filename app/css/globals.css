@@ -26,12 +26,12 @@
 }
 
 /* Dark mode colors */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #171717;
     --foreground: #ffffff;
   }
-}
+} */
 
 /* Global body styles */
 body {
