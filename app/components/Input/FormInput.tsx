@@ -41,10 +41,10 @@ const FormInput = (props: FormInputProps) => {
   const [internalErrorStyles, setInternalErrorStyles] = useState(!!error)
 
   useEffect(() => {
-    if (error && inputType !== 'tel') {
+    if (error) {
       setInternalErrorStyles(!!error)
     }
-  }, [error])
+  }, [error, inputType])
 
   return (
     <div
@@ -58,7 +58,7 @@ const FormInput = (props: FormInputProps) => {
         text={label}
         styles={
           internalErrorStyles && error
-            ? 'text-digired1624-semibold'
+            ? 'text-digired1420-semibold'
             : labelStyles
         }
         required={mandatory}
@@ -72,7 +72,11 @@ const FormInput = (props: FormInputProps) => {
               }
               initOptions={{
                 containerClass: classNames(
-                  query ? 'border-b-digibrown' : 'border-b-gray-300',
+                  error && internalErrorStyles
+                    ? 'border-b-digired'
+                    : query
+                      ? 'border-b-digibrown'
+                      : 'border-b-gray-300',
                   'border-b text-digibrown1624-semibold focus:outline-none focus:border-b-digibrown focus:ring-0',
                   'disabled:cursor-not-allowed disabled:text-gray-400 outline-none'
                 ),
@@ -84,6 +88,7 @@ const FormInput = (props: FormInputProps) => {
               }}
               onChangeNumber={(value) => {
                 if (value !== query) {
+                  setInternalErrorStyles(false)
                   setQuery(value)
                 }
               }}

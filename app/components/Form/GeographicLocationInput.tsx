@@ -128,18 +128,30 @@ export default function GeographicLocationInput({
     const geographicLocation = mapNominatimToGeographicLocation(result)
 
     // Set all form values
-    setValue('geographicLocation.city', geographicLocation.city || '')
+    setValue('geographicLocation.city', geographicLocation.city || '', {
+      shouldValidate: true,
+    })
     setValue(
       'geographicLocation.municipality',
-      geographicLocation.municipality || ''
+      geographicLocation.municipality || '',
+      { shouldValidate: true }
     )
-    setValue('geographicLocation.locality', geographicLocation.locality || '')
-    setValue('geographicLocation.parish', geographicLocation.parish || '')
-    setValue('geographicLocation.latitude', geographicLocation.latitude)
-    setValue('geographicLocation.longitude', geographicLocation.longitude)
+    setValue('geographicLocation.locality', geographicLocation.locality || '', {
+      shouldValidate: true,
+    })
+    setValue('geographicLocation.parish', geographicLocation.parish || '', {
+      shouldValidate: true,
+    })
+    setValue('geographicLocation.latitude', geographicLocation.latitude, {
+      shouldValidate: true,
+    })
+    setValue('geographicLocation.longitude', geographicLocation.longitude, {
+      shouldValidate: true,
+    })
     setValue(
       'geographicLocation.addressFull',
-      geographicLocation.addressFull || ''
+      geographicLocation.addressFull || '',
+      { shouldValidate: true }
     )
 
     // Update search query with the display name and close dropdown
@@ -150,13 +162,13 @@ export default function GeographicLocationInput({
   }
 
   const handleClearFields = () => {
-    setValue('geographicLocation.city', '')
-    setValue('geographicLocation.municipality', '')
-    setValue('geographicLocation.locality', '')
-    setValue('geographicLocation.parish', '')
-    setValue('geographicLocation.latitude', null)
-    setValue('geographicLocation.longitude', null)
-    setValue('geographicLocation.addressFull', '')
+    setValue('geographicLocation.city', '', { shouldValidate: true })
+    setValue('geographicLocation.municipality', '', { shouldValidate: true })
+    setValue('geographicLocation.locality', '', { shouldValidate: true })
+    setValue('geographicLocation.parish', '', { shouldValidate: true })
+    setValue('geographicLocation.latitude', null, { shouldValidate: true })
+    setValue('geographicLocation.longitude', null, { shouldValidate: true })
+    setValue('geographicLocation.addressFull', '', { shouldValidate: true })
   }
 
   return (
@@ -185,6 +197,12 @@ export default function GeographicLocationInput({
         onItemSelect={handleSelectLocation}
         helperText="Pesquise por uma localização acima para preencher automaticamente os campos de localização."
         clearAdditionalFields={handleClearFields}
+        error={
+          (errors?.geographicLocation as any)?.city?.message ||
+          (errors?.geographicLocation as any)?.municipality?.message ||
+          ((errors?.geographicLocation as any)?.city &&
+            'Localização é obrigatória')
+        }
       />
 
       <div className="grid lg:grid-cols-4 grid-cols-1 gap-4">
