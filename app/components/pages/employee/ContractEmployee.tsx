@@ -15,8 +15,6 @@ import Separator from '../../Separator/Separator'
 import DisplayDocumentButton from '../../Button/DisplayDocumentButton'
 import useGetEmployeeDocument from '@/app/hooks/employees/documents/useGetDocument'
 import useDownloadDocument from '@/app/hooks/employees/documents/useDownloadDocument'
-import useCreateContract from '@/app/hooks/employees/documents/useCreateContract'
-import { useEditContract } from '@/app/hooks/employees/documents/useEditContract'
 import { useDeleteContract } from '@/app/hooks/employees/documents/useDeleteContract'
 import DownloadDocumentButton from '../../Button/DownloadDocumentButton'
 import GenericTooltip from '../../Tooltip/GenericTooltip'
@@ -24,7 +22,6 @@ import { useWindowSize } from '@/utils/hooks'
 import { classNames, isDesktopSize } from '@/utils'
 import AreYouSureModal from '../../Modal/AreYouSureModal'
 import DocumentUploadModal from '../../Modal/DocumentUploadModal'
-import { DocumentUploadData } from '@/app/types/employee/document'
 
 type ContractEmployeeProps = {
   employee: Employee | null
@@ -61,8 +58,6 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
   } = useGetEmployeeDocument(contractDocumentId)
 
   const { downloadDocument } = useDownloadDocument()
-  const { createContract } = useCreateContract()
-  const { editContract } = useEditContract()
   const { deleteContract } = useDeleteContract()
 
   const handleOpenAddModal = () => {
@@ -323,63 +318,12 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
         <DocumentUploadModal
           isOpen={openHandleContractModal}
           onClose={() => setOpenHandleContractModal(false)}
-          onUpload={async (data: DocumentUploadData) => {
-            let result: boolean | null = null
-            const formData = new FormData()
-            if (data.title) {
-              formData.append('title', data.title)
-            }
-            if (data.file) {
-              formData.append('file', data.file)
-            }
-
-            if (actionModal === 'edit' && contractToEdit) {
-              result = await editContract(
-                contractToEdit?.id || '',
-                employee?.id || '',
-                formData,
-                accessToken
-              )
-            } else {
-              result = await createContract(employee?.id || '', formData)
-            }
-            if (result) {
-              setActivationTrigger((prev) => prev + 1)
-              setOpenHandleContractModal(false)
-
-              return true
-            }
-
-            return false
+          onSuccess={() => {
+            setActivationTrigger((prev) => prev + 1)
           }}
-          loading={documentLoading}
+          employeeId={employee?.id || ''}
+          documentType="contract"
         />
-        // <ContractModal
-        //   isOpen={openHandleContractModal}
-        //   action={actionModal}
-        //   contract={contractToEdit}
-        //   employeeId={employee?.id || ''}
-        //   onClose={() => setOpenHandleContractModal(false)}
-        //   onConfirm={async (data) => {
-        //     if (data) {
-        //       let result: boolean | null = null
-        //       if (actionModal === 'edit') {
-        //         result = await editContract(
-        //           contractToEdit?.id || '',
-        //           employee?.id || '',
-        //           data,
-        //           accessToken
-        //         )
-        //       } else {
-        //         result = await createContract(employee?.id || '', data)
-        //       }
-        //       if (result && setActivationTrigger) {
-        //         setActivationTrigger((prev) => prev + 1)
-        //         setOpenHandleContractModal(false)
-        //       }
-        //     }
-        //   }}
-        // />
       )}
     </div>
   )

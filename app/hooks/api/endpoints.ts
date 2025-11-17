@@ -31,6 +31,7 @@ export const CANDIDATE_ENDPOINTS = {
 
 export const EMPLOYEE_DOCUMENTS_ENDPOINTS = {
   documents: 'api/v1/employees/employee-documents/',
+  bulkUpload: 'api/v1/employees/employee-documents/bulk-upload/',
   getDocumentById: (id: string) => `api/v1/employees/employee-documents/${id}/`,
   getDocumentsByEmployeeId: (employeeId: string) =>
     `api/v1/employees/employee-documents/by-employee/${employeeId}/`,

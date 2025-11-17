@@ -8,17 +8,21 @@ import { Viewer, Worker } from '@react-pdf-viewer/core'
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout'
 import '@react-pdf-viewer/core/lib/styles/index.css'
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
-import { DocumentUploadData } from '@/app/types/employee/document'
 import Text from '../Text/Text'
 import { classNames } from '@/utils'
 import PreviewButton from '../Button/PreviewButton'
 import DeleteButton from '../Button/DeleteButton'
+import useBulkUploadDocuments from '@/app/hooks/employees/documents/useBulkUploadDocuments'
 
 type DocumentUploadModalProps = {
   isOpen: boolean
   onClose: () => void
-  onUpload: (data: DocumentUploadData) => Promise<boolean>
-  loading: boolean
+  onSuccess?: () => void
+  employeeId: string
+  documentType: string
+  title?: string
+  expiryDate?: string
+  notes?: string
 }
 
 type FileWithStatus = {
@@ -31,9 +35,14 @@ type FileWithStatus = {
 const DocumentUploadModal = ({
   isOpen,
   onClose,
-  onUpload,
-  loading,
+  onSuccess,
+  employeeId,
+  documentType,
+  title,
+  expiryDate,
+  notes,
 }: DocumentUploadModalProps) => {
+  const { bulkUploadDocuments, loading } = useBulkUploadDocuments()
   const [files, setFiles] = useState<FileWithStatus[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [previewFile, setPreviewFile] = useState<File | null>(null)
@@ -165,17 +174,23 @@ const DocumentUploadModal = ({
 
   const handleUploadAll = async () => {
     const uploadedFiles = files.filter((f) => f.status === 'uploaded')
+    const filesToUpload = uploadedFiles.map((f) => f.file)
 
-    for (const fileWithStatus of uploadedFiles) {
-      const success = await onUpload({
-        file: fileWithStatus.file,
-        title: fileWithStatus.file.name.replace(/\.[^/.]+$/, ''),
-        documentType: 'other',
-      })
+    if (filesToUpload.length === 0) return
 
-      if (!success) {
-        // If upload fails, stop processing remaining files
-        return
+    const success = await bulkUploadDocuments(
+      employeeId,
+      filesToUpload,
+      documentType,
+      title,
+      expiryDate,
+      notes
+    )
+
+    if (success) {
+      handleClose()
+      if (onSuccess) {
+        onSuccess()
       }
     }
   }
