@@ -1,33 +1,36 @@
-import useGetEmployeeContracts from '@/app/hooks/employees/documents/useGetEmployeeContracts'
-import { Employee } from '@/app/types/employee/employee'
-import Spinner from '../../Spinner/Spinner'
-import Text from '../../Text/Text'
-import { useSession } from 'next-auth/react'
-import { useState, useEffect, use } from 'react'
-import { EmployeeContract } from '@/app/types/utils/contract'
-import Collapsible from '../../Collapsible/Collapsible'
-import Row from '../../Row/Row'
+'use client'
+
+import React, { useEffect } from 'react'
+import { EmployeeDocument } from '@/app/types/utils/document'
 import Label from '../../Label/Label'
-import AddButton from '../../Button/AddButton'
-import { formatDate, formatFileSize } from '@/app/utils'
+import Row from '../../Row/Row'
+import Collapsible from '../../Collapsible/Collapsible'
 import DeleteButton from '../../Button/DeleteButton'
 import Separator from '../../Separator/Separator'
-import DisplayDocumentButton from '../../Button/DisplayDocumentButton'
+import Text from '../../Text/Text'
+import AddButton from '../../Button/AddButton'
+import { useState } from 'react'
+import DocumentUploadModal from '../../Modal/DocumentUploadModal'
+import AreYouSureModal from '../../Modal/AreYouSureModal'
+import { useSession } from 'next-auth/react'
+import { useDeleteDocument } from '@/app/hooks/employees/documents/useDeleteDocument'
+import { formatDate, formatFileSize } from '@/app/utils'
+import { Employee } from '@/app/types/employee/employee'
+import { useWindowSize } from '@/utils/hooks'
+import { isDesktopSize } from '@/utils'
+import useGetEmployeeDocuments from '@/app/hooks/employees/documents/useGetEmployeeDocuments'
 import useGetEmployeeDocument from '@/app/hooks/employees/documents/useGetDocument'
 import useDownloadDocument from '@/app/hooks/employees/documents/useDownloadDocument'
-import { useDeleteContract } from '@/app/hooks/employees/documents/useDeleteContract'
+import Spinner from '../../Spinner/Spinner'
 import DownloadDocumentButton from '../../Button/DownloadDocumentButton'
+import DisplayDocumentButton from '../../Button/DisplayDocumentButton'
 import GenericTooltip from '../../Tooltip/GenericTooltip'
-import { useWindowSize } from '@/utils/hooks'
-import { classNames, isDesktopSize } from '@/utils'
-import AreYouSureModal from '../../Modal/AreYouSureModal'
-import DocumentUploadModal from '../../Modal/DocumentUploadModal'
 
-type ContractEmployeeProps = {
+type DocumentsEmployeeProps = {
   employee: Employee | null
 }
 
-export default function ContractEmployee(props: ContractEmployeeProps) {
+export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
   const { employee } = props
 
   const { data: session } = useSession()
@@ -37,16 +40,19 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
 
   const [areYouSureToDeleteOpen, setAreYouSureToDeleteOpen] = useState(false)
   const [actionModal, setActionModal] = useState<'add' | 'edit'>('add')
-  const [openHandleContractModal, setOpenHandleContractModal] = useState(false)
-  const [contractToEdit, setContractToEdit] = useState<EmployeeContract | null>(
+  const [openHandleDocumentModal, setOpenHandleDocumentModal] = useState(false)
+  const [documentToEdit, setDocumentToEdit] = useState<EmployeeDocument | null>(
     null
   )
-  const [contractToDelete, setContractToDelete] =
-    useState<EmployeeContract | null>(null)
-  const [contractDocumentId, setContractDocumentId] = useState<string>('')
+  const [documentToDelete, setDocumentToDelete] =
+    useState<EmployeeDocument | null>(null)
+  const [documentToPreview, setDocumentToPreview] =
+    useState<EmployeeDocument | null>(null)
+  const [openPreviewModal, setOpenPreviewModal] = useState(false)
+  const [documentId, setDocumentId] = useState<string>('')
   const [activationTrigger, setActivationTrigger] = useState(0)
 
-  const { contracts, error, loading, count } = useGetEmployeeContracts(
+  const { documents, error, loading, count } = useGetEmployeeDocuments(
     employee?.id || '',
     [activationTrigger]
   )
@@ -55,48 +61,48 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
     document: documentFile,
     error: documentError,
     loading: documentLoading,
-  } = useGetEmployeeDocument(contractDocumentId)
+  } = useGetEmployeeDocument(documentId)
 
   const { downloadDocument } = useDownloadDocument()
-  const { deleteContract } = useDeleteContract()
+  const { deleteDocument } = useDeleteDocument()
 
   const handleOpenAddModal = () => {
     setActionModal('add')
-    setOpenHandleContractModal(true)
+    setOpenHandleDocumentModal(true)
   }
 
-  const handleOpenEditModal = (contract: EmployeeContract) => {
+  const handleOpenEditModal = (document: EmployeeDocument) => {
     setActionModal('edit')
-    setContractToEdit(contract)
-    setOpenHandleContractModal(true)
+    setDocumentToEdit(document)
+    setOpenHandleDocumentModal(true)
   }
 
-  const handleDeleteContract = async () => {
-    if (!contractToDelete) return
+  const handleDeleteDocument = async () => {
+    if (!documentToDelete) return
 
-    const result = await deleteContract(contractToDelete.id, accessToken)
+    const result = await deleteDocument(documentToDelete.id, accessToken)
     if (result) {
       setActivationTrigger((prev) => prev + 1)
       setAreYouSureToDeleteOpen(false)
     }
   }
 
-  const handleOpenAreYouSureModal = (contract: EmployeeContract) => {
-    setContractToDelete(contract)
+  const handleOpenAreYouSureModal = (document: EmployeeDocument) => {
+    setDocumentToDelete(document)
     setAreYouSureToDeleteOpen(true)
   }
 
-  const handleDownloadContract = (contract: EmployeeContract) => {
-    downloadDocument(contract?.id || '', contract?.fileName || 'document')
+  const handleDownloadDocument = (document: EmployeeDocument) => {
+    downloadDocument(document?.id || '', document?.fileName || 'document')
   }
 
   useEffect(() => {
-    if (documentFile?.downloadUrl && contractDocumentId) {
+    if (documentFile?.downloadUrl && documentId) {
       const viewUrl = documentFile.downloadUrl
       window.open(viewUrl, '_blank', 'noopener,noreferrer')
-      setContractDocumentId('') // Reset to prevent reopening
+      setDocumentId('') // Reset to prevent reopening
     }
-  }, [documentFile, contractDocumentId])
+  }, [documentFile, documentId])
 
   return (
     <div className="flex flex-col gap-4">
@@ -111,7 +117,7 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
             header="h1"
             styles=""
           />
-          {contracts.length > 0 ? (
+          {documents.length > 0 ? (
             <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center w-full gap-4">
                 <Text
@@ -137,62 +143,53 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
               </div>
 
               <div className="flex flex-col gap-4 max-h-[25rem] overflow-y-auto border border-digiblue py-4 px-6 rounded-2xl">
-                {contracts?.map((contract, index) => (
+                {documents?.map((document, index) => (
                   <div
-                    key={contract?.id}
+                    key={document?.id}
                     className="flex flex-col gap-4"
                   >
-                    <div
-                      className={classNames(
-                        !contract?.expiryDate &&
-                          index === 0 &&
-                          'bg-digiblue/20 border border-digiblue border-dashed',
-                        ' rounded-2xl '
-                      )}
-                    >
+                    <div className=" rounded-2xl ">
                       <Collapsible
                         header={
                           <div className="flex flex-col xl:flex-row items-start lg:items-center justify-between gap-2 px-2">
                             <Row extraStyles="flex-1 w-full">
                               <Label
                                 label="Título"
-                                value={contract?.title || undefined}
+                                value={document?.title || undefined}
                               />
                               <Label
                                 label="Ficheiro"
-                                value={contract?.fileName || undefined}
+                                value={document?.fileName || undefined}
                                 extraContent={
                                   <div className="flex gap-2">
                                     <DownloadDocumentButton
                                       fileType={
-                                        (contract?.fileType as
+                                        (document?.fileType as
                                           | 'pdf'
                                           | 'png'
                                           | 'jpg'
                                           | 'jpeg') || 'pdf'
                                       }
-                                      tooltipText="Download Contrato"
+                                      tooltipText="Download Documento"
                                       hasTooltip
-                                      id={`download-contract-${contract?.id}`}
+                                      id={`download-document-${document?.id}`}
                                       onClick={() =>
-                                        handleDownloadContract(contract)
+                                        handleDownloadDocument(document)
                                       }
                                     />
                                     <DisplayDocumentButton
                                       fileType={
-                                        (contract?.fileType as
+                                        (document?.fileType as
                                           | 'pdf'
                                           | 'png'
                                           | 'jpg'
                                           | 'jpeg') || 'pdf'
                                       }
-                                      tooltipText="Visualizar Contrato"
+                                      tooltipText="Visualizar Documento"
                                       hasTooltip
-                                      id={`display-contract-${contract?.id}`}
+                                      id={`display-document-${document?.id}`}
                                       onClick={() =>
-                                        setContractDocumentId(
-                                          contract?.id || ''
-                                        )
+                                        setDocumentId(document?.id || '')
                                       }
                                     />
                                   </div>
@@ -201,17 +198,17 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
                               <Label
                                 label="Criado Em"
                                 value={
-                                  contract?.createdAt
-                                    ? formatDate(contract.createdAt)
+                                  document?.createdAt
+                                    ? formatDate(document.createdAt)
                                     : undefined
                                 }
                               />
                               <Label
                                 label="Expira Em"
                                 value={
-                                  contract?.expiryDate
+                                  document?.expiryDate
                                     ? formatDate(
-                                        contract.expiryDate as unknown as Date
+                                        document.expiryDate as unknown as Date
                                       )
                                     : undefined
                                 }
@@ -227,28 +224,28 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
                                   hasTooltip={true}
                                 /> */}
                                 <DeleteButton
-                                  id={`delete-contract-${contract?.id}`}
+                                  id={`delete-document-${document?.id}`}
                                   onClick={() =>
-                                    handleOpenAreYouSureModal(contract)
+                                    handleOpenAreYouSureModal(document)
                                   }
-                                  tooltipText="Remover Contrato"
+                                  tooltipText="Remover Documento"
                                   hasTooltip={true}
                                 />
                               </div>
                             )}
                           </div>
                         }
-                        buttonId={`toggle-contract-${contract?.id}`}
+                        buttonId={`toggle-document-${document?.id}`}
                         fullWidth
                       >
                         <Row extraStyles="px-2">
                           <Label
                             label="Tipo de Ficheiro"
-                            value={contract?.fileType || undefined}
+                            value={document?.fileType || undefined}
                           />
                           <Label
                             label="Tamanho do Ficheiro"
-                            value={formatFileSize(contract?.fileSize)}
+                            value={formatFileSize(document?.fileSize)}
                           />
                         </Row>
                       </Collapsible>
@@ -261,9 +258,9 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
                             hasTooltip={true}
                           /> */}
                           <DeleteButton
-                            id={`delete-contract-${contract?.id}`}
-                            onClick={() => handleOpenAreYouSureModal(contract)}
-                            tooltipText="Remover Contrato"
+                            id={`delete-document-${document?.id}`}
+                            onClick={() => handleOpenAreYouSureModal(document)}
+                            tooltipText="Remover Documento"
                             hasTooltip={true}
                           />
                         </div>
@@ -303,22 +300,22 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
       {areYouSureToDeleteOpen && (
         <AreYouSureModal
           isOpen={areYouSureToDeleteOpen}
-          title="Remover Contrato"
-          message="Tem a certeza que deseja remover este contrato? Esta ação não pode ser desfeita."
-          onConfirm={handleDeleteContract}
+          title="Remover Documento"
+          message="Tem a certeza que deseja remover este documento? Esta ação não pode ser desfeita."
+          onConfirm={handleDeleteDocument}
           primaryBtnText="Remover"
           onClose={() => setAreYouSureToDeleteOpen(false)}
         />
       )}
-      {openHandleContractModal && (
+      {openHandleDocumentModal && (
         <DocumentUploadModal
-          isOpen={openHandleContractModal}
-          onClose={() => setOpenHandleContractModal(false)}
+          isOpen={openHandleDocumentModal}
+          onClose={() => setOpenHandleDocumentModal(false)}
           onSuccess={() => {
             setActivationTrigger((prev) => prev + 1)
           }}
           employeeId={employee?.id || ''}
-          documentType="contract"
+          documentType="other"
         />
       )}
     </div>

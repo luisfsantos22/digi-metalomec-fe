@@ -37,7 +37,7 @@ export const EMPLOYEE_DOCUMENTS_ENDPOINTS = {
     `api/v1/employees/employee-documents/by-employee/${employeeId}/`,
   downloadDocumentFile: (id: string) =>
     `api/v1/employees/employee-documents/${id}/download/`,
-  getEmployeeContracts: (employeeId: string, documentType: string) =>
+  getEmployeeDocumentsByType: (employeeId: string, documentType: string) =>
     `api/v1/employees/employee-documents/by-employee/${employeeId}/?document_type=${documentType}`,
 }
 

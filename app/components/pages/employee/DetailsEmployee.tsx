@@ -22,6 +22,7 @@ import { classNames } from 'utils'
 import CertificationsEmployee from './CertificationsEmployee'
 import SkillsEmployee from './SkillsEmployee'
 import ContractEmployee from './ContractEmployee'
+import DocumentsEmployee from './DocumentsEmployee'
 
 type DetailsEmployeeProps = {
   session: Session | null
@@ -191,6 +192,8 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
             certifications={employee?.certifications}
             setActivationTrigger={setActivationTrigger}
           />
+        ) : tab === 'documents' ? (
+          <DocumentsEmployee employee={employee} />
         ) : tab === 'technicalQualifications' ? (
           <SkillsEmployee
             employeeId={employee?.id}

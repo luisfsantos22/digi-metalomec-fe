@@ -68,7 +68,7 @@ export const EMPLOYEE_DETAILS_TABS = [
 
   { label: 'Certificações', value: 'certifications', disabled: false },
   { label: 'Contratos', value: 'contract', disabled: false },
-  { label: 'Documentos', value: 'documents', disabled: true },
+  { label: 'Documentos', value: 'documents', disabled: false },
   {
     label: 'Habilitações Técnicas',
     value: 'technicalQualifications',
