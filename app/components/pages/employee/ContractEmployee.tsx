@@ -1,3 +1,5 @@
+'use client'
+
 import useGetEmployeeContracts from '@/app/hooks/employees/documents/useGetEmployeeContracts'
 import { Employee } from '@/app/types/employee/employee'
 import Spinner from '../../Spinner/Spinner'
@@ -19,7 +21,7 @@ import { useDeleteContract } from '@/app/hooks/employees/documents/useDeleteCont
 import DownloadDocumentButton from '../../Button/DownloadDocumentButton'
 import GenericTooltip from '../../Tooltip/GenericTooltip'
 import { useWindowSize } from '@/utils/hooks'
-import { classNames, isDesktopSize } from '@/utils'
+import { classNames, isDesktopSize } from 'utils'
 import AreYouSureModal from '../../Modal/AreYouSureModal'
 import DocumentUploadModal from '../../Modal/DocumentUploadModal'
 

@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import ContainerCard from '../Card/ContainerCard'
-import { redirect } from 'next/navigation'
 import SecondaryButton from '../Button/SecondaryButton'
 import { useRef, useState, useEffect } from 'react'
 import Text from '../Text/Text'

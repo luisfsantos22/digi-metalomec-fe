@@ -17,7 +17,7 @@ import { useDeleteDocument } from '@/app/hooks/employees/documents/useDeleteDocu
 import { formatDate, formatFileSize } from '@/app/utils'
 import { Employee } from '@/app/types/employee/employee'
 import { useWindowSize } from '@/utils/hooks'
-import { isDesktopSize } from '@/utils'
+import { isDesktopSize } from 'utils'
 import useGetEmployeeDocuments from '@/app/hooks/employees/documents/useGetEmployeeDocuments'
 import useGetEmployeeDocument from '@/app/hooks/employees/documents/useGetDocument'
 import useDownloadDocument from '@/app/hooks/employees/documents/useDownloadDocument'
