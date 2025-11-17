@@ -1,4 +1,4 @@
-import { classNames } from '@/utils/index'
+import { classNames } from 'utils'
 import GenericTooltip from '../Tooltip/GenericTooltip'
 
 type PrimaryButtonProps = {
