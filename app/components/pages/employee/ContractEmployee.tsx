@@ -108,11 +108,6 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
         </div>
       ) : (
         <div className="flex flex-col gap-4 ">
-          <Text
-            text={'Contratos'}
-            header="h1"
-            styles=""
-          />
           {contracts.length > 0 ? (
             <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center w-full gap-4">

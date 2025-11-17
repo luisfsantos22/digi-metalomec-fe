@@ -112,11 +112,6 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
         </div>
       ) : (
         <div className="flex flex-col gap-4 ">
-          <Text
-            text={'Contratos'}
-            header="h1"
-            styles=""
-          />
           {documents.length > 0 ? (
             <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center w-full gap-4">
@@ -125,18 +120,18 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
                   styles="text-digiblack2025-normal lg:text-left text-center"
                   text={
                     <span>
-                      Total de Contratos: <strong>{count || 0}</strong>
+                      Total de Documentos: <strong>{count || 0}</strong>
                       <span className="text-digiblack1212-semibold">
                         {' '}
-                        (Lista de Contratos já associados a este colaborador)
+                        (Lista de Documentos já associados a este colaborador)
                       </span>
                     </span>
                   }
                 />
                 <AddButton
-                  id="add-contract"
+                  id="add-document"
                   onClick={handleOpenAddModal}
-                  tooltipText="Adicionar Contrato"
+                  tooltipText="Adicionar Documento"
                   size="h-10 w-10"
                   widthTooltip="300"
                 />
@@ -279,9 +274,9 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
                 text="Nenhuma certificação encontrada"
               />
               <AddButton
-                id="add-contract"
+                id="add-document"
                 onClick={handleOpenAddModal}
-                tooltipText="Adicionar Contrato"
+                tooltipText="Adicionar Documento"
                 size="h-20 w-20"
                 widthTooltip="300"
               />
