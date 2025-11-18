@@ -13,7 +13,7 @@ export interface EmployeeDocument {
   employee?: string
   employeeName?: string
   expiryDate?: string | null
-  notes?: string | null
+  notes?: string | undefined
   isExpired?: boolean
   daysUntilExpiry?: number | null
   isExpiringSoon?: boolean

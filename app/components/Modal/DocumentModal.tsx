@@ -7,61 +7,61 @@ import SecondaryButton from '../Button/SecondaryButton'
 import PrimaryButton from '../Button/PrimaryButton'
 import Row from '../Row/Row'
 import FormInput from '../Input/FormInput'
-import { useEditContract } from '@/app/hooks/employees/documents/useEditContract'
+import { useEditDocument } from '@/app/hooks/employees/documents/useEditDocument'
 import { useSession } from 'next-auth/react'
 
-type ContractModalProps = {
+type DocumentModalProps = {
   isOpen: boolean
   action: 'add' | 'edit'
-  contract: EmployeeDocument | null
+  document: EmployeeDocument | null
   employeeId: string
   onClose: () => void
   onConfirm: (data?: EmployeeDocument) => void
 }
 
-const ContractModal = ({
+const DocumentModal = ({
   isOpen,
   action,
-  contract,
+  document,
   employeeId,
   onClose,
   onConfirm,
-}: ContractModalProps) => {
+}: DocumentModalProps) => {
   const { data: session } = useSession()
   const accessToken = session?.accessToken || ''
-  const { editContract, loading } = useEditContract()
+  const { editDocument, loading } = useEditDocument()
 
-  const [tempContract, setTempContract] = useState({
-    title: contract?.title || '',
-    expiryDate: contract?.expiryDate || null,
-    notes: contract?.notes || '',
+  const [tempDocument, setTempDocument] = useState({
+    title: document?.title || '',
+    expiryDate: document?.expiryDate || null,
+    notes: document?.notes || '',
   })
 
-  // Update state when contract prop changes
+  // Update state when document prop changes
   useEffect(() => {
-    if (contract) {
-      setTempContract({
-        title: contract.title || '',
-        expiryDate: contract.expiryDate || null,
-        notes: contract.notes || '',
+    if (document) {
+      setTempDocument({
+        title: document.title || '',
+        expiryDate: document.expiryDate || null,
+        notes: document.notes || '',
       })
     }
-  }, [contract])
+  }, [document])
 
   const handleSave = async () => {
-    if (!contract?.id || !employeeId || !accessToken) return
-    if (!tempContract.title.trim()) return
+    if (!document?.id || !employeeId || !accessToken) return
+    if (!tempDocument.title.trim()) return
 
-    const contractData = {
-      title: tempContract.title.trim(),
-      expiryDate: tempContract.expiryDate,
-      notes: tempContract.notes?.trim() || null,
+    const documentData = {
+      title: tempDocument.title.trim(),
+      expiryDate: tempDocument.expiryDate,
+      notes: tempDocument.notes?.trim() || null,
     }
 
-    const result = await editContract(
-      contract.id,
+    const result = await editDocument(
+      document.id,
       employeeId,
-      contractData,
+      documentData,
       accessToken
     )
 
@@ -71,7 +71,7 @@ const ContractModal = ({
     }
   }
 
-  if (!isOpen || !contract) {
+  if (!isOpen || !document) {
     return null
   }
 
@@ -79,7 +79,7 @@ const ContractModal = ({
     <Modal
       opened={isOpen}
       onClose={onClose}
-      title={action === 'add' ? 'Adicionar Contrato' : 'Editar Contrato'}
+      title={action === 'add' ? 'Adicionar Documento' : 'Editar Documento'}
       centered
       size="xl"
       transitionProps={{ transition: 'fade', duration: 400 }}
@@ -98,11 +98,11 @@ const ContractModal = ({
           <FormInput
             label="Título"
             labelStyles="text-digiblack1420-semibold flex gap-1"
-            placeholder="Título do Contrato"
+            placeholder="Título do Documento"
             mandatory
-            query={tempContract.title}
+            query={tempDocument.title}
             setQuery={(value) =>
-              setTempContract((prev) => ({
+              setTempDocument((prev) => ({
                 ...prev,
                 title: typeof value === 'string' ? value : String(value),
               }))
@@ -117,9 +117,9 @@ const ContractModal = ({
             labelStyles="text-digiblack1420-semibold flex gap-1"
             placeholder="dd/mm/aaaa"
             mandatory={false}
-            query={tempContract.expiryDate as unknown as string}
+            query={tempDocument.expiryDate as unknown as string}
             setQuery={(value) =>
-              setTempContract((prev) => ({
+              setTempDocument((prev) => ({
                 ...prev,
                 expiryDate: value as unknown as string | null,
               }))
@@ -135,9 +135,9 @@ const ContractModal = ({
             placeholder="Notas adicionais"
             mandatory={false}
             inputType="text"
-            query={tempContract.notes || ''}
+            query={tempDocument.notes || ''}
             setQuery={(value) =>
-              setTempContract((prev) => ({
+              setTempDocument((prev) => ({
                 ...prev,
                 notes: value as string,
               }))
@@ -156,7 +156,7 @@ const ContractModal = ({
             text={loading ? 'A guardar...' : action === 'add' ? 'Adicionar' : 'Editar'}
             id="primary-btn"
             onClick={handleSave}
-            disabled={!tempContract.title.trim() || loading}
+            disabled={!tempDocument.title.trim() || loading}
             extraStyles="!bg-digiorange hover:!bg-digiorange"
             textDisabled="Preencher todos os campos"
           />
@@ -166,4 +166,4 @@ const ContractModal = ({
   )
 }
 
-export default ContractModal
+export default DocumentModal

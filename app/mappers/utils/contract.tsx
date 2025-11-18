@@ -7,5 +7,6 @@ export const mapContract = (data: any) => ({
   fileSize: data.file_size,
   isContract: data.is_contract,
   expiryDate: data.expiry_date,
+  notes: data.notes || undefined,
   createdAt: data.created_at,
 })
