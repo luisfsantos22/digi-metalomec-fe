@@ -9,6 +9,16 @@ export interface EmployeeDocument {
   uploadedByName?: string
   createdAt?: string
   updatedAt?: string
+  uploadedBy?: string
+  employee?: string
+  employeeName?: string
+  expiryDate?: string | null
+  notes?: string | null
+  isExpired?: boolean
+  daysUntilExpiry?: number | null
+  isExpiringSoon?: boolean
+  isContract?: boolean
+  fileKey?: string
 }
 
 export interface DocumentUploadData {

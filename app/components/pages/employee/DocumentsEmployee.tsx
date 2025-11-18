@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { EmployeeDocument } from '@/app/types/utils/document'
 import Label from '../../Label/Label'
 import Row from '../../Row/Row'
 import Collapsible from '../../Collapsible/Collapsible'
@@ -24,12 +23,8 @@ import Spinner from '../../Spinner/Spinner'
 import DownloadDocumentButton from '../../Button/DownloadDocumentButton'
 import DisplayDocumentButton from '../../Button/DisplayDocumentButton'
 import GenericTooltip from '../../Tooltip/GenericTooltip'
-import { Modal } from '@mantine/core'
-import { Viewer, Worker } from '@react-pdf-viewer/core'
-import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout'
-import '@react-pdf-viewer/core/lib/styles/index.css'
-import '@react-pdf-viewer/default-layout/lib/styles/index.css'
-import Image from 'next/image'
+import DocumentPreviewModal from '../../Modal/DocumentPreviewModal'
+import { EmployeeDocument } from '@/app/types/employee/document'
 
 type DocumentsEmployeeProps = {
   employee: Employee | null
@@ -57,7 +52,6 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
   const [openPreviewModal, setOpenPreviewModal] = useState(false)
   const [documentId, setDocumentId] = useState<string>('')
   const [activationTrigger, setActivationTrigger] = useState(0)
-  const defaultLayoutPluginInstance = defaultLayoutPlugin()
 
   const { documents, error, loading, count } = useGetEmployeeDocuments(
     employee?.id || '',
@@ -110,7 +104,12 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
   }
 
   useEffect(() => {
-    if (documentFile?.downloadUrl && documentId && documentToPreview && openPreviewModal) {
+    if (
+      documentFile?.downloadUrl &&
+      documentId &&
+      documentToPreview &&
+      openPreviewModal
+    ) {
       setPreviewFileUrl(documentFile.downloadUrl)
       setDocumentId('') // Reset to prevent reopening
     }
@@ -326,89 +325,14 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
         />
       )}
       {/* Preview Modal */}
-      {openPreviewModal && documentToPreview && (
-        <Modal
-          opened={openPreviewModal}
-          onClose={() => {
-            setOpenPreviewModal(false)
-            setDocumentToPreview(null)
-            setDocumentId('')
-          }}
-          title={documentToPreview.fileName || 'Documento'}
-          centered
-          size="xl"
-          transitionProps={{ transition: 'fade', duration: 400 }}
-          padding="lg"
-          radius="12"
-          styles={{
-            title: {
-              fontSize: '20px',
-              fontWeight: '600',
-              fontFamily: 'inter, sans-serif',
-            },
-          }}
-        >
-          <div className="flex flex-col gap-4">
-            {documentLoading ? (
-              <div className="flex justify-center items-center p-4" style={{ height: '600px' }}>
-                <Spinner />
-              </div>
-            ) : documentError ? (
-              <div className="flex items-center justify-center h-96">
-                <Text
-                  styles="text-digired1420-normal"
-                  text="Erro ao carregar o documento"
-                />
-              </div>
-            ) : previewFileUrl ? (
-              <>
-                {documentToPreview.fileType === 'pdf' && (
-                  <div
-                    className="border border-digiblue"
-                    style={{ height: '600px' }}
-                  >
-                    <Worker workerUrl="https://unpkg.com/pdfjs-dist@5.4.394/build/pdf.worker.mjs">
-                      <Viewer
-                        fileUrl={previewFileUrl}
-                        plugins={[defaultLayoutPluginInstance]}
-                      />
-                    </Worker>
-                  </div>
-                )}
-
-                {(documentToPreview.fileType === 'png' ||
-                  documentToPreview.fileType === 'jpg' ||
-                  documentToPreview.fileType === 'jpeg') && (
-                  <div
-                    className="flex justify-center relative"
-                    style={{ minHeight: '400px' }}
-                  >
-                    <Image
-                      src={previewFileUrl}
-                      alt={documentToPreview.fileName || 'Document'}
-                      width={800}
-                      height={600}
-                      className="rounded-lg object-contain"
-                      unoptimized={true}
-                    />
-                  </div>
-                )}
-
-                {documentToPreview.fileType !== 'pdf' &&
-                  documentToPreview.fileType !== 'png' &&
-                  documentToPreview.fileType !== 'jpg' &&
-                  documentToPreview.fileType !== 'jpeg' && (
-                    <div className="flex items-center justify-center h-96">
-                      <Text
-                        styles="text-gray1420-normal"
-                        text="Pré-visualização não disponível para este tipo de ficheiro"
-                      />
-                    </div>
-                  )}
-              </>
-            ) : null}
-          </div>
-        </Modal>
+      {openPreviewModal && documentFile && (
+        <DocumentPreviewModal
+          isOpen={openPreviewModal}
+          onClose={() => setOpenPreviewModal(false)}
+          document={documentFile}
+          isLoading={documentLoading}
+          isError={!!documentError}
+        />
       )}
     </div>
   )

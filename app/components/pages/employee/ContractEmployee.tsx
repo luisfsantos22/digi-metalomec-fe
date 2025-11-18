@@ -5,7 +5,7 @@ import { Employee } from '@/app/types/employee/employee'
 import Spinner from '../../Spinner/Spinner'
 import Text from '../../Text/Text'
 import { useSession } from 'next-auth/react'
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 import { EmployeeContract } from '@/app/types/utils/contract'
 import Collapsible from '../../Collapsible/Collapsible'
 import Row from '../../Row/Row'
@@ -24,12 +24,6 @@ import { useWindowSize } from '@/utils/hooks'
 import { classNames, isDesktopSize } from 'utils'
 import AreYouSureModal from '../../Modal/AreYouSureModal'
 import DocumentUploadModal from '../../Modal/DocumentUploadModal'
-import { Modal } from '@mantine/core'
-import { Viewer, Worker } from '@react-pdf-viewer/core'
-import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout'
-import '@react-pdf-viewer/core/lib/styles/index.css'
-import '@react-pdf-viewer/default-layout/lib/styles/index.css'
-import Image from 'next/image'
 import DocumentPreviewModal from '../../Modal/DocumentPreviewModal'
 
 type ContractEmployeeProps = {
@@ -58,7 +52,6 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
   const [openPreviewModal, setOpenPreviewModal] = useState(false)
   const [contractDocumentId, setContractDocumentId] = useState<string>('')
   const [activationTrigger, setActivationTrigger] = useState(0)
-  const defaultLayoutPluginInstance = defaultLayoutPlugin()
 
   const { contracts, error, loading, count } = useGetEmployeeContracts(
     employee?.id || '',

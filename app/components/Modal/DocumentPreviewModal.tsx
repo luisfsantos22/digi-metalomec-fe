@@ -1,16 +1,13 @@
 'use client'
 
 import { Modal } from '@mantine/core'
-import React, { useState } from 'react'
-import SecondaryButton from '../Button/SecondaryButton'
-import PrimaryButton from '../Button/PrimaryButton'
+import React from 'react'
 import { EmployeeDocument } from '@/app/types/employee/document'
 import Image from 'next/image'
 import { Viewer, Worker } from '@react-pdf-viewer/core'
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout'
 import '@react-pdf-viewer/core/lib/styles/index.css'
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
-import { EmployeeContract } from '@/app/types/utils/contract'
 import Spinner from '../Spinner/Spinner'
 import Text from '@/app/components/Text/Text'
 
@@ -31,20 +28,9 @@ const DocumentPreviewModal = ({
 }: DocumentPreviewModalProps) => {
   const defaultLayoutPluginInstance = defaultLayoutPlugin()
 
-  console.log('DocumentPreviewModal document:', document)
   if (!isOpen || !document) {
     return null
   }
-
-  const isPDF =
-    document.fileType?.toLowerCase() === 'pdf' ||
-    document.fileType?.toLowerCase()?.includes('pdf') ||
-    document.fileName?.toLowerCase()?.endsWith('.pdf')
-  const isImage = ['png', 'jpg', 'jpeg'].some(
-    (ext) =>
-      document.fileType?.toLowerCase()?.includes(ext) ||
-      document.fileName?.toLowerCase()?.endsWith(`.${ext}`)
-  )
 
   return (
     <Modal
