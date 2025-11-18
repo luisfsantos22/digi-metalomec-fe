@@ -6,6 +6,7 @@ const IntlTelInput = dynamic(() => import('intl-tel-input/reactWithUtils'), {
 import 'intl-tel-input/styles'
 
 import Image from 'next/image'
+import React from 'react'
 
 type LabelProps = {
   label: string
@@ -22,6 +23,7 @@ type LabelProps = {
     height?: number
     className?: string
   }
+  extraContent?: React.ReactNode
 }
 
 const Label = ({
@@ -33,6 +35,7 @@ const Label = ({
   mandatory = false,
   type = 'text',
   imageProps,
+  extraContent,
 }: LabelProps) => {
   const placeholderStyles = 'text-gray-400 italic'
 
@@ -69,10 +72,13 @@ const Label = ({
               disabled
             />
           ) : (
-            <Text
-              text={value ?? placeholder}
-              styles={value ? valueStyles : placeholderStyles}
-            />
+            <div className="flex justify-between gap-2 items-center">
+              <Text
+                text={value ?? placeholder}
+                styles={value ? valueStyles : placeholderStyles}
+              />
+              {extraContent}
+            </div>
           )}
         </div>
       </div>

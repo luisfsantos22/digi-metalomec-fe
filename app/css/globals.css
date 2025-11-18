@@ -26,12 +26,12 @@
 }
 
 /* Dark mode colors */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #171717;
     --foreground: #ffffff;
   }
-}
+} */
 
 /* Global body styles */
 body {
@@ -209,6 +209,10 @@ body {
 
 .text-digibrown1212-bold {
   @apply text-digibrown text-[12px] leading-[12px] font-bold;
+}
+
+.text-digibrown1212-normal {
+  @apply text-digibrown text-[12px] leading-[12px] font-normal;
 }
 
 /* Digired */

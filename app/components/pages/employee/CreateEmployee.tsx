@@ -65,11 +65,11 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
       nationalId: undefined,
       nif: undefined,
       socialSecurityNumber: undefined,
+      europeanHealthInsuranceCard: undefined,
       collaborationStartDate: new Date().toISOString().slice(0, 10),
       gender: undefined,
       maritalStatus: undefined,
       transportAvailable: undefined,
-      geographicAvailability: undefined,
       preferredWorkLocation: undefined,
       emergencyContact: {
         name: undefined,

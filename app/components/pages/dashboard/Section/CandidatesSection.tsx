@@ -27,6 +27,8 @@ import 'intl-tel-input/styles'
 import dynamic from 'next/dynamic'
 import { GenericCandidate } from '@/app/types/candidate/candidate'
 import GenericTooltip from '@/app/components/Tooltip/GenericTooltip'
+import LocationRadiusSearch from '@/app/components/Input/LocationRadiusSearch'
+import LocationSearchBadge from '@/app/components/Badge/LocationSearchBadge'
 
 const CandidatesSection = () => {
   const router = useRouter()
@@ -41,10 +43,30 @@ const CandidatesSection = () => {
   )
   const [phoneFilter, setPhoneFilter] = useState('')
 
+  // Location-based search states
+  const [useLocationSearch, setUseLocationSearch] = useState(false)
+  const [locationPlace, setLocationPlace] = useState('')
+  const [locationRadius, setLocationRadius] = useState<number | null>(null)
+
   // State for modal and selected employee
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [activePage, setActivePage] = useState(1)
   const [scrolled, setScrolled] = useState(false)
+
+  // Store page state per search mode to preserve pagination when switching
+  const [normalSearchPage, setNormalSearchPage] = useState(1)
+  const [locationSearchPage, setLocationSearchPage] = useState(1)
+
+  // Store filters per search mode
+  const [normalSearchFilters, setNormalSearchFilters] = useState({
+    searchQuery: '',
+    jobTitleFilter: undefined as string | undefined,
+    phoneFilter: '',
+  })
+  const [locationSearchFilters, setLocationSearchFilters] = useState({
+    locationPlace: '',
+    locationRadius: null as number | null,
+  })
 
   const [areYouSureToDeleteOpen, setAreYouSureToDeleteOpen] =
     useState<boolean>(false)
@@ -52,25 +74,91 @@ const CandidatesSection = () => {
     useState<GenericCandidate | null>(null)
   // State to force refresh
   const [refreshFlag, setRefreshFlag] = useState(false)
+  const [searchLocationQuery, setSearchLocationQuery] = useState('')
 
-  // useQueries
+  // Single useQuery for both regular and location-based search
   const { candidates, loading, error, count } = useCompanyCandidatesQuery(
     activePage,
     searchQuery,
     jobTitleFilter,
     phoneFilter,
-    refreshFlag
+    refreshFlag,
+    locationPlace,
+    locationRadius
   )
 
   // Employee deletion function
   const { deleteEmployee } = useDeleteEmployee()
 
+  // Handle page change - updates both active page and mode-specific page
+  const handlePageChange = (page: number) => {
+    setActivePage(page)
+    if (useLocationSearch) {
+      setLocationSearchPage(page)
+    } else {
+      setNormalSearchPage(page)
+    }
+  }
+
   // Clear all filters
   const handleClearFilters = () => {
-    setJobTitleFilter('')
-    setSearchQuery('')
-    setPhoneFilter('')
-    setActivePage(1)
+    if (useLocationSearch) {
+      setLocationPlace('')
+      setLocationRadius(null)
+      setLocationSearchPage(1)
+      setActivePage(1)
+      setSearchLocationQuery('')
+      setLocationSearchFilters({
+        locationPlace: '',
+        locationRadius: null,
+      })
+    } else {
+      setJobTitleFilter('')
+      setSearchQuery('')
+      setPhoneFilter('')
+      setNormalSearchPage(1)
+      setActivePage(1)
+      setNormalSearchFilters({
+        searchQuery: '',
+        jobTitleFilter: undefined,
+        phoneFilter: '',
+      })
+    }
+  }
+
+  // Toggle search mode - preserves state per mode
+  const handleToggleSearchMode = () => {
+    if (useLocationSearch) {
+      // Switching from location to normal search
+      // Save current location search state
+      setLocationSearchPage(activePage)
+      setLocationSearchFilters({
+        locationPlace,
+        locationRadius,
+      })
+
+      // Restore normal search state
+      setSearchQuery(normalSearchFilters.searchQuery)
+      setJobTitleFilter(normalSearchFilters.jobTitleFilter)
+      setPhoneFilter(normalSearchFilters.phoneFilter)
+      setActivePage(normalSearchPage)
+    } else {
+      // Switching from normal to location search
+      // Save current normal search state
+      setNormalSearchPage(activePage)
+      setNormalSearchFilters({
+        searchQuery,
+        jobTitleFilter,
+        phoneFilter,
+      })
+
+      // Restore location search state
+      setLocationPlace(locationSearchFilters.locationPlace)
+      setLocationRadius(locationSearchFilters.locationRadius)
+      setActivePage(locationSearchPage)
+    }
+
+    setUseLocationSearch(!useLocationSearch)
   }
 
   const handleDelete = async (id: string, token: string) => {
@@ -87,36 +175,84 @@ const CandidatesSection = () => {
         styles="flex flex-col gap-4 w-full rounded-xl"
       >
         <div className="flex flex-col gap-2">
-          <Text
-            text="Candidatos"
-            header="h1"
-            styles="text-digibrown3240-bold"
-          />
+          <div className="flex items-center gap-2">
+            <Text
+              text="Candidatos"
+              header="h1"
+              styles="text-digibrown3240-bold"
+            />
+          </div>
           <Text
             text="Gerencie os candidatos da sua empresa, adicione novos e visualize informações detalhadas."
             styles="text-digiblack1624-normal"
           />
+          {useLocationSearch && locationPlace && locationRadius && (
+            <LocationSearchBadge
+              locationPlace={locationPlace}
+              locationRadius={locationRadius}
+            />
+          )}
         </div>
         <Row>
-          {/* Search Bar */}
-          <FormInput
-            query={searchQuery}
-            setQuery={(e) => setSearchQuery(e ? String(e) : '')}
-            placeholder="Pesquisar candidatos..."
-            clearable
-            inputType="text"
-          />
-          {/* Filters button */}
-          <SecondaryButton
-            id="candidate-filters-button"
-            text={filtersOpen ? 'Fechar filtros' : 'Abrir filtros'}
-            type="button"
-            onClick={() => setFiltersOpen(!filtersOpen)}
-            extraStyles="flex flex-none"
-          />
+          <div className="flex xl:flex-row flex-col xl:justify-between gap-2 w-full">
+            {/* Search Mode Toggle */}
+            <SecondaryButton
+              id="toggle-search-mode-button"
+              text={
+                useLocationSearch
+                  ? 'Pesquisa Normal'
+                  : 'Pesquisa por Localização'
+              }
+              type="button"
+              onClick={handleToggleSearchMode}
+              extraStyles="flex flex-none"
+            />
+            {/* Filters button */}
+            {!useLocationSearch && (
+              <SecondaryButton
+                id="candidate-filters-button"
+                text={filtersOpen ? 'Fechar filtros' : 'Abrir filtros'}
+                type="button"
+                onClick={() => setFiltersOpen(!filtersOpen)}
+                extraStyles="flex flex-none"
+              />
+            )}
+            {useLocationSearch && (
+              <ClearAllFiltersButton
+                onClick={handleClearFilters}
+                id="clear-location-filters"
+                label="Limpar Filtros"
+                width="w-auto"
+              />
+            )}
+          </div>
         </Row>
 
-        {filtersOpen && (
+        <Row>
+          {useLocationSearch ? (
+            /* Location-based Search */
+            <LocationRadiusSearch
+              place={locationPlace}
+              setPlace={setLocationPlace}
+              radius={locationRadius}
+              setRadius={setLocationRadius}
+              helperText="Pesquise candidatos próximos a uma localização específica. Ex: Matosinhos com raio de 20km"
+              searchQuery={searchLocationQuery}
+              setSearchQuery={setSearchLocationQuery}
+            />
+          ) : (
+            /* Regular Search Bar */
+            <FormInput
+              query={searchQuery}
+              setQuery={(e) => setSearchQuery(e ? String(e) : '')}
+              placeholder="Pesquisar candidatos..."
+              clearable
+              inputType="text"
+            />
+          )}
+        </Row>
+
+        {filtersOpen && !useLocationSearch && (
           <Row>
             <FormInput
               placeholder="Cargo"
@@ -303,11 +439,13 @@ const CandidatesSection = () => {
                       </Table.Td>
                       <Table.Td>
                         <Text
-                          text={candidate.geographicAvailability || 'N/A'}
+                          text={
+                            candidate.geographicLocation?.addressFull || 'N/A'
+                          }
                           styles={
                             classNames(
                               'text-digiblack1624-normal',
-                              !candidate.geographicAvailability &&
+                              !candidate.geographicLocation?.addressFull &&
                                 'text-digired'
                             ) as string
                           }
@@ -362,7 +500,7 @@ const CandidatesSection = () => {
               <Pagination
                 total={Math.ceil(count / 10)} // Assuming 10 items per page
                 value={activePage}
-                onChange={setActivePage}
+                onChange={handlePageChange}
                 radius="xl"
                 color="#478ac9"
                 className="flex justify-center lg:justify-end"

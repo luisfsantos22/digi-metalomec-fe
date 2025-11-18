@@ -2,6 +2,7 @@ import { classNames } from 'utils'
 import Text from '../Text/Text'
 import Spinner from '../Spinner/Spinner'
 import useOutsideClick from '@/app/hooks/utils/useOutsideClick'
+import { ReactNode } from 'react'
 
 type SearchInputProps = {
   query: string
@@ -18,13 +19,18 @@ type SearchInputProps = {
   labelStyles?: string
   value: string
   setValue: (value: string) => void
-  setSelectedObj: (obj: any) => void
-  setShowCreateModal: (show: boolean) => void
+  setSelectedObj?: (obj: any) => void
+  setShowCreateModal?: (show: boolean) => void
   createText?: string
-  source: 'JobTitle'
+  source: 'JobTitle' | 'Location'
   setIsDropdownOpen: (isOpen: boolean) => void
   isDropdownOpen?: boolean
   seletectedObjValue?: string
+  renderItem?: (item: any) => ReactNode
+  onItemSelect?: (item: any) => void
+  helperText?: string
+  showCreateOption?: boolean
+  clearAdditionalFields?: () => void
 }
 
 const SearchInput = (props: SearchInputProps) => {
@@ -50,9 +56,36 @@ const SearchInput = (props: SearchInputProps) => {
     setIsDropdownOpen,
     isDropdownOpen = false,
     seletectedObjValue = '',
+    renderItem,
+    onItemSelect,
+    helperText,
+    showCreateOption = true,
+    clearAdditionalFields,
   } = props
 
   const dropdownRef = useOutsideClick(() => setIsDropdownOpen(false))
+
+  const handleItemClick = (item: any) => {
+    if (onItemSelect) {
+      onItemSelect(item)
+    } else if (source === 'JobTitle') {
+      setValue(item.id)
+      setSelectedObj?.(item)
+      setQuery(item.name)
+    }
+    setIsDropdownOpen(false)
+  }
+
+  const getItemDisplay = (item: any) => {
+    if (renderItem) {
+      return renderItem(item)
+    }
+    if (source === 'JobTitle') {
+      return item?.name
+    }
+
+    return null
+  }
 
   return (
     <div
@@ -92,14 +125,25 @@ const SearchInput = (props: SearchInputProps) => {
               'border-b text-digibrown1624-semibold p-2 relative w-full focus:outline-none focus:border-b-digibrown focus:ring-0 '
             )}
           />
-          {value && (
+          {dataIsLoading && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <Spinner
+                height={16}
+                width={16}
+              />
+            </div>
+          )}
+          {value && !dataIsLoading && (
             <button
               type="button"
               onClick={() => {
                 setQuery('')
                 setValue?.('')
-                setSelectedObj(null)
+                setSelectedObj?.(null)
                 setIsDropdownOpen(false)
+                if (clearAdditionalFields) {
+                  clearAdditionalFields()
+                }
               }}
               className="absolute hover:cursor-pointer right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
             >
@@ -133,16 +177,18 @@ const SearchInput = (props: SearchInputProps) => {
                   text="Nenhum resultado encontrado."
                   styles="text-gray1624-normal"
                 />
-                <a
-                  href="#"
-                  className="text-digibrown1624-medium underline hover:bg-digiblue-hover-options"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setShowCreateModal(true)
-                  }}
-                >
-                  {createText}
-                </a>
+                {showCreateOption && setShowCreateModal && (
+                  <a
+                    href="#"
+                    className="text-digibrown1624-medium underline hover:bg-digiblue-hover-options"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setShowCreateModal(true)
+                    }}
+                  >
+                    {createText}
+                  </a>
+                )}
               </div>
             ) : (
               data &&
@@ -150,16 +196,9 @@ const SearchInput = (props: SearchInputProps) => {
                 <div
                   key={index}
                   className="p-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => {
-                    if (source === 'JobTitle') {
-                      setValue(obj.id)
-                      setSelectedObj(obj)
-                      setQuery(obj.name)
-                      setIsDropdownOpen(false)
-                    }
-                  }}
+                  onClick={() => handleItemClick(obj)}
                 >
-                  {source === 'JobTitle' ? obj?.name : null}
+                  {getItemDisplay(obj)}
                 </div>
               ))
             )}
@@ -173,6 +212,13 @@ const SearchInput = (props: SearchInputProps) => {
             />
           )}
         </div>
+        {/* Helper text */}
+        {helperText && (
+          <Text
+            styles="text-digibrown1212-normal"
+            text={helperText}
+          />
+        )}
       </div>
     </div>
   )

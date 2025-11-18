@@ -168,6 +168,55 @@ jobs:
             sudo docker image prune -f
             "
 
+  cleanup-dockerhub:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Delete Docker Hub Repository
+          command: |
+            # Install jq for JSON parsing
+            sudo apt-get update && sudo apt-get install -y jq curl
+
+            # Only run cleanup on main or develop branches
+            if [ "$CIRCLE_BRANCH" != "main" ] && [ "$CIRCLE_BRANCH" != "develop" ]; then
+              echo "Skipping cleanup for branch: $CIRCLE_BRANCH"
+              exit 0
+            fi
+
+            echo "Deleting Docker Hub repository: gic2luis/digi-metalomec-fe-v1"
+            echo "Getting Docker Hub token..."
+
+            # Get Docker Hub API token
+            TOKEN=$(curl -s -X POST \
+              -H "Content-Type: application/json" \
+              -d '{"username": "'"${DOCKERHUB_USER}"'", "password": "'"${DOCKERHUB_PASS}"'"}' \
+              https://hub.docker.com/v2/users/login/ | jq -r .token)
+
+            if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+              echo "Failed to get Docker Hub token"
+              exit 1
+            fi
+
+            # Delete the entire repository
+            echo "Deleting repository..."
+            RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X DELETE \
+              -H "Authorization: JWT ${TOKEN}" \
+              https://hub.docker.com/v2/repositories/gic2luis/digi-metalomec-fe-v1/)
+
+            HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d: -f2)
+
+            if [ "$HTTP_STATUS" = "204" ] || [ "$HTTP_STATUS" = "202" ] || [ "$HTTP_STATUS" = "200" ]; then
+              echo "Successfully deleted repository: gic2luis/digi-metalomec-fe-v1"
+              echo "Repository will be recreated automatically on next push"
+            else
+              echo "Failed to delete repository (HTTP status: $HTTP_STATUS)"
+              echo "Response: $RESPONSE"
+              exit 1
+            fi
+
+            echo "Docker Hub cleanup completed - repository deleted!"
+
 workflows:
   version: 2
   deploy-staging:
@@ -182,6 +231,12 @@ workflows:
           filters:
             branches:
               only: develop
+      - cleanup-dockerhub:
+          requires:
+            - deploy-staging
+          filters:
+            branches:
+              only: develop
 
   deploy-production:
     jobs:
@@ -192,6 +247,12 @@ workflows:
       - deploy-production:
           requires:
             - build-production
+          filters:
+            branches:
+              only: main
+      - cleanup-dockerhub:
+          requires:
+            - deploy-production
           filters:
             branches:
               only: main

@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-export function formatDate(date: Date) {
+export function formatDate(date: Date | string) {
   moment.locale('pt')
 
   return moment(date).format('L')
@@ -61,4 +61,13 @@ export function translateSkillLevel(level: string) {
     default:
       return 'Desconhecido'
   }
+}
+
+export function formatFileSize(bytes: number | undefined): string {
+  if (!bytes) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i]
 }

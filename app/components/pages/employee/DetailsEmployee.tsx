@@ -21,6 +21,8 @@ import { useActivationEmployee } from '@/app/hooks/employees/useActivationEmploy
 import { classNames } from 'utils'
 import CertificationsEmployee from './CertificationsEmployee'
 import SkillsEmployee from './SkillsEmployee'
+import ContractEmployee from './ContractEmployee'
+import DocumentsEmployee from './DocumentsEmployee'
 
 type DetailsEmployeeProps = {
   session: Session | null
@@ -182,12 +184,16 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
           />
         ) : tab === 'general' ? (
           <GeneralInfoEmployee employee={employee} />
+        ) : tab === 'contract' ? (
+          <ContractEmployee employee={employee} />
         ) : tab === 'certifications' ? (
           <CertificationsEmployee
             employeeId={employee?.id}
             certifications={employee?.certifications}
             setActivationTrigger={setActivationTrigger}
           />
+        ) : tab === 'documents' ? (
+          <DocumentsEmployee employee={employee} />
         ) : tab === 'technicalQualifications' ? (
           <SkillsEmployee
             employeeId={employee?.id}

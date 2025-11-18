@@ -1,6 +1,6 @@
-import { classNames } from '@/utils/index'
 import Image from 'next/image'
 import GenericTooltip from '../Tooltip/GenericTooltip'
+import { classNames } from 'utils'
 
 type SecondaryButtonProps = {
   onClick?: () => void
