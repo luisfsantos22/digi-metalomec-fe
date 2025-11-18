@@ -1,11 +1,8 @@
 'use client'
 
+import { EmployeeDocument } from '@/app/types/employee/document'
 import { Modal } from '@mantine/core'
-import React, { useState } from 'react'
-import SecondaryButton from '../Button/SecondaryButton'
-import PrimaryButton from '../Button/PrimaryButton'
-import Image from 'next/image'
-import { EmployeeDocument } from '@/app/types/utils/document'
+import React from 'react'
 
 type ContractModalProps = {
   isOpen: boolean

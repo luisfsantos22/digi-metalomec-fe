@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { EMPLOYEE_DOCUMENTS_ENDPOINTS } from '../../api/endpoints'
 import axiosInstance from '../../axiosInstance'
-import { mapContract } from '@/app/mappers/utils/contract'
-import { EmployeeContract } from '@/app/types/utils/contract'
-import { EmployeeDocument } from '@/app/types/utils/document'
 import { mapDocument } from '@/app/mappers/utils/document'
+import { EmployeeDocument } from '@/app/types/employee/document'
 
 const useGetEmployeeDocument = (documentId: string) => {
   const { data: session } = useSession()

@@ -5,7 +5,7 @@ import { Employee } from '@/app/types/employee/employee'
 import Spinner from '../../Spinner/Spinner'
 import Text from '../../Text/Text'
 import { useSession } from 'next-auth/react'
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 import { EmployeeContract } from '@/app/types/utils/contract'
 import Collapsible from '../../Collapsible/Collapsible'
 import Row from '../../Row/Row'
@@ -24,6 +24,7 @@ import { useWindowSize } from '@/utils/hooks'
 import { classNames, isDesktopSize } from 'utils'
 import AreYouSureModal from '../../Modal/AreYouSureModal'
 import DocumentUploadModal from '../../Modal/DocumentUploadModal'
+import DocumentPreviewModal from '../../Modal/DocumentPreviewModal'
 
 type ContractEmployeeProps = {
   employee: Employee | null
@@ -45,6 +46,10 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
   )
   const [contractToDelete, setContractToDelete] =
     useState<EmployeeContract | null>(null)
+  const [contractToPreview, setContractToPreview] =
+    useState<EmployeeContract | null>(null)
+  const [previewFileUrl, setPreviewFileUrl] = useState<string | null>(null)
+  const [openPreviewModal, setOpenPreviewModal] = useState(false)
   const [contractDocumentId, setContractDocumentId] = useState<string>('')
   const [activationTrigger, setActivationTrigger] = useState(0)
 
@@ -92,13 +97,23 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
     downloadDocument(contract?.id || '', contract?.fileName || 'document')
   }
 
+  const handleDisplayContract = async (contract: EmployeeContract) => {
+    setContractToPreview(contract)
+    setContractDocumentId(contract?.id || '')
+    setOpenPreviewModal(true)
+  }
+
   useEffect(() => {
-    if (documentFile?.downloadUrl && contractDocumentId) {
-      const viewUrl = documentFile.downloadUrl
-      window.open(viewUrl, '_blank', 'noopener,noreferrer')
+    if (
+      documentFile?.downloadUrl &&
+      contractDocumentId &&
+      contractToPreview &&
+      openPreviewModal
+    ) {
+      setPreviewFileUrl(documentFile.downloadUrl)
       setContractDocumentId('') // Reset to prevent reopening
     }
-  }, [documentFile, contractDocumentId])
+  }, [documentFile, contractDocumentId, contractToPreview, openPreviewModal])
 
   return (
     <div className="flex flex-col gap-4">
@@ -108,11 +123,6 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
         </div>
       ) : (
         <div className="flex flex-col gap-4 ">
-          <Text
-            text={'Contratos'}
-            header="h1"
-            styles=""
-          />
           {contracts.length > 0 ? (
             <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center w-full gap-4">
@@ -192,9 +202,7 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
                                       hasTooltip
                                       id={`display-contract-${contract?.id}`}
                                       onClick={() =>
-                                        setContractDocumentId(
-                                          contract?.id || ''
-                                        )
+                                        handleDisplayContract(contract)
                                       }
                                     />
                                   </div>
@@ -281,7 +289,7 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
               <Text
                 header="h2"
                 styles="text-digired2025-semibold text-center"
-                text="Nenhuma certificação encontrada"
+                text="Nenhum contrato encontrado"
               />
               <AddButton
                 id="add-contract"
@@ -321,6 +329,16 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
           }}
           employeeId={employee?.id || ''}
           documentType="contract"
+        />
+      )}
+      {/* Preview Modal */}
+      {openPreviewModal && documentFile && (
+        <DocumentPreviewModal
+          isOpen={openPreviewModal}
+          onClose={() => setOpenPreviewModal(false)}
+          document={documentFile}
+          isLoading={documentLoading}
+          isError={!!documentError}
         />
       )}
     </div>

@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
-import { EmployeeDocument } from '@/app/types/utils/document'
+import React, { useEffect, useState } from 'react'
 import Label from '../../Label/Label'
 import Row from '../../Row/Row'
 import Collapsible from '../../Collapsible/Collapsible'
@@ -9,7 +8,6 @@ import DeleteButton from '../../Button/DeleteButton'
 import Separator from '../../Separator/Separator'
 import Text from '../../Text/Text'
 import AddButton from '../../Button/AddButton'
-import { useState } from 'react'
 import DocumentUploadModal from '../../Modal/DocumentUploadModal'
 import AreYouSureModal from '../../Modal/AreYouSureModal'
 import { useSession } from 'next-auth/react'
@@ -25,6 +23,8 @@ import Spinner from '../../Spinner/Spinner'
 import DownloadDocumentButton from '../../Button/DownloadDocumentButton'
 import DisplayDocumentButton from '../../Button/DisplayDocumentButton'
 import GenericTooltip from '../../Tooltip/GenericTooltip'
+import DocumentPreviewModal from '../../Modal/DocumentPreviewModal'
+import { EmployeeDocument } from '@/app/types/employee/document'
 
 type DocumentsEmployeeProps = {
   employee: Employee | null
@@ -48,6 +48,7 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
     useState<EmployeeDocument | null>(null)
   const [documentToPreview, setDocumentToPreview] =
     useState<EmployeeDocument | null>(null)
+  const [previewFileUrl, setPreviewFileUrl] = useState<string | null>(null)
   const [openPreviewModal, setOpenPreviewModal] = useState(false)
   const [documentId, setDocumentId] = useState<string>('')
   const [activationTrigger, setActivationTrigger] = useState(0)
@@ -96,13 +97,23 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
     downloadDocument(document?.id || '', document?.fileName || 'document')
   }
 
+  const handleDisplayDocument = async (document: EmployeeDocument) => {
+    setDocumentToPreview(document)
+    setDocumentId(document?.id || '')
+    setOpenPreviewModal(true)
+  }
+
   useEffect(() => {
-    if (documentFile?.downloadUrl && documentId) {
-      const viewUrl = documentFile.downloadUrl
-      window.open(viewUrl, '_blank', 'noopener,noreferrer')
+    if (
+      documentFile?.downloadUrl &&
+      documentId &&
+      documentToPreview &&
+      openPreviewModal
+    ) {
+      setPreviewFileUrl(documentFile.downloadUrl)
       setDocumentId('') // Reset to prevent reopening
     }
-  }, [documentFile, documentId])
+  }, [documentFile, documentId, documentToPreview, openPreviewModal])
 
   return (
     <div className="flex flex-col gap-4">
@@ -112,11 +123,6 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
         </div>
       ) : (
         <div className="flex flex-col gap-4 ">
-          <Text
-            text={'Contratos'}
-            header="h1"
-            styles=""
-          />
           {documents.length > 0 ? (
             <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center w-full gap-4">
@@ -125,18 +131,18 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
                   styles="text-digiblack2025-normal lg:text-left text-center"
                   text={
                     <span>
-                      Total de Contratos: <strong>{count || 0}</strong>
+                      Total de Documentos: <strong>{count || 0}</strong>
                       <span className="text-digiblack1212-semibold">
                         {' '}
-                        (Lista de Contratos já associados a este colaborador)
+                        (Lista de Documentos já associados a este colaborador)
                       </span>
                     </span>
                   }
                 />
                 <AddButton
-                  id="add-contract"
+                  id="add-document"
                   onClick={handleOpenAddModal}
-                  tooltipText="Adicionar Contrato"
+                  tooltipText="Adicionar Documento"
                   size="h-10 w-10"
                   widthTooltip="300"
                 />
@@ -189,7 +195,7 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
                                       hasTooltip
                                       id={`display-document-${document?.id}`}
                                       onClick={() =>
-                                        setDocumentId(document?.id || '')
+                                        handleDisplayDocument(document)
                                       }
                                     />
                                   </div>
@@ -276,12 +282,12 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
               <Text
                 header="h2"
                 styles="text-digired2025-semibold text-center"
-                text="Nenhuma certificação encontrada"
+                text="Nenhum documento encontrado"
               />
               <AddButton
-                id="add-contract"
+                id="add-document"
                 onClick={handleOpenAddModal}
-                tooltipText="Adicionar Contrato"
+                tooltipText="Adicionar Documento"
                 size="h-20 w-20"
                 widthTooltip="300"
               />
@@ -316,6 +322,16 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
           }}
           employeeId={employee?.id || ''}
           documentType="other"
+        />
+      )}
+      {/* Preview Modal */}
+      {openPreviewModal && documentFile && (
+        <DocumentPreviewModal
+          isOpen={openPreviewModal}
+          onClose={() => setOpenPreviewModal(false)}
+          document={documentFile}
+          isLoading={documentLoading}
+          isError={!!documentError}
         />
       )}
     </div>
