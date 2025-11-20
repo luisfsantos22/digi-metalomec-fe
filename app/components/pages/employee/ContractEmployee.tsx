@@ -234,6 +234,7 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
                               <Label
                                 label="Notas"
                                 value={contract?.notes}
+                                placeholder="Sem notas"
                               />
                             </Row>
                             {isDesktop && (

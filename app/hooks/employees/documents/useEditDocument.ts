@@ -7,7 +7,7 @@ import snakecaseKeys from 'snakecase-keys'
 interface DocumentData {
   title: string
   expiryDate?: string | null
-  notes?: string | null
+  notes?: string | undefined
 }
 
 export function useEditDocument() {
@@ -26,7 +26,10 @@ export function useEditDocument() {
     setLoading(true)
     setError(null)
 
-    const payload = snakecaseKeys(documentData as unknown as Record<string, unknown>, { deep: true })
+    const payload = snakecaseKeys(
+      documentData as unknown as Record<string, unknown>,
+      { deep: true }
+    )
     const finalPayload = { ...payload, employee: employeeId }
 
     try {
