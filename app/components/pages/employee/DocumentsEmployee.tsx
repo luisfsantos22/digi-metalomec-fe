@@ -226,6 +226,7 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
                               <Label
                                 label="Notas"
                                 value={document?.notes}
+                                placeholder="Sem notas"
                               />
                             </Row>
                             {isDesktop && (
