@@ -27,11 +27,11 @@ const ContractModal = ({
   onClose,
   onConfirm,
 }: ContractModalProps) => {
-  const { data: session } = useSession()
-  const accessToken = session?.accessToken || ''
-  const { editContract, loading } = useEditContract()
+  const { data: authSession } = useSession()
+  const sessionAccessToken = authSession?.accessToken || ''
+  const { editContract: sendEditContractRequest, loading: isEditingContract } = useEditContract()
 
-  const [tempContract, setTempContract] = useState({
+  const [draftContract, setDraftContract] = useState({
     title: contract?.title || '',
     expiryDate: contract?.expiryDate || null,
     notes: contract?.notes || '',
@@ -40,7 +40,7 @@ const ContractModal = ({
   // Update state when contract prop changes
   useEffect(() => {
     if (contract) {
-      setTempContract({
+      setDraftContract({
         title: contract.title || '',
         expiryDate: contract.expiryDate || null,
         notes: contract.notes || '',
@@ -49,20 +49,20 @@ const ContractModal = ({
   }, [contract])
 
   const handleSave = async () => {
-    if (!contract?.id || !employeeId || !accessToken) return
-    if (!tempContract.title.trim()) return
+    if (!contract?.id || !employeeId || !sessionAccessToken) return
+    if (!draftContract.title.trim()) return
 
     const contractData = {
-      title: tempContract.title.trim(),
-      expiryDate: tempContract.expiryDate,
-      notes: tempContract.notes?.trim() || null,
+      title: draftContract.title.trim(),
+      expiryDate: draftContract.expiryDate,
+      notes: draftContract.notes?.trim() || null,
     }
 
-    const result = await editContract(
+    const result = await sendEditContractRequest(
       contract.id,
       employeeId,
       contractData,
-      accessToken
+      sessionAccessToken
     )
 
     if (result) {
@@ -100,9 +100,9 @@ const ContractModal = ({
             labelStyles="text-digiblack1420-semibold flex gap-1"
             placeholder="Título do Contrato"
             mandatory
-            query={tempContract.title}
+            query={draftContract.title}
             setQuery={(value) =>
-              setTempContract((prev) => ({
+              setDraftContract((prev) => ({
                 ...prev,
                 title: typeof value === 'string' ? value : String(value),
               }))
@@ -117,9 +117,9 @@ const ContractModal = ({
             labelStyles="text-digiblack1420-semibold flex gap-1"
             placeholder="dd/mm/aaaa"
             mandatory={false}
-            query={tempContract.expiryDate as unknown as string}
+            query={draftContract.expiryDate as unknown as string}
             setQuery={(value) =>
-              setTempContract((prev) => ({
+              setDraftContract((prev) => ({
                 ...prev,
                 expiryDate: value as unknown as string | null,
               }))
@@ -135,9 +135,9 @@ const ContractModal = ({
             placeholder="Notas adicionais"
             mandatory={false}
             inputType="text"
-            query={tempContract.notes || ''}
+            query={draftContract.notes || ''}
             setQuery={(value) =>
-              setTempContract((prev) => ({
+              setDraftContract((prev) => ({
                 ...prev,
                 notes: value as string,
               }))
@@ -153,10 +153,10 @@ const ContractModal = ({
           />
           <PrimaryButton
             type="button"
-            text={loading ? 'A guardar...' : action === 'add' ? 'Adicionar' : 'Editar'}
+            text={isEditingContract ? 'A guardar...' : action === 'add' ? 'Adicionar' : 'Editar'}
             id="primary-btn"
             onClick={handleSave}
-            disabled={!tempContract.title.trim() || loading}
+            disabled={!draftContract.title.trim() || isEditingContract}
             extraStyles="!bg-digiorange hover:!bg-digiorange"
             textDisabled="Preencher todos os campos"
           />

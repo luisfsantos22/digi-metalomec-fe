@@ -27,11 +27,11 @@ const DocumentModal = ({
   onClose,
   onConfirm,
 }: DocumentModalProps) => {
-  const { data: session } = useSession()
-  const accessToken = session?.accessToken || ''
-  const { editDocument, loading } = useEditDocument()
+  const { data: authSession } = useSession()
+  const sessionAccessToken = authSession?.accessToken || ''
+  const { editDocument: sendEditDocumentRequest, loading: isEditingDocument } = useEditDocument()
 
-  const [tempDocument, setTempDocument] = useState({
+  const [draftDocument, setDraftDocument] = useState({
     title: document?.title || '',
     expiryDate: document?.expiryDate || null,
     notes: document?.notes || '',
@@ -40,7 +40,7 @@ const DocumentModal = ({
   // Update state when document prop changes
   useEffect(() => {
     if (document) {
-      setTempDocument({
+      setDraftDocument({
         title: document.title || '',
         expiryDate: document.expiryDate || null,
         notes: document.notes || '',
@@ -49,20 +49,20 @@ const DocumentModal = ({
   }, [document])
 
   const handleSave = async () => {
-    if (!document?.id || !employeeId || !accessToken) return
-    if (!tempDocument.title.trim()) return
+    if (!document?.id || !employeeId || !sessionAccessToken) return
+    if (!draftDocument.title.trim()) return
 
     const documentData = {
-      title: tempDocument.title.trim(),
-      expiryDate: tempDocument.expiryDate,
-      notes: tempDocument.notes?.trim() || null,
+      title: draftDocument.title.trim(),
+      expiryDate: draftDocument.expiryDate,
+      notes: draftDocument.notes?.trim() || null,
     }
 
-    const result = await editDocument(
+    const result = await sendEditDocumentRequest(
       document.id,
       employeeId,
       documentData,
-      accessToken
+      sessionAccessToken
     )
 
     if (result) {
@@ -100,9 +100,9 @@ const DocumentModal = ({
             labelStyles="text-digiblack1420-semibold flex gap-1"
             placeholder="Título do Documento"
             mandatory
-            query={tempDocument.title}
+            query={draftDocument.title}
             setQuery={(value) =>
-              setTempDocument((prev) => ({
+              setDraftDocument((prev) => ({
                 ...prev,
                 title: typeof value === 'string' ? value : String(value),
               }))
@@ -117,9 +117,9 @@ const DocumentModal = ({
             labelStyles="text-digiblack1420-semibold flex gap-1"
             placeholder="dd/mm/aaaa"
             mandatory={false}
-            query={tempDocument.expiryDate as unknown as string}
+            query={draftDocument.expiryDate as unknown as string}
             setQuery={(value) =>
-              setTempDocument((prev) => ({
+              setDraftDocument((prev) => ({
                 ...prev,
                 expiryDate: value as unknown as string | null,
               }))
@@ -135,9 +135,9 @@ const DocumentModal = ({
             placeholder="Notas adicionais"
             mandatory={false}
             inputType="text"
-            query={tempDocument.notes || ''}
+            query={draftDocument.notes || ''}
             setQuery={(value) =>
-              setTempDocument((prev) => ({
+              setDraftDocument((prev) => ({
                 ...prev,
                 notes: value as string,
               }))
@@ -153,10 +153,10 @@ const DocumentModal = ({
           />
           <PrimaryButton
             type="button"
-            text={loading ? 'A guardar...' : action === 'add' ? 'Adicionar' : 'Editar'}
+            text={isEditingDocument ? 'A guardar...' : action === 'add' ? 'Adicionar' : 'Editar'}
             id="primary-btn"
             onClick={handleSave}
-            disabled={!tempDocument.title.trim() || loading}
+            disabled={!draftDocument.title.trim() || isEditingDocument}
             extraStyles="!bg-digiorange hover:!bg-digiorange"
             textDisabled="Preencher todos os campos"
           />
