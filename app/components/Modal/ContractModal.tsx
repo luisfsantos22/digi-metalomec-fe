@@ -29,7 +29,8 @@ const ContractModal = ({
 }: ContractModalProps) => {
   const { data: authSession } = useSession()
   const sessionAccessToken = authSession?.accessToken || ''
-  const { editContract: sendEditContractRequest, loading: isEditingContract } = useEditContract()
+  const { editContract: sendEditContractRequest, loading: isEditingContract } =
+    useEditContract()
 
   const [draftContract, setDraftContract] = useState({
     title: contract?.title || '',
@@ -55,7 +56,7 @@ const ContractModal = ({
     const contractData = {
       title: draftContract.title.trim(),
       expiryDate: draftContract.expiryDate,
-      notes: draftContract.notes?.trim() || null,
+      notes: draftContract.notes?.trim() || undefined,
     }
 
     const result = await sendEditContractRequest(
@@ -153,7 +154,13 @@ const ContractModal = ({
           />
           <PrimaryButton
             type="button"
-            text={isEditingContract ? 'A guardar...' : action === 'add' ? 'Adicionar' : 'Editar'}
+            text={
+              isEditingContract
+                ? 'A guardar...'
+                : action === 'add'
+                  ? 'Adicionar'
+                  : 'Editar'
+            }
             id="primary-btn"
             onClick={handleSave}
             disabled={!draftContract.title.trim() || isEditingContract}

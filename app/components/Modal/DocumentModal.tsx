@@ -55,7 +55,7 @@ const DocumentModal = ({
     const documentData = {
       title: draftDocument.title.trim(),
       expiryDate: draftDocument.expiryDate,
-      notes: draftDocument.notes?.trim() || null,
+      notes: draftDocument.notes?.trim() || undefined,
     }
 
     const result = await sendEditDocumentRequest(

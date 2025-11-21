@@ -88,11 +88,12 @@ export default function EditEmployee() {
     watch,
     handleSubmit,
     setValue,
-    formState: { errors },
+    formState: { errors, isValid },
     clearErrors,
     reset,
   } = useForm<CreateEmployeeData>({
     defaultValues: employee as CreateEmployeeData | undefined,
+    mode: 'onChange', // Enable real-time validation
   })
 
   const formData = watch()
@@ -135,38 +136,86 @@ export default function EditEmployee() {
   }, [formData])
 
   //functions
+  const onValidSubmit = async (data: CreateEmployeeData) => {
+    await formSubmit(data)
+  }
+
+  const onInvalidSubmit = async (errors: any) => {
+    // Show specific error messages
+    const errorMessages: string[] = []
+
+    // Check user errors
+    if (errors.user?.email) errorMessages.push('Email é obrigatório')
+    if (errors.user?.firstName) errorMessages.push('Nome é obrigatório')
+    if (errors.user?.lastName) errorMessages.push('Apelido é obrigatório')
+    if (errors.user?.phoneNumber) errorMessages.push('Número de telemóvel é obrigatório ou inválido')
+
+    // Check employee errors
+    if (errors.country) errorMessages.push('País é obrigatório')
+    if (!formData?.jobTitles?.length) errorMessages.push('Pelo menos um cargo é obrigatório')
+
+    // Check emergency contact errors
+    if (errors.emergencyContact?.name) errorMessages.push('Nome do contato de emergência é obrigatório')
+    if (errors.emergencyContact?.phone) errorMessages.push('Telemóvel do contato de emergência é obrigatório ou inválido')
+    if (errors.emergencyContact?.relationship) errorMessages.push('Relação do contato de emergência é obrigatória')
+
+    // Check other validation errors
+    if (errors.nif) errorMessages.push('NIF deve ter exatamente 9 dígitos')
+    if (errors.nationalId) errorMessages.push('CC deve ter exatamente 8 dígitos')
+    if (errors.socialSecurityNumber) errorMessages.push('Número de Segurança Social deve ter exatamente 11 dígitos')
+    if (errors.europeanHealthInsuranceCard) errorMessages.push('Cartão Europeu de Seguro de Doença deve ter exatamente 20 dígitos')
+    if (errors.postalCode) errorMessages.push('Código Postal deve ter formato XXXX-XXX')
+
+    const message = errorMessages.length > 0
+      ? errorMessages.slice(0, 3).join(', ') + (errorMessages.length > 3 ? '...' : '')
+      : 'Preencha todos os campos obrigatórios corretamente antes de submeter.'
+
+    notifications.show({
+      title: 'Erro de Validação',
+      color: 'red',
+      message,
+      position: 'top-right',
+    })
+  }
+
   const formSubmit = async (data: CreateEmployeeData) => {
-    if (Object.keys(errors).length > 0) {
+    // Preprocess emergencyContact: if all fields are blank, set to null
+    if (data.emergencyContact) {
+      const { name, phone, relationship } = data.emergencyContact
+      if (
+        (!name || name === '') &&
+        (!phone || phone === '') &&
+        (!relationship || relationship === '')
+      ) {
+        data.emergencyContact = undefined
+      }
+    }
+    try {
+      startLoading()
+      const result = await editEmployee(employeeId, data)
+
+      if (result?.id) {
+        notifications.show({
+          title: 'Sucesso',
+          color: 'green',
+          message: 'Colaborador editado com sucesso!',
+          position: 'top-right',
+        })
+        // Small delay to show the notification before redirecting
+        setTimeout(() => {
+          router.push(`/employee/details/${result.id}/`)
+        }, 1500)
+      }
+      stopLoading()
+    } catch (err) {
+      console.log(err)
+      stopLoading()
       notifications.show({
         title: 'Erro',
         color: 'red',
-        message: 'Preencha todos os campos obrigatórios antes de submeter.',
+        message: 'Ocorreu um erro ao editar o colaborador. Tente novamente.',
         position: 'top-right',
       })
-    } else {
-      // Preprocess emergencyContact: if all fields are blank, set to null
-      if (data.emergencyContact) {
-        const { name, phone, relationship } = data.emergencyContact
-        if (
-          (!name || name === '') &&
-          (!phone || phone === '') &&
-          (!relationship || relationship === '')
-        ) {
-          data.emergencyContact = undefined
-        }
-      }
-      try {
-        startLoading()
-        const result = await editEmployee(employeeId, data)
-
-        if (result?.id) {
-          router.push(`/employee/details/${result.id}/`)
-        }
-        stopLoading()
-      } catch (err) {
-        console.log(err)
-        stopLoading()
-      }
     }
   }
 
@@ -218,7 +267,7 @@ export default function EditEmployee() {
         setCurrentStep={setCurrentStep}
       />
       <form
-        onSubmit={handleSubmit(formSubmit)}
+        onSubmit={handleSubmit(onValidSubmit, onInvalidSubmit)}
         className="w-full flex flex-col gap-4"
       >
         {
@@ -270,7 +319,7 @@ export default function EditEmployee() {
             text={'Editar'}
             type="submit"
             size={'medium'}
-            disabled={Object.keys(errors).length > 0 || !canSubmit}
+            disabled={!isValid || !canSubmit}
             id="btn-edit-employee-action"
             textDisabled="Preencha todos os campos obrigatórios"
           />
