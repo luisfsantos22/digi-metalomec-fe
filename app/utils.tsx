@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-export function formatDate(date: Date) {
+export function formatDate(date: Date | string) {
   moment.locale('pt')
 
   return moment(date).format('L')

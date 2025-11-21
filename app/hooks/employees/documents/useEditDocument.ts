@@ -4,20 +4,20 @@ import axiosInstance from '../../axiosInstance'
 import { EMPLOYEE_DOCUMENTS_ENDPOINTS } from '../../api/endpoints'
 import snakecaseKeys from 'snakecase-keys'
 
-interface ContractData {
+interface DocumentData {
   title: string
   expiryDate?: string | null
   notes?: string | undefined
 }
 
-export function useEditContract() {
+export function useEditDocument() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const editContract = async (
+  const editDocument = async (
     id: string | undefined,
     employeeId: string,
-    contractData: ContractData,
+    documentData: DocumentData,
     accessToken: string
   ) => {
     if (!id) {
@@ -27,7 +27,7 @@ export function useEditContract() {
     setError(null)
 
     const payload = snakecaseKeys(
-      contractData as unknown as Record<string, unknown>,
+      documentData as unknown as Record<string, unknown>,
       { deep: true }
     )
     const finalPayload = { ...payload, employee: employeeId }
@@ -47,7 +47,7 @@ export function useEditContract() {
         notifications.show({
           title: 'Sucesso',
           color: 'green',
-          message: 'Contrato editado com sucesso!',
+          message: 'Documento editado com sucesso!',
           position: 'top-right',
         })
 
@@ -56,21 +56,21 @@ export function useEditContract() {
         notifications.show({
           title: 'Erro',
           color: 'red',
-          message: 'Falha ao editar o contrato. Tente novamente.',
+          message: 'Falha ao editar o documento. Tente novamente.',
           position: 'top-right',
         })
 
         return false
       }
     } catch (err) {
-      console.error('Failed to edit contract:', err)
+      console.error('Failed to edit document:', err)
       notifications.show({
         title: 'Erro',
         color: 'red',
-        message: 'Falha ao editar o contrato. Tente novamente.',
+        message: 'Falha ao editar o documento. Tente novamente.',
         position: 'top-right',
       })
-      setError('Um erro ocorreu ao editar o contrato')
+      setError('Um erro ocorreu ao editar o documento')
 
       return false
     } finally {
@@ -78,5 +78,5 @@ export function useEditContract() {
     }
   }
 
-  return { editContract, loading, error }
+  return { editDocument, loading, error }
 }

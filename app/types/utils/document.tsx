@@ -1,7 +1,5 @@
-type EmployeeDocument = {
+type GenericDocument = {
   id: string
-  employee?: string
-  employeeName: string
   documentType: string
   title: string
   fileKey: string
@@ -17,8 +15,8 @@ type EmployeeDocument = {
   isExpiringSoon?: boolean
   isContract: boolean
   downloadUrl: string
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
 }
 
-export type { EmployeeDocument }
+export type { GenericDocument }

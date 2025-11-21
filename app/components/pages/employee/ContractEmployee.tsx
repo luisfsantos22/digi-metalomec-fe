@@ -2,10 +2,11 @@
 
 import useGetEmployeeContracts from '@/app/hooks/employees/documents/useGetEmployeeContracts'
 import { Employee } from '@/app/types/employee/employee'
+import { EmployeeDocument } from '@/app/types/employee/document'
 import Spinner from '../../Spinner/Spinner'
 import Text from '../../Text/Text'
 import { useSession } from 'next-auth/react'
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 import { EmployeeContract } from '@/app/types/utils/contract'
 import Collapsible from '../../Collapsible/Collapsible'
 import Row from '../../Row/Row'
@@ -13,6 +14,7 @@ import Label from '../../Label/Label'
 import AddButton from '../../Button/AddButton'
 import { formatDate, formatFileSize } from '@/app/utils'
 import DeleteButton from '../../Button/DeleteButton'
+import EditButton from '../../Button/EditButton'
 import Separator from '../../Separator/Separator'
 import DisplayDocumentButton from '../../Button/DisplayDocumentButton'
 import useGetEmployeeDocument from '@/app/hooks/employees/documents/useGetDocument'
@@ -24,6 +26,8 @@ import { useWindowSize } from '@/utils/hooks'
 import { classNames, isDesktopSize } from 'utils'
 import AreYouSureModal from '../../Modal/AreYouSureModal'
 import DocumentUploadModal from '../../Modal/DocumentUploadModal'
+import DocumentPreviewModal from '../../Modal/DocumentPreviewModal'
+import ContractModal from '../../Modal/ContractModal'
 
 type ContractEmployeeProps = {
   employee: Employee | null
@@ -40,11 +44,16 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
   const [areYouSureToDeleteOpen, setAreYouSureToDeleteOpen] = useState(false)
   const [actionModal, setActionModal] = useState<'add' | 'edit'>('add')
   const [openHandleContractModal, setOpenHandleContractModal] = useState(false)
+  const [openEditContractModal, setOpenEditContractModal] = useState(false)
   const [contractToEdit, setContractToEdit] = useState<EmployeeContract | null>(
     null
   )
   const [contractToDelete, setContractToDelete] =
     useState<EmployeeContract | null>(null)
+  const [contractToPreview, setContractToPreview] =
+    useState<EmployeeContract | null>(null)
+  const [previewFileUrl, setPreviewFileUrl] = useState<string | null>(null)
+  const [openPreviewModal, setOpenPreviewModal] = useState(false)
   const [contractDocumentId, setContractDocumentId] = useState<string>('')
   const [activationTrigger, setActivationTrigger] = useState(0)
 
@@ -70,7 +79,7 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
   const handleOpenEditModal = (contract: EmployeeContract) => {
     setActionModal('edit')
     setContractToEdit(contract)
-    setOpenHandleContractModal(true)
+    setOpenEditContractModal(true)
   }
 
   const handleDeleteContract = async () => {
@@ -92,13 +101,23 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
     downloadDocument(contract?.id || '', contract?.fileName || 'document')
   }
 
+  const handleDisplayContract = async (contract: EmployeeContract) => {
+    setContractToPreview(contract)
+    setContractDocumentId(contract?.id || '')
+    setOpenPreviewModal(true)
+  }
+
   useEffect(() => {
-    if (documentFile?.downloadUrl && contractDocumentId) {
-      const viewUrl = documentFile.downloadUrl
-      window.open(viewUrl, '_blank', 'noopener,noreferrer')
+    if (
+      documentFile?.downloadUrl &&
+      contractDocumentId &&
+      contractToPreview &&
+      openPreviewModal
+    ) {
+      setPreviewFileUrl(documentFile.downloadUrl)
       setContractDocumentId('') // Reset to prevent reopening
     }
-  }, [documentFile, contractDocumentId])
+  }, [documentFile, contractDocumentId, contractToPreview, openPreviewModal])
 
   return (
     <div className="flex flex-col gap-4">
@@ -108,11 +127,6 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
         </div>
       ) : (
         <div className="flex flex-col gap-4 ">
-          <Text
-            text={'Contratos'}
-            header="h1"
-            styles=""
-          />
           {contracts.length > 0 ? (
             <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center w-full gap-4">
@@ -192,9 +206,7 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
                                       hasTooltip
                                       id={`display-contract-${contract?.id}`}
                                       onClick={() =>
-                                        setContractDocumentId(
-                                          contract?.id || ''
-                                        )
+                                        handleDisplayContract(contract)
                                       }
                                     />
                                   </div>
@@ -219,15 +231,20 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
                                 }
                                 placeholder="Por definir"
                               />
+                              <Label
+                                label="Notas"
+                                value={contract?.notes}
+                                placeholder="Sem notas"
+                              />
                             </Row>
                             {isDesktop && (
                               <div className="flex flex-row gap-2 pt-2 lg:pt-0 justify-end">
-                                {/* <EditButton
+                                <EditButton
                                   id={`edit-contract-${contract?.id}`}
                                   onClick={() => handleOpenEditModal(contract)}
                                   tooltipText="Editar Contrato"
                                   hasTooltip={true}
-                                /> */}
+                                />
                                 <DeleteButton
                                   id={`delete-contract-${contract?.id}`}
                                   onClick={() =>
@@ -256,12 +273,12 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
                       </Collapsible>
                       {!isDesktop && (
                         <div className="flex flex-row gap-2 pb-2 w-full justify-center">
-                          {/* <EditButton
+                          <EditButton
                             id={`edit-contract-${contract?.id}`}
                             onClick={() => handleOpenEditModal(contract)}
                             tooltipText="Editar Contrato"
                             hasTooltip={true}
-                          /> */}
+                          />
                           <DeleteButton
                             id={`delete-contract-${contract?.id}`}
                             onClick={() => handleOpenAreYouSureModal(contract)}
@@ -281,7 +298,7 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
               <Text
                 header="h2"
                 styles="text-digired2025-semibold text-center"
-                text="Nenhuma certificação encontrada"
+                text="Nenhum contrato encontrado"
               />
               <AddButton
                 id="add-contract"
@@ -321,6 +338,32 @@ export default function ContractEmployee(props: ContractEmployeeProps) {
           }}
           employeeId={employee?.id || ''}
           documentType="contract"
+        />
+      )}
+      {/* Edit Contract Modal */}
+      {openEditContractModal && contractToEdit && (
+        <ContractModal
+          isOpen={openEditContractModal}
+          onClose={() => {
+            setOpenEditContractModal(false)
+            setContractToEdit(null)
+          }}
+          onConfirm={() => {
+            setActivationTrigger((prev) => prev + 1)
+          }}
+          contract={contractToEdit as unknown as EmployeeDocument}
+          employeeId={employee?.id || ''}
+          action="edit"
+        />
+      )}
+      {/* Preview Modal */}
+      {openPreviewModal && documentFile && (
+        <DocumentPreviewModal
+          isOpen={openPreviewModal}
+          onClose={() => setOpenPreviewModal(false)}
+          document={documentFile}
+          isLoading={documentLoading}
+          isError={!!documentError}
         />
       )}
     </div>

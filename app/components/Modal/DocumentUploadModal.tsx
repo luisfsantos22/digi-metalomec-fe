@@ -215,7 +215,11 @@ const DocumentUploadModal = ({
     <Modal
       opened={isOpen}
       onClose={handleClose}
-      title="Adicionar Documento"
+      title={
+        documentType === 'contract'
+          ? 'Adicionar Contrato'
+          : 'Adicionar Documento'
+      }
       centered
       transitionProps={{ transition: 'fade', duration: 400 }}
       padding="lg"

@@ -270,6 +270,14 @@ export default function MainNavbar() {
           />
           <Divider />
           <NavbarMobileButton
+            id="candidates"
+            text="Candidatos"
+            isActive={tabActive === 'candidates'}
+            type="button"
+            onClick={() => handleTabChange('candidates')}
+          />
+          <Divider />
+          <NavbarMobileButton
             id="clients"
             text="Clientes"
             isActive={tabActive === 'clients'}

@@ -1,4 +1,4 @@
-import { EmployeeDocument } from '@/app/types/utils/document'
+import { EmployeeDocument } from '@/app/types/employee/document'
 
 export const mapDocument = (data: any): EmployeeDocument => {
   return {
@@ -15,7 +15,7 @@ export const mapDocument = (data: any): EmployeeDocument => {
     employee: data.employee || '',
     employeeName: data.employee_name || '',
     expiryDate: data.expiry_date || null,
-    notes: data.notes || null,
+    notes: data.notes || undefined,
     isExpired: data.is_expired || false,
     daysUntilExpiry: data.days_until_expiry || null,
     isExpiringSoon: data.is_expiring_soon || false,

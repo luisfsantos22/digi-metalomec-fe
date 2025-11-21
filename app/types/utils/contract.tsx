@@ -7,7 +7,8 @@ type EmployeeContract = {
   fileSize: number
   isContract: boolean
   expiryDate: string | null
-  createdAt: Date
+  notes?: string | undefined
+  createdAt: string
 }
 
 export type { EmployeeContract }
