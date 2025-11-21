@@ -7,61 +7,61 @@ import SecondaryButton from '../Button/SecondaryButton'
 import PrimaryButton from '../Button/PrimaryButton'
 import Row from '../Row/Row'
 import FormInput from '../Input/FormInput'
-import { useEditContract } from '@/app/hooks/employees/documents/useEditContract'
+import { useEditDocument } from '@/app/hooks/employees/documents/useEditDocument'
 import { useSession } from 'next-auth/react'
 
-type ContractModalProps = {
+type DocumentModalProps = {
   isOpen: boolean
   action: 'add' | 'edit'
-  contract: EmployeeDocument | null
+  document: EmployeeDocument | null
   employeeId: string
   onClose: () => void
   onConfirm: (data?: EmployeeDocument) => void
 }
 
-const ContractModal = ({
+const DocumentModal = ({
   isOpen,
   action,
-  contract,
+  document,
   employeeId,
   onClose,
   onConfirm,
-}: ContractModalProps) => {
+}: DocumentModalProps) => {
   const { data: authSession } = useSession()
   const sessionAccessToken = authSession?.accessToken || ''
-  const { editContract: sendEditContractRequest, loading: isEditingContract } = useEditContract()
+  const { editDocument: sendEditDocumentRequest, loading: isEditingDocument } = useEditDocument()
 
-  const [draftContract, setDraftContract] = useState({
-    title: contract?.title || '',
-    expiryDate: contract?.expiryDate || null,
-    notes: contract?.notes || '',
+  const [draftDocument, setDraftDocument] = useState({
+    title: document?.title || '',
+    expiryDate: document?.expiryDate || null,
+    notes: document?.notes || '',
   })
 
-  // Update state when contract prop changes
+  // Update state when document prop changes
   useEffect(() => {
-    if (contract) {
-      setDraftContract({
-        title: contract.title || '',
-        expiryDate: contract.expiryDate || null,
-        notes: contract.notes || '',
+    if (document) {
+      setDraftDocument({
+        title: document.title || '',
+        expiryDate: document.expiryDate || null,
+        notes: document.notes || '',
       })
     }
-  }, [contract])
+  }, [document])
 
   const handleSave = async () => {
-    if (!contract?.id || !employeeId || !sessionAccessToken) return
-    if (!draftContract.title.trim()) return
+    if (!document?.id || !employeeId || !sessionAccessToken) return
+    if (!draftDocument.title.trim()) return
 
-    const contractData = {
-      title: draftContract.title.trim(),
-      expiryDate: draftContract.expiryDate,
-      notes: draftContract.notes?.trim() || null,
+    const documentData = {
+      title: draftDocument.title.trim(),
+      expiryDate: draftDocument.expiryDate,
+      notes: draftDocument.notes?.trim() || null,
     }
 
-    const result = await sendEditContractRequest(
-      contract.id,
+    const result = await sendEditDocumentRequest(
+      document.id,
       employeeId,
-      contractData,
+      documentData,
       sessionAccessToken
     )
 
@@ -71,7 +71,7 @@ const ContractModal = ({
     }
   }
 
-  if (!isOpen || !contract) {
+  if (!isOpen || !document) {
     return null
   }
 
@@ -79,7 +79,7 @@ const ContractModal = ({
     <Modal
       opened={isOpen}
       onClose={onClose}
-      title={action === 'add' ? 'Adicionar Contrato' : 'Editar Contrato'}
+      title={action === 'add' ? 'Adicionar Documento' : 'Editar Documento'}
       centered
       size="xl"
       transitionProps={{ transition: 'fade', duration: 400 }}
@@ -98,11 +98,11 @@ const ContractModal = ({
           <FormInput
             label="Título"
             labelStyles="text-digiblack1420-semibold flex gap-1"
-            placeholder="Título do Contrato"
+            placeholder="Título do Documento"
             mandatory
-            query={draftContract.title}
+            query={draftDocument.title}
             setQuery={(value) =>
-              setDraftContract((prev) => ({
+              setDraftDocument((prev) => ({
                 ...prev,
                 title: typeof value === 'string' ? value : String(value),
               }))
@@ -117,9 +117,9 @@ const ContractModal = ({
             labelStyles="text-digiblack1420-semibold flex gap-1"
             placeholder="dd/mm/aaaa"
             mandatory={false}
-            query={draftContract.expiryDate as unknown as string}
+            query={draftDocument.expiryDate as unknown as string}
             setQuery={(value) =>
-              setDraftContract((prev) => ({
+              setDraftDocument((prev) => ({
                 ...prev,
                 expiryDate: value as unknown as string | null,
               }))
@@ -135,9 +135,9 @@ const ContractModal = ({
             placeholder="Notas adicionais"
             mandatory={false}
             inputType="text"
-            query={draftContract.notes || ''}
+            query={draftDocument.notes || ''}
             setQuery={(value) =>
-              setDraftContract((prev) => ({
+              setDraftDocument((prev) => ({
                 ...prev,
                 notes: value as string,
               }))
@@ -153,10 +153,10 @@ const ContractModal = ({
           />
           <PrimaryButton
             type="button"
-            text={isEditingContract ? 'A guardar...' : action === 'add' ? 'Adicionar' : 'Editar'}
+            text={isEditingDocument ? 'A guardar...' : action === 'add' ? 'Adicionar' : 'Editar'}
             id="primary-btn"
             onClick={handleSave}
-            disabled={!draftContract.title.trim() || isEditingContract}
+            disabled={!draftDocument.title.trim() || isEditingDocument}
             extraStyles="!bg-digiorange hover:!bg-digiorange"
             textDisabled="Preencher todos os campos"
           />
@@ -166,4 +166,4 @@ const ContractModal = ({
   )
 }
 
-export default ContractModal
+export default DocumentModal

@@ -15,7 +15,7 @@ export const mapDocument = (data: any): EmployeeDocument => {
     employee: data.employee || '',
     employeeName: data.employee_name || '',
     expiryDate: data.expiry_date || null,
-    notes: data.notes || null,
+    notes: data.notes || undefined,
     isExpired: data.is_expired || false,
     daysUntilExpiry: data.days_until_expiry || null,
     isExpiringSoon: data.is_expiring_soon || false,
