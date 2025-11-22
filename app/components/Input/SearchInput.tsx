@@ -207,7 +207,7 @@ const SearchInput = (props: SearchInputProps) => {
           {error && (
             <Text
               text={error}
-              styles="text-red-500"
+              styles="text-digired1212-normal"
               id="error-message"
             />
           )}
