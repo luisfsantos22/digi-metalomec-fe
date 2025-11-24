@@ -261,6 +261,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
                   setValue={setValue}
                   errors={errors}
                   clearErrors={clearErrors}
+                  action={'create'}
                 />
               ),
               2: (

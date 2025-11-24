@@ -26,10 +26,12 @@ type CandidateFormScreenProps = {
   errors: FieldErrors<CreateCandidateData>
   clearErrors?: UseFormClearErrors<CreateCandidateData>
   watch?: UseFormWatch<any>
+  action: 'create' | 'edit'
 }
 
 const CandidateFormScreen = (props: CandidateFormScreenProps) => {
-  const { formData, register, setValue, errors, clearErrors, watch } = props
+  const { formData, register, setValue, errors, clearErrors, watch, action } =
+    props
 
   const [selectedJobTitle, setSelectedJobTitle] =
     useState<GenericJobTitle | null>(null)
@@ -77,7 +79,7 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             placeholder="José"
             inputType="text"
             mandatory={true}
-            width="lg:w-1/3 w-full"
+            width="lg:w-1/4 w-full"
             label="Nome"
             labelStyles="text-digiblack1420-semibold flex gap-1"
             {...register('user.firstName', { required: true })}
@@ -90,9 +92,18 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             inputType="text"
             mandatory={true}
             label="Apelido"
-            width="lg:w-1/3 w-full"
+            width="lg:w-1/4 w-full"
             labelStyles="text-digiblack1420-semibold flex gap-1"
             {...register('user.lastName', { required: true })}
+          />
+          <FormInput
+            query={formData.nationality}
+            setQuery={(e) => setValue('nationality', e as unknown as string)}
+            placeholder="Português(a)"
+            inputType="text"
+            label="Nacionalidade"
+            labelStyles="text-digiblack1420-semibold flex gap-1"
+            width="lg:w-1/4 w-full"
           />
           <SearchInput
             query={search}
@@ -107,7 +118,7 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             label="Cargo/Função"
             labelStyles="text-digiblack1420-semibold flex gap-1"
             mandatory={true}
-            width="lg:w-1/3 w-full"
+            width="lg:w-1/4 w-full"
             value={search}
             setValue={(id) => {
               const found = searchedJobTitles.find((jt) => jt.id === id)
@@ -147,6 +158,7 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             labelStyles="text-digiblack1420-semibold flex gap-1"
             {...register('user.email', { required: true })}
             width="lg:w-3/4 w-full"
+            disabled={action === 'edit'}
           />
           <FormInput
             query={phoneNumber ? phoneNumber : ''}

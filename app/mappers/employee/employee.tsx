@@ -37,6 +37,7 @@ export const mapEmployee = (data: any): Employee => ({
     role: data?.user?.role || '',
     company: data?.user?.company || '',
     phoneNumber: data?.user?.phone_number || '',
+    temporaryEmail: data?.user?.email_is_temporary || false,
   },
   jobTitles: data?.job_titles || [],
   department: data?.department || '',
@@ -106,4 +107,5 @@ export const mapEmployee = (data: any): Employee => ({
   district: data?.district || '',
   country: data?.country || '',
   dateOfBirth: data?.date_of_birth || null,
+  nationality: data?.nationality || undefined,
 })

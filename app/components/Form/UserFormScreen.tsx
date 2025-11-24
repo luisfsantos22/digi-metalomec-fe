@@ -20,11 +20,12 @@ type UserFormScreenProps = {
   setValue: UseFormSetValue<CreateEmployeeData>
   errors: FieldErrors<CreateEmployeeData>
   clearErrors?: UseFormClearErrors<CreateEmployeeData>
+  action: 'create' | 'edit'
 }
 const UserFormScreen = (props: UserFormScreenProps) => {
-  const { formData, register, setValue, errors, clearErrors } = props
+  const { formData, register, setValue, errors, clearErrors, action } = props
   const {
-    user: { email, firstName, lastName, phoneNumber } = {},
+    user: { email, firstName, lastName, phoneNumber, temporaryEmail } = {},
     nif,
     nationalId,
     socialSecurityNumber,
@@ -38,6 +39,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
     district,
     country,
     dateOfBirth,
+    nationality,
   } = formData
 
   const { uploadImage, loading, error } = useUploadImage()
@@ -57,6 +59,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           mandatory={true}
           label="Nome"
           labelStyles="text-digiblack1420-semibold flex gap-1"
+          width="lg:w-1/4 w-full"
           {...register('user.firstName', { required: true })}
         />
         <FormInput
@@ -68,7 +71,17 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           mandatory={true}
           label="Apelido"
           labelStyles="text-digiblack1420-semibold flex gap-1"
+          width="lg:w-1/4 w-full"
           {...register('user.lastName', { required: true })}
+        />
+        <FormInput
+          query={nationality}
+          setQuery={(e) => setValue('nationality', e as unknown as string)}
+          placeholder="Português(a)"
+          inputType="text"
+          label="Nacionalidade"
+          labelStyles="text-digiblack1420-semibold flex gap-1"
+          width="lg:w-1/4 w-full"
         />
         <FormInput
           query={email?.split('@')[0]}
@@ -79,6 +92,8 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           disabled
           label="Username (gerado automaticamente)"
           labelStyles="text-digiblack1420-semibold flex gap-1"
+          width="lg:w-1/4 w-full"
+          additionalText={temporaryEmail ? 'Email Temporário' : undefined}
         />
       </Row>
       <Row>
@@ -141,6 +156,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           labelStyles="text-digiblack1420-semibold flex gap-1"
           {...register('user.email', { required: true })}
           width="lg:w-3/4 w-full"
+          disabled={action === 'edit'}
         />
         <FormInput
           query={phoneNumber ? phoneNumber : ''}

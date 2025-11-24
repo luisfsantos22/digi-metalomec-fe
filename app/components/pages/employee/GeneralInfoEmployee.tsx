@@ -152,12 +152,8 @@ export default function GeneralInfoEmployee(props: GeneralInfoEmployeeProps) {
           }
         />
         <Label
-          label="Nome do Contato de Emergência"
-          value={
-            employee?.emergencyContact?.name
-              ? employee?.emergencyContact?.name
-              : undefined
-          }
+          label="Nacionalidade"
+          value={employee?.nationality ? employee?.nationality : undefined}
         />
         <Label
           label="Qualificação Educacional"

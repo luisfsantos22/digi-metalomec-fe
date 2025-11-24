@@ -1,4 +1,4 @@
-import { CreateUserData, User } from '../user'
+import { CreateUserData, UpdateUserData, User } from '../user'
 import { GenericJobTitle } from '../utils/job-title'
 import {
   GeographicLocationInput,
@@ -14,6 +14,16 @@ type GenericCandidate = {
   availabilityStatus: string
   geographicLocation?: GeographicLocationOutput
   lastIteraction?: string
+  nationality?: string
+}
+
+type UpdateCandidateData = {
+  user: UpdateUserData
+  jobTitles: GenericJobTitle[]
+  availabilityStatus: string
+  geographicLocation?: GeographicLocationInput
+  internalIdentifier?: number
+  nationality?: string
 }
 
 type CreateCandidateData = {
@@ -22,6 +32,7 @@ type CreateCandidateData = {
   availabilityStatus: string
   geographicLocation?: GeographicLocationInput
   internalIdentifier?: number
+  nationality?: string
 }
 
 type CandidateIteraction = {
@@ -42,4 +53,5 @@ export type {
   CreateCandidateData,
   CreateCandidateIteraction,
   CandidateIteraction,
+  UpdateCandidateData,
 }

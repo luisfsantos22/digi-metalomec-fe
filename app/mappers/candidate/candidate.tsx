@@ -15,6 +15,7 @@ export const mapGenericCandidate = (data: any): GenericCandidate => ({
     fullName: `${data?.user?.first_name || ''} ${data?.user?.last_name || ''}`,
     username: data?.user?.email ? data?.user?.email.split('@')[0] : '',
     role: data?.user?.role || '',
+    temporaryEmail: data?.user?.email_is_temporary || false,
   },
   jobTitles: data?.job_titles || [],
   updatedAt: data?.updated_at || undefined,
@@ -30,6 +31,7 @@ export const mapGenericCandidate = (data: any): GenericCandidate => ({
       }
     : undefined,
   lastIteraction: data?.last_iteraction || undefined,
+  nationality: data?.nationality || undefined,
 })
 
 export const mapGenericCandidateIteraction = (data: any) => ({
