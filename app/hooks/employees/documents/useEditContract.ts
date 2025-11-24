@@ -3,12 +3,7 @@ import { notifications } from '@mantine/notifications'
 import axiosInstance from '../../axiosInstance'
 import { EMPLOYEE_DOCUMENTS_ENDPOINTS } from '../../api/endpoints'
 import snakecaseKeys from 'snakecase-keys'
-
-interface ContractData {
-  title: string
-  expiryDate?: string | null
-  notes?: string | undefined
-}
+import { ContractData } from '@/app/types/utils/contract'
 
 export function useEditContract() {
   const [loading, setLoading] = useState(false)

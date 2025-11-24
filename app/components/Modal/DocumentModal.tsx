@@ -9,6 +9,7 @@ import Row from '../Row/Row'
 import FormInput from '../Input/FormInput'
 import { useEditDocument } from '@/app/hooks/employees/documents/useEditDocument'
 import { useSession } from 'next-auth/react'
+import { DocumentData } from '@/app/types/utils/document'
 
 type DocumentModalProps = {
   isOpen: boolean
@@ -29,7 +30,8 @@ const DocumentModal = ({
 }: DocumentModalProps) => {
   const { data: authSession } = useSession()
   const sessionAccessToken = authSession?.accessToken || ''
-  const { editDocument: sendEditDocumentRequest, loading: isEditingDocument } = useEditDocument()
+  const { editDocument: sendEditDocumentRequest, loading: isEditingDocument } =
+    useEditDocument()
 
   const [draftDocument, setDraftDocument] = useState({
     title: document?.title || '',
@@ -52,10 +54,10 @@ const DocumentModal = ({
     if (!document?.id || !employeeId || !sessionAccessToken) return
     if (!draftDocument.title.trim()) return
 
-    const documentData = {
+    const documentData: DocumentData = {
       title: draftDocument.title.trim(),
       expiryDate: draftDocument.expiryDate,
-      notes: draftDocument.notes?.trim() || null,
+      notes: draftDocument.notes?.trim() || undefined,
     }
 
     const result = await sendEditDocumentRequest(
@@ -153,7 +155,13 @@ const DocumentModal = ({
           />
           <PrimaryButton
             type="button"
-            text={isEditingDocument ? 'A guardar...' : action === 'add' ? 'Adicionar' : 'Editar'}
+            text={
+              isEditingDocument
+                ? 'A guardar...'
+                : action === 'add'
+                  ? 'Adicionar'
+                  : 'Editar'
+            }
             id="primary-btn"
             onClick={handleSave}
             disabled={!draftDocument.title.trim() || isEditingDocument}

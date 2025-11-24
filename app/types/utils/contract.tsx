@@ -11,4 +11,10 @@ type EmployeeContract = {
   createdAt: string
 }
 
-export type { EmployeeContract }
+type ContractData = {
+  title: string
+  expiryDate?: string | null
+  notes?: string | undefined
+}
+
+export type { EmployeeContract, ContractData }

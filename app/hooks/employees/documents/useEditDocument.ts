@@ -3,12 +3,7 @@ import { notifications } from '@mantine/notifications'
 import axiosInstance from '../../axiosInstance'
 import { EMPLOYEE_DOCUMENTS_ENDPOINTS } from '../../api/endpoints'
 import snakecaseKeys from 'snakecase-keys'
-
-interface DocumentData {
-  title: string
-  expiryDate?: string | null
-  notes?: string | undefined
-}
+import { DocumentData } from '@/app/types/utils/document'
 
 export function useEditDocument() {
   const [loading, setLoading] = useState(false)
