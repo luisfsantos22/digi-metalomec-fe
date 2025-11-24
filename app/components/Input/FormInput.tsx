@@ -21,6 +21,7 @@ type FormInputProps = {
   width?: string
   disabled?: boolean
   clearable?: boolean
+  additionalText?: string
 }
 
 const FormInput = (props: FormInputProps) => {
@@ -36,6 +37,7 @@ const FormInput = (props: FormInputProps) => {
     width = 'w-full',
     disabled = false,
     clearable = false,
+    additionalText = '',
   } = props
 
   const [internalErrorStyles, setInternalErrorStyles] = useState(!!error)
@@ -121,6 +123,12 @@ const FormInput = (props: FormInputProps) => {
             </button>
           )}
         </div>
+        {additionalText && (
+          <Text
+            text={additionalText}
+            styles="text-digiblue1212-normal"
+          />
+        )}
         {internalErrorStyles && error && (
           <Text
             text={error}

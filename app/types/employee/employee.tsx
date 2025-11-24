@@ -1,4 +1,4 @@
-import { CreateUserData, User } from '../user'
+import { CreateUserData, UpdateUserData, User } from '../user'
 import { Language, UserLanguage } from '@/app/types/utils/language'
 import { EmployeeSkill } from './skill'
 import { GenericJobTitle } from '../utils/job-title'
@@ -76,6 +76,7 @@ type Employee = {
   country: string
   dateOfBirth?: Date
   internalIdentifier?: number
+  nationality?: string
 }
 
 type GenericEmployee = {
@@ -88,6 +89,45 @@ type GenericEmployee = {
   status: string
   availabilityStatus: string
   internalIdentifier?: number
+  nationality?: string
+}
+
+type UpdateEmployeeData = {
+  user: UpdateUserData
+  jobTitles: GenericJobTitle[]
+  department?: string
+  departmentName?: string
+  nationalId?: string
+  nif?: string
+  socialSecurityNumber?: string
+  europeanHealthInsuranceCard?: string
+  collaborationStartDate?: string
+  gender?: string
+  maritalStatus?: string
+  transportAvailable?: boolean
+  geographicLocation?: GeographicLocationInput
+  preferredWorkLocation?: string
+  emergencyContact?: EmergencyContact
+  educationQualification?: string
+  languages?: UserLanguage[]
+  photoUrl?: string
+  currentLocation?: string
+  needsHousing?: boolean
+  housingProvided?: boolean
+  availabilityStatus: string
+  status: string
+  workPermitExpiry?: Date | null
+  medicalCertificationExpiry?: Date | null
+  skills?: EmployeeSkill[]
+  certifications?: EmployeeCertification[]
+  address?: string
+  postalCode?: string
+  city: string
+  district?: string
+  country: string
+  dateOfBirth?: Date
+  phoneNumber?: string
+  nationality?: string
 }
 
 type CreateEmployeeData = {
@@ -125,6 +165,7 @@ type CreateEmployeeData = {
   country: string
   dateOfBirth?: Date
   phoneNumber?: string
+  nationality?: string
 }
 export type {
   GenericEmployee,
@@ -132,4 +173,5 @@ export type {
   Employee,
   CreateEmployeeData,
   Certification,
+  UpdateEmployeeData,
 }

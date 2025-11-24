@@ -71,7 +71,7 @@ const CreateJobTitleModal = (props: CreateJobTitleModalProps) => {
             label="Descrição"
             labelStyles="text-digiblack1420-semibold flex gap-1"
             placeholder="Descrição do Cargo"
-            mandatory
+            mandatory={false}
             query={newJobTitle?.description || ''}
             setQuery={(value) =>
               setNewJobTitle((prev) => ({

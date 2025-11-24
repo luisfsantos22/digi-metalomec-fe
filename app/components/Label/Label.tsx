@@ -24,18 +24,22 @@ type LabelProps = {
     className?: string
   }
   extraContent?: React.ReactNode
+  numberOfLinesClass?: string
+  additionalText?: string
 }
 
 const Label = ({
   label,
   value,
   labelStyles = 'text-digiblack1624-semibold',
-  valueStyles = 'text-digibrown1624-normal w-full focus:outline-none focus:border-b-digibrown focus:ring-0 disabled:cursor-not-allowed disabled:text-gray-400 line-clamp-1 text-left border-b-gray-300',
+  valueStyles = 'text-digibrown1624-normal w-full focus:outline-none focus:border-b-digibrown focus:ring-0 disabled:cursor-not-allowed disabled:text-gray-400 text-left border-b-gray-300',
+  numberOfLinesClass = 'line-clamp-1',
   placeholder = 'Por Preencher...',
   mandatory = false,
   type = 'text',
   imageProps,
   extraContent,
+  additionalText,
 }: LabelProps) => {
   const placeholderStyles = 'text-gray-400 italic'
 
@@ -75,12 +79,22 @@ const Label = ({
             <div className="flex justify-between gap-2 items-center">
               <Text
                 text={value ?? placeholder}
-                styles={value ? valueStyles : placeholderStyles}
+                styles={
+                  value
+                    ? valueStyles + ' ' + numberOfLinesClass
+                    : placeholderStyles
+                }
               />
               {extraContent}
             </div>
           )}
         </div>
+        {additionalText && (
+          <Text
+            text={additionalText}
+            styles="text-digired1212-normal"
+          />
+        )}
       </div>
     </div>
   )
