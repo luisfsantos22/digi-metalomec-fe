@@ -230,6 +230,7 @@ export default function EditEmployee() {
                 setValue={setValue}
                 errors={errors}
                 clearErrors={clearErrors}
+                action={'edit'}
               />
             ),
             2: (

@@ -5,10 +5,12 @@ import Label from '../../Label/Label'
 import Row from '../../Row/Row'
 import Collapsible from '../../Collapsible/Collapsible'
 import DeleteButton from '../../Button/DeleteButton'
+import EditButton from '../../Button/EditButton'
 import Separator from '../../Separator/Separator'
 import Text from '../../Text/Text'
 import AddButton from '../../Button/AddButton'
 import DocumentUploadModal from '../../Modal/DocumentUploadModal'
+import DocumentModal from '../../Modal/DocumentModal'
 import AreYouSureModal from '../../Modal/AreYouSureModal'
 import { useSession } from 'next-auth/react'
 import { useDeleteDocument } from '@/app/hooks/employees/documents/useDeleteDocument'
@@ -41,6 +43,7 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
   const [areYouSureToDeleteOpen, setAreYouSureToDeleteOpen] = useState(false)
   const [actionModal, setActionModal] = useState<'add' | 'edit'>('add')
   const [openHandleDocumentModal, setOpenHandleDocumentModal] = useState(false)
+  const [openEditDocumentModal, setOpenEditDocumentModal] = useState(false)
   const [documentToEdit, setDocumentToEdit] = useState<EmployeeDocument | null>(
     null
   )
@@ -75,7 +78,7 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
   const handleOpenEditModal = (document: EmployeeDocument) => {
     setActionModal('edit')
     setDocumentToEdit(document)
-    setOpenHandleDocumentModal(true)
+    setOpenEditDocumentModal(true)
   }
 
   const handleDeleteDocument = async () => {
@@ -220,15 +223,20 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
                                 }
                                 placeholder="Por definir"
                               />
+                              <Label
+                                label="Notas"
+                                value={document?.notes}
+                                placeholder="Sem notas"
+                              />
                             </Row>
                             {isDesktop && (
                               <div className="flex flex-row gap-2 pt-2 lg:pt-0 justify-end">
-                                {/* <EditButton
-                                  id={`edit-contract-${contract?.id}`}
-                                  onClick={() => handleOpenEditModal(contract)}
-                                  tooltipText="Editar Contrato"
+                                <EditButton
+                                  id={`edit-document-${document?.id}`}
+                                  onClick={() => handleOpenEditModal(document)}
+                                  tooltipText="Editar Documento"
                                   hasTooltip={true}
-                                /> */}
+                                />
                                 <DeleteButton
                                   id={`delete-document-${document?.id}`}
                                   onClick={() =>
@@ -257,12 +265,12 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
                       </Collapsible>
                       {!isDesktop && (
                         <div className="flex flex-row gap-2 pb-2 w-full justify-center">
-                          {/* <EditButton
-                            id={`edit-contract-${contract?.id}`}
-                            onClick={() => handleOpenEditModal(contract)}
-                            tooltipText="Editar Contrato"
+                          <EditButton
+                            id={`edit-document-${document?.id}`}
+                            onClick={() => handleOpenEditModal(document)}
+                            tooltipText="Editar Documento"
                             hasTooltip={true}
-                          /> */}
+                          />
                           <DeleteButton
                             id={`delete-document-${document?.id}`}
                             onClick={() => handleOpenAreYouSureModal(document)}
@@ -322,6 +330,22 @@ export default function DocumentsEmployee(props: DocumentsEmployeeProps) {
           }}
           employeeId={employee?.id || ''}
           documentType="other"
+        />
+      )}
+      {/* Edit Document Modal */}
+      {openEditDocumentModal && documentToEdit && (
+        <DocumentModal
+          isOpen={openEditDocumentModal}
+          onClose={() => {
+            setOpenEditDocumentModal(false)
+            setDocumentToEdit(null)
+          }}
+          onConfirm={() => {
+            setActivationTrigger((prev) => prev + 1)
+          }}
+          document={documentToEdit}
+          employeeId={employee?.id || ''}
+          action="edit"
         />
       )}
       {/* Preview Modal */}

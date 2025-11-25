@@ -105,6 +105,23 @@ const IteractionModal = (props: IteractionModalProps) => {
             width="w-full"
           />
         </Row>
+        <Row>
+          <FormInput
+            query={tempCandidateIteraction.createdAt as unknown as string}
+            setQuery={(e) =>
+              setTempCandidateIteraction((prev) => ({
+                ...prev,
+                createdAt: e as unknown as Date,
+              }))
+            }
+            placeholder="dd/mm/aaaa"
+            inputType="date"
+            mandatory
+            label="Data da Iteração"
+            labelStyles="text-digiblack1420-semibold flex gap-1"
+            width="lg:w-1/3 w-full"
+          />
+        </Row>
         <div className="flex justify-end gap-4">
           <SecondaryButton
             text="Cancelar"

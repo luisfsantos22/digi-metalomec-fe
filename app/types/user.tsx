@@ -14,6 +14,7 @@ type User = {
   fullName: string
   company: string
   phoneNumber?: string
+  temporaryEmail?: boolean
 }
 
 type CreateUserData = {
@@ -24,6 +25,16 @@ type CreateUserData = {
   role: string
   company: string
   phoneNumber?: string
+  temporaryEmail?: boolean
 }
 
-export type { UserCredentials, User, CreateUserData }
+type UpdateUserData = {
+  username?: string
+  firstName: string
+  lastName: string
+  role: string
+  company: string
+  phoneNumber?: string
+}
+
+export type { UserCredentials, UpdateUserData, User, CreateUserData }

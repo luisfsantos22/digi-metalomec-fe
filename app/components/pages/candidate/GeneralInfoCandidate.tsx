@@ -27,13 +27,25 @@ export default function GeneralInfoCandidate(props: GeneralInfoCandidateProps) {
           label="Nome Completo"
           value={candidate?.user?.fullName}
         />
+        <Label
+          label="Nacionalidade"
+          value={candidate?.nationality}
+        />
       </Row>
       <Row>
         <Label
-          label="Cargo"
+          label="Email"
+          value={candidate?.user?.email}
+          additionalText={
+            candidate?.user?.temporaryEmail ? 'Email Temporário' : undefined
+          }
+        />
+        <Label
+          label="Telefone"
+          type="phone"
           value={
-            candidate?.jobTitles && candidate.jobTitles.length > 0
-              ? candidate.jobTitles.map((job) => job.name).join(', ')
+            candidate?.user?.phoneNumber
+              ? candidate?.user?.phoneNumber
               : undefined
           }
         />
@@ -47,20 +59,13 @@ export default function GeneralInfoCandidate(props: GeneralInfoCandidateProps) {
       </Row>
       <Row>
         <Label
-          label="Email"
-          value={candidate?.user?.email}
-        />
-        <Label
-          label="Telefone"
-          type="phone"
+          label="Cargo"
           value={
-            candidate?.user?.phoneNumber
-              ? candidate?.user?.phoneNumber
+            candidate?.jobTitles && candidate.jobTitles.length > 0
+              ? candidate.jobTitles.map((job) => job.name).join(', ')
               : undefined
           }
         />
-      </Row>
-      <Row>
         <Label
           label="Disponibilidade"
           value={
@@ -74,6 +79,7 @@ export default function GeneralInfoCandidate(props: GeneralInfoCandidateProps) {
         <Label
           label="Localização"
           value={candidate?.geographicLocation?.addressFull ?? undefined}
+          numberOfLinesClass="line-clamp-2"
         />
       </Row>
     </div>

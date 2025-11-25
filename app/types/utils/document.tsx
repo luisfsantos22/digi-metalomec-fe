@@ -19,4 +19,10 @@ type GenericDocument = {
   updatedAt: string
 }
 
-export type { GenericDocument }
+type DocumentData = {
+  title: string
+  expiryDate?: string | null
+  notes?: string | undefined
+}
+
+export type { GenericDocument, DocumentData }

@@ -21,9 +21,9 @@ export const CANDIDATE_ENDPOINTS = {
   getCandidateForActivation: (id: string) =>
     `api/v1/employees/candidates/${id}/activation/`,
   getCandidatesIteractions: (candidateId?: string) =>
-    `api/v1/employees/iteractions/${candidateId ? `?employee=${candidateId}` : ''}`,
+    `api/v1/employees/iteractions/${candidateId ? `?employee_id=${candidateId}` : ''}`,
   getCandidatesIteractionsPage: (candidateId: string, page: number) =>
-    `api/v1/employees/iteractions/?page=${page}&employee=${candidateId}`,
+    `api/v1/employees/iteractions/?page=${page}&employee_id=${candidateId}`,
   getCandidateIteractionById: (id: string) =>
     `api/v1/employees/iteractions/${id}/`,
   searchByLocation: 'api/v1/employees/candidates/search-by-location/',
