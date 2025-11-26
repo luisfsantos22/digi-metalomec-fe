@@ -47,14 +47,16 @@ export function useEditEmployee() {
       }
 
       return response.data
-    } catch {
+    } catch (err: any) {
+      const validationErrors = err?.response?.data
       notifications.show({
         title: 'Erro',
         color: 'red',
         message: 'Falha ao editar o colaborador. Tente novamente.',
         position: 'top-right',
       })
-      setError('Um erro ocorreu ao editar o colaborador')
+      setError(validationErrors || 'Um erro ocorreu ao editar o colaborador')
+      return validationErrors
     } finally {
       setLoading(false)
     }

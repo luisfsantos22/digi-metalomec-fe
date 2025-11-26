@@ -4,6 +4,7 @@ import {
   UseFormSetValue,
   UseFormClearErrors,
   UseFormWatch,
+  UseFormSetError,
 } from 'react-hook-form'
 import ContainerCard from '../Card/ContainerCard'
 import FormInput from '../Input/FormInput'
@@ -12,6 +13,8 @@ import FormDropdown from '../Dropdown/FormDropdown'
 import { AVAILABILITY_STATUS } from '@/app/constants'
 import Separator from '../Separator/Separator'
 import SearchInput from '../Input/SearchInput'
+import { patterns as validatorsPatterns, messages as validatorsMessages, cleanPhone } from '@/app/validators/validation'
+import useCheckUnique from '@/app/hooks/utils/useCheckUnique'
 import useJobTitlesSearchQuery from '@/app/hooks/employees/useJobTitlesSearchQuery'
 import { useEffect, useState } from 'react'
 import { GenericJobTitle } from '@/app/types/utils/job-title'
@@ -23,6 +26,7 @@ type CandidateFormScreenProps = {
   formData: CreateCandidateData
   register: UseFormRegister<CreateCandidateData>
   setValue: UseFormSetValue<CreateCandidateData>
+  setError: UseFormSetError<CreateCandidateData>
   errors: FieldErrors<CreateCandidateData>
   clearErrors?: UseFormClearErrors<CreateCandidateData>
   watch?: UseFormWatch<any>
@@ -30,7 +34,7 @@ type CandidateFormScreenProps = {
 }
 
 const CandidateFormScreen = (props: CandidateFormScreenProps) => {
-  const { formData, register, setValue, errors, clearErrors, watch, action } =
+  const { formData, register, setValue, errors, clearErrors, watch, action, setError } =
     props
 
   const [selectedJobTitle, setSelectedJobTitle] =
@@ -66,6 +70,9 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
   }, [jobTitles])
 
   console.log(errors)
+
+  const { checkUnique } = useCheckUnique('candidates')
+  const { checkUnique: checkEmployeeUnique } = useCheckUnique('employees')
 
   return (
     <>
@@ -174,11 +181,26 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
         <Row title="Contatos">
           <FormInput
             query={email}
-            setQuery={(e) =>
+            setQuery={(e) => {
+              clearErrors && clearErrors('user.email')
               setValue('user.email', e as unknown as string, {
                 shouldValidate: true,
               })
             }
+            }
+            onBlur={async () => {
+              if (action === 'create' && email) {
+                const exists = await checkUnique(email as string)
+                // also check employees to make email/phone unique across both
+                const existsInEmployees = await checkEmployeeUnique(email as string)
+                if (exists || existsInEmployees) {
+                  setError('user.email' as any, {
+                    type: 'unique',
+                    message: 'Este email já se encontra em uso',
+                  })
+                }
+              }
+            }}
             error={errors.user?.email?.message}
             placeholder="jose.carlos@email.com"
             inputType="email"
@@ -188,8 +210,8 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             {...register('user.email', {
               required: 'Email é obrigatório',
               pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'Email inválido',
+                value: validatorsPatterns.email,
+                message: validatorsMessages.email,
               },
             })}
             width="lg:w-3/4 w-full"
@@ -197,10 +219,12 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
           />
           <FormInput
             query={phoneNumber ? phoneNumber : ''}
-            setQuery={(e) =>
+            setQuery={(e) => {
+              clearErrors && clearErrors('user.phoneNumber')
               setValue('user.phoneNumber', e as string, {
                 shouldValidate: true,
               })
+            }
             }
             placeholder="912 345 678"
             inputType="tel"
@@ -209,8 +233,28 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             labelStyles="text-digiblack1420-semibold flex gap-1"
             width="lg:w-1/4 w-full"
             error={errors.user?.phoneNumber?.message}
+            validation={{ required: true, pattern: validatorsPatterns.phone }}
+            onBlur={async () => {
+              if (action === 'create' && phoneNumber) {
+                const cleanedPhone = cleanPhone(phoneNumber as string)
+                const exists = await checkUnique(cleanedPhone)
+                const existsInEmployees = await checkEmployeeUnique(cleanedPhone)
+                if (exists || existsInEmployees) {
+                  setError('user.phoneNumber' as any, {
+                    type: 'unique',
+                    message: 'Este número já se encontra em uso',
+                  })
+                }
+              }
+            }}
             {...register('user.phoneNumber', {
               required: 'Número de telemóvel é obrigatório',
+              // pattern removed: use custom `validate` which normalizes input before checking
+              validate: (value) => {
+                if (!value) return true
+                const cleaned = value.toString().replace(/[\s\-\(\)\.]/g, '').replace(/^\+?351/, '')
+                return /^9\d{8}$/.test(cleaned) || 'Deve começar com 9 e ter 9 dígitos'
+              }
             })}
           />
         </Row>

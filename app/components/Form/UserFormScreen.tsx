@@ -14,16 +14,19 @@ import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from '@/app/constants'
 import Separator from '../Separator/Separator'
 import UploadImage from '../Upload/UploadImage'
 import useUploadImage from '@/app/hooks/useUploadImage'
+import useCheckUnique from '@/app/hooks/utils/useCheckUnique'
+import { patterns as validatorsPatterns, messages as validatorsMessages, cleanPhone } from '@/app/validators/validation'
 type UserFormScreenProps = {
   formData: CreateEmployeeData
   register: UseFormRegister<CreateEmployeeData>
   setValue: UseFormSetValue<CreateEmployeeData>
   errors: FieldErrors<CreateEmployeeData>
+  setError: UseFormSetError<CreateEmployeeData>
   clearErrors?: UseFormClearErrors<CreateEmployeeData>
   action: 'create' | 'edit'
 }
 const UserFormScreen = (props: UserFormScreenProps) => {
-  const { formData, register, setValue, errors, clearErrors, action } = props
+  const { formData, register, setValue, errors, clearErrors, action, setError } = props
   const {
     user: { email, firstName, lastName, phoneNumber, temporaryEmail } = {},
     nif,
@@ -43,6 +46,8 @@ const UserFormScreen = (props: UserFormScreenProps) => {
   } = formData
 
   const { uploadImage, loading, error } = useUploadImage()
+  const { checkUnique } = useCheckUnique('employees')
+  const { checkUnique: checkCandidatesUnique } = useCheckUnique('candidates')
 
   return (
     <ContainerCard
@@ -145,10 +150,25 @@ const UserFormScreen = (props: UserFormScreenProps) => {
       </Row>
       <Separator />
       <Row title="Contatos">
-        <FormInput
+          <FormInput
           query={email}
-          setQuery={(e) => setValue('user.email', e as unknown as string)}
-          error={errors.user?.email ? 'Email é obrigatório' : undefined}
+          setQuery={(e) => {
+            if (errors?.user?.email) clearErrors && clearErrors('user.email')
+            setValue('user.email', e as unknown as string)
+          }}
+          onBlur={async () => {
+            if (action === 'create' && email) {
+              const existsInEmployees = await checkUnique(email as string)
+              const existsInCandidates = await checkCandidatesUnique(email as string)
+              if (existsInEmployees || existsInCandidates) {
+                setError('user.email' as any, {
+                  type: 'unique',
+                  message: 'Este email já se encontra em uso',
+                })
+              }
+            }
+          }}
+          error={errors.user?.email?.message ?? (errors.user?.email ? 'Email é obrigatório' : undefined)}
           placeholder="jose.carlos@email.com"
           inputType="email"
           mandatory={true}
@@ -156,7 +176,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           labelStyles="text-digiblack1420-semibold flex gap-1"
           validation={{
             required: true,
-            pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+            pattern: validatorsPatterns.email
           }}
           {...register('user.email', { required: true })}
           width="lg:w-3/4 w-full"
@@ -164,7 +184,23 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         />
         <FormInput
           query={phoneNumber ? phoneNumber : ''}
-          setQuery={setValue.bind(null, 'user.phoneNumber')}
+          setQuery={(v) => {
+            if (errors?.user?.phoneNumber) clearErrors && clearErrors('user.phoneNumber')
+            setValue('user.phoneNumber', v as unknown as string)
+          }}
+          onBlur={async () => {
+            if (action === 'create' && phoneNumber) {
+              const cleaned = cleanPhone(phoneNumber as string)
+              const existsInEmployees = await checkUnique(cleaned)
+              const existsInCandidates = await checkCandidatesUnique(cleaned)
+              if (existsInEmployees || existsInCandidates) {
+                setError('user.phoneNumber' as any, {
+                  type: 'unique',
+                  message: 'Este número já se encontra em uso',
+                })
+              }
+            }
+          }}
           placeholder="912 345 678"
           inputType="tel"
           mandatory={true}
@@ -172,16 +208,16 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           labelStyles="text-digiblack1420-semibold flex gap-1"
           validation={{
             required: true,
-            pattern: /^9\d{8}$/
+            pattern: validatorsPatterns.phone
           }}
           {...register('user.phoneNumber', {
             required: 'Número de telemóvel é obrigatório',
             validate: (value) => {
-              if (!value) return true // Let required handle this
-              // Clean the phone number like the FormInput validation does
-              const cleaned = value.toString().replace(/[\s\-\(\)\.]/g, '')
-                .replace(/^\+?351/, '') // Remove country code
-              return /^9\d{8}$/.test(cleaned) || 'Deve começar com 9 e ter 9 dígitos'
+              if (!value) return true
+              const cleaned = value.toString().replace(/[\s\-\(\)\.]/g, '').replace(/^\+?351/, '')
+              const emergency = formData?.emergencyContact?.phone ? formData.emergencyContact.phone.toString().replace(/[\s\-\(\)\.]/g, '').replace(/^\+?351/, '') : ''
+              if (emergency && cleaned === emergency) return 'O número principal não pode ser o mesmo que o telemóvel de emergência'
+              return validatorsPatterns.phone.test(cleaned) || validatorsMessages.phone
             }
           })}
           width="lg:w-1/4 w-full"
@@ -205,10 +241,14 @@ const UserFormScreen = (props: UserFormScreenProps) => {
             validate: (value) => {
               const phone = formData?.emergencyContact?.phone
               const relationship = formData?.emergencyContact?.relationship
+              const mainPhone = formData?.user?.phoneNumber
               if (value || phone || relationship) {
-                return value ? true : 'Preencha o nome do contato de emergência'
+                if (!value) return 'Preencha o nome do contato de emergência'
+                const cleanedName = value?.toString().replace(/[\s\-\(\)\.]/g, '')
+                const cleanedMain = mainPhone ? mainPhone.toString().replace(/[\s\-\(\)\.]/g, '') : ''
+                // keep validation minimal: only require the name if other emergency fields exist
+                return true
               }
-
               return true
             },
           })}
@@ -227,7 +267,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           mandatory={false}
           error={errors?.emergencyContact?.phone?.message}
           validation={{
-            pattern: /^9\d{8}$/
+            pattern: validatorsPatterns.phone
           }}
           {...register('emergencyContact.phone', {
             validate: (value) => {
@@ -235,10 +275,12 @@ const UserFormScreen = (props: UserFormScreenProps) => {
               const relationship = formData?.emergencyContact?.relationship
               if (value || name || relationship) {
                 if (!value) return 'Preencha o telemóvel de emergência'
-                // Clean the phone number like the FormInput validation does
-                const cleaned = value.toString().replace(/[\s\-\(\)\.]/g, '')
-                  .replace(/^\+?351/, '') // Remove country code
-                return /^9\d{8}$/.test(cleaned) || 'Deve começar com 9 e ter 9 dígitos'
+                const cleaned = value.toString().replace(/[\s\-\(\)\.]/g, '').replace(/^\+?351/, '')
+                const mainPhone = formData?.user?.phoneNumber ? formData.user.phoneNumber.toString().replace(/[\s\-\(\)\.]/g, '').replace(/^\+?351/, '') : ''
+                if (mainPhone && cleaned === mainPhone) {
+                  return 'O telemóvel de emergência não pode ser igual ao telemóvel principal'
+                }
+                return validatorsPatterns.phone.test(cleaned) || validatorsMessages.phone
               }
               return true
             },
@@ -326,12 +368,12 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           label="Código Postal"
           labelStyles="text-digiblack1420-semibold flex gap-1"
           validation={{
-            pattern: /^\d{4}-\d{3}$/
+            pattern: validatorsPatterns.postalCode
           }}
           {...register('postalCode', {
             pattern: {
-              value: /^\d{4}-\d{3}$/,
-              message: 'Deve ter formato XXXX-XXX'
+              value: validatorsPatterns.postalCode,
+              message: validatorsMessages.postalCode
             }
           })}
         />
@@ -345,13 +387,11 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           inputType="number"
           label="NIF"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          validation={{
-            pattern: /^\d{9}$/
-          }}
+          validation={{ pattern: validatorsPatterns.nif }}
           {...register('nif', {
             pattern: {
-              value: /^\d{9}$/,
-              message: 'Deve ter exatamente 9 dígitos'
+              value: validatorsPatterns.nif,
+              message: validatorsMessages.nif
             }
           })}
         />
@@ -362,13 +402,11 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           inputType="number"
           label="Número de Identificação Nacional (CC)"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          validation={{
-            pattern: /^\d{8}$/
-          }}
+          validation={{ pattern: validatorsPatterns.nationalId }}
           {...register('nationalId', {
             pattern: {
-              value: /^\d{8}$/,
-              message: 'Deve ter exatamente 8 dígitos'
+              value: validatorsPatterns.nationalId,
+              message: validatorsMessages.nationalId
             }
           })}
         />
@@ -381,13 +419,11 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           inputType="number"
           label="Número de Segurança Social"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          validation={{
-            pattern: /^\d{11}$/
-          }}
+          validation={{ pattern: validatorsPatterns.socialSecurity }}
           {...register('socialSecurityNumber', {
             pattern: {
-              value: /^\d{11}$/,
-              message: 'Deve ter exatamente 11 dígitos'
+              value: validatorsPatterns.socialSecurity,
+              message: validatorsMessages.socialSecurity
             }
           })}
         />
@@ -400,13 +436,11 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           inputType="number"
           label="Cartão Europeu de Seguro de Doença"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          validation={{
-            pattern: /^\d{20}$/
-          }}
+          validation={{ pattern: validatorsPatterns.ehic }}
           {...register('europeanHealthInsuranceCard', {
             pattern: {
-              value: /^\d{20}$/,
-              message: 'Deve ter exatamente 20 dígitos'
+              value: validatorsPatterns.ehic,
+              message: validatorsMessages.ehic
             }
           })}
         />

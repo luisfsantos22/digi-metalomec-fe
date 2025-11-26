@@ -89,6 +89,7 @@ export default function EditEmployee() {
     handleSubmit,
     setValue,
     formState: { errors },
+    setError,
     clearErrors,
     reset,
   } = useForm<CreateEmployeeData>({
@@ -159,6 +160,33 @@ export default function EditEmployee() {
         startLoading()
         const result = await editEmployee(employeeId, data)
 
+        // If API returned validation errors (returned from hook), map them
+        if (result && typeof result === 'object' && !(result as any).id) {
+          const validationErrors = result as any
+          const toCamel = (s: string) => s.replace(/_([a-z])/g, (m, p1) => p1.toUpperCase())
+
+          if (validationErrors.user && typeof validationErrors.user === 'object') {
+            Object.keys(validationErrors.user).forEach((userKey) => {
+              const errorMessages = validationErrors.user[userKey]
+              if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+                const camel = toCamel(userKey)
+                setError(`user.${camel}` as any, { type: 'server', message: errorMessages[0] })
+              }
+            })
+          }
+
+          Object.keys(validationErrors).forEach((key) => {
+            if (key === 'user') return
+            const msgs = validationErrors[key]
+            if (Array.isArray(msgs) && msgs.length > 0) {
+              setError(key as any, { type: 'server', message: msgs[0] })
+            }
+          })
+
+          stopLoading()
+          return
+        }
+
         if (result?.id) {
           router.push(`/employee/details/${result.id}/`)
         }
@@ -224,10 +252,11 @@ export default function EditEmployee() {
         {
           {
             1: (
-              <UserFormScreen
+                <UserFormScreen
                 formData={formData}
                 register={register}
                 setValue={setValue}
+                  setError={setError}
                 errors={errors}
                 clearErrors={clearErrors}
                 action={'edit'}

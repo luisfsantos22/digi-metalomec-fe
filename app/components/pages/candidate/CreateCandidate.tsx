@@ -35,7 +35,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
     clearErrors,
     setError,
   } = useForm<CreateCandidateData>({
-    mode: 'onBlur', // Validate on blur to show errors as user fills form
+    mode: 'onChange', // Validate on change for immediate feedback
     defaultValues: {
       user: {
         username: '',
@@ -191,9 +191,15 @@ export default function CreateCandidate(props: CreateCandidateProps) {
             Object.keys(validationErrors[key]).forEach((userKey) => {
               const errorMessages = validationErrors[key][userKey]
               if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+                // Translate common backend messages to user-friendly Portuguese
+                let msg = errorMessages[0]
+                if (userKey === 'email' && /already exists|in use|exists/i.test(msg)) {
+                  msg = 'Este email já se encontra em uso'
+                }
+
                 setError(`user.${userKey}` as any, {
                   type: 'server',
-                  message: errorMessages[0],
+                  message: msg,
                 })
               }
             })
@@ -241,6 +247,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
           formData={formData}
           register={register}
           setValue={setValue}
+          setError={setError}
           errors={errors}
           clearErrors={clearErrors}
           watch={watch}

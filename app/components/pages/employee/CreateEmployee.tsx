@@ -48,6 +48,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
     setValue,
     formState: { errors },
     clearErrors,
+    setError,
   } = useForm<CreateEmployeeData>({
     defaultValues: {
       user: {
@@ -97,6 +98,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
       district: '',
       country: '',
     },
+    mode: 'onChange',
   })
 
   const formData = watch()
@@ -202,7 +204,43 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
       }
       try {
         startLoading()
-        await createEmployee(data)
+        const result = await createEmployee(data)
+
+        // If API returned validation errors, map them to form fields
+        if (result && typeof result === 'object' && !(result as any).id) {
+          const validationErrors = result as any
+          // Map user-specific errors (e.g. phone/email)
+          if (validationErrors.user && typeof validationErrors.user === 'object') {
+            Object.keys(validationErrors.user).forEach((userKey) => {
+              const messages = validationErrors.user[userKey]
+              if (Array.isArray(messages) && messages.length > 0) {
+                // register field path name
+                const fieldName = `user.${userKey}` as any
+                let msg = messages[0]
+
+                // Localize some common backend messages
+                if (userKey === 'email' && /already exists|in use|exists/i.test(msg)) {
+                  msg = 'Este email já se encontra em uso'
+                }
+                if ((userKey === 'phone' || userKey === 'phone_number' || userKey === 'phoneNumber') && /already exists|in use|exists/i.test(msg)) {
+                  msg = 'Este número já se encontra em uso'
+                }
+
+                setError(fieldName, { type: 'server', message: msg })
+              }
+            })
+          }
+
+          // Generic mapping for other top-level errors
+          Object.keys(validationErrors).forEach((key) => {
+            if (key !== 'user') {
+              const msgs = validationErrors[key]
+              if (Array.isArray(msgs) && msgs.length > 0) {
+                setError(key as any, { type: 'server', message: msgs[0] })
+              }
+            }
+          })
+        }
       } catch (err) {
         console.log(err)
       } finally {
@@ -260,6 +298,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
                   register={register}
                   setValue={setValue}
                   errors={errors}
+                  setError={setError}
                   clearErrors={clearErrors}
                   action={'create'}
                 />
