@@ -13,7 +13,11 @@ import FormDropdown from '../Dropdown/FormDropdown'
 import { AVAILABILITY_STATUS } from '@/app/constants'
 import Separator from '../Separator/Separator'
 import SearchInput from '../Input/SearchInput'
-import { patterns as validatorsPatterns, messages as validatorsMessages, cleanPhone } from '@/app/validators/validation'
+import {
+  patterns as validatorsPatterns,
+  messages as validatorsMessages,
+  cleanPhone,
+} from '@/app/validators/validation'
 import useCheckUnique from '@/app/hooks/utils/useCheckUnique'
 import useJobTitlesSearchQuery from '@/app/hooks/employees/useJobTitlesSearchQuery'
 import { useEffect, useState } from 'react'
@@ -34,8 +38,16 @@ type CandidateFormScreenProps = {
 }
 
 const CandidateFormScreen = (props: CandidateFormScreenProps) => {
-  const { formData, register, setValue, errors, clearErrors, watch, action, setError } =
-    props
+  const {
+    formData,
+    register,
+    setValue,
+    errors,
+    clearErrors,
+    watch,
+    action,
+    setError,
+  } = props
 
   const [selectedJobTitle, setSelectedJobTitle] =
     useState<GenericJobTitle | null>(null)
@@ -69,7 +81,7 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
     }
   }, [jobTitles])
 
-  console.log(errors)
+  // errors are shown in the form UI via the `errors` prop — avoid noisy console logging
 
   const { checkUnique } = useCheckUnique('candidates')
   const { checkUnique: checkEmployeeUnique } = useCheckUnique('employees')
@@ -186,13 +198,14 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
               setValue('user.email', e as unknown as string, {
                 shouldValidate: true,
               })
-            }
-            }
+            }}
             onBlur={async () => {
               if (action === 'create' && email) {
                 const exists = await checkUnique(email as string)
                 // also check employees to make email/phone unique across both
-                const existsInEmployees = await checkEmployeeUnique(email as string)
+                const existsInEmployees = await checkEmployeeUnique(
+                  email as string
+                )
                 if (exists || existsInEmployees) {
                   setError('user.email' as any, {
                     type: 'unique',
@@ -224,8 +237,7 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
               setValue('user.phoneNumber', e as string, {
                 shouldValidate: true,
               })
-            }
-            }
+            }}
             placeholder="912 345 678"
             inputType="tel"
             mandatory={true}
@@ -238,7 +250,8 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
               if (action === 'create' && phoneNumber) {
                 const cleanedPhone = cleanPhone(phoneNumber as string)
                 const exists = await checkUnique(cleanedPhone)
-                const existsInEmployees = await checkEmployeeUnique(cleanedPhone)
+                const existsInEmployees =
+                  await checkEmployeeUnique(cleanedPhone)
                 if (exists || existsInEmployees) {
                   setError('user.phoneNumber' as any, {
                     type: 'unique',
@@ -252,9 +265,16 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
               // pattern removed: use custom `validate` which normalizes input before checking
               validate: (value) => {
                 if (!value) return true
-                const cleaned = value.toString().replace(/[\s\-\(\)\.]/g, '').replace(/^\+?351/, '')
-                return /^9\d{8}$/.test(cleaned) || 'Deve começar com 9 e ter 9 dígitos'
-              }
+                const cleaned = value
+                  .toString()
+                  .replace(/[\s\-().]/g, '')
+                  .replace(/^\+?351/, '')
+
+                return (
+                  /^9\d{8}$/.test(cleaned) ||
+                  'Deve começar com 9 e ter 9 dígitos'
+                )
+              },
             })}
           />
         </Row>

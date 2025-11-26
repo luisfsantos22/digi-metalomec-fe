@@ -47,6 +47,10 @@ const useCreateCandidate = (): UseCreateCandidateResult => {
       const validationErrors = err?.response?.data
       setError(validationErrors || 'Failed to create candidate')
 
+      if (validationErrors && Object.keys(validationErrors).length > 0) {
+        return validationErrors
+      }
+
       notifications.show({
         title: 'Erro',
         color: 'red',

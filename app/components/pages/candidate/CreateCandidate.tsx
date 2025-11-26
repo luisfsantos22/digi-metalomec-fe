@@ -15,6 +15,8 @@ import { useForm } from 'react-hook-form'
 import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
 import useCreateCandidate from '@/app/hooks/candidates/useCreateEmployee'
+import useCheckUnique from '@/app/hooks/utils/useCheckUnique'
+import { cleanPhone } from '@/app/validators/validation'
 import CandidateFormScreen from '../../Form/CandidateFormScreen'
 import { CreateCandidateData } from '@/app/types/candidate/candidate'
 
@@ -75,6 +77,8 @@ export default function CreateCandidate(props: CreateCandidateProps) {
   ] = useState(false)
 
   const { createCandidate, loading, error } = useCreateCandidate()
+  const { checkUnique } = useCheckUnique('candidates')
+  const { checkUnique: checkEmployeeUnique } = useCheckUnique('employees')
   const { startLoading, stopLoading } = useGlobalLoading()
 
   // UseEffects
@@ -171,6 +175,55 @@ export default function CreateCandidate(props: CreateCandidateProps) {
     }
 
     try {
+      // Re-check uniqueness on submit (normalize inputs first). This is a final client-side check
+      // to avoid accidental duplicate submissions; the server is still authoritative.
+      if (data?.user) {
+        const email = data.user.email?.toString().trim().toLowerCase() || ''
+        const phoneRaw = data.user.phoneNumber?.toString() || ''
+        const phone = cleanPhone(phoneRaw)
+
+        // check both candidates & employees to ensure cross-entity uniqueness
+        const existsInCandidates = email ? await checkUnique(email) : false
+        const existsInEmployees = email
+          ? await checkEmployeeUnique(email)
+          : false
+
+        if (existsInCandidates || existsInEmployees) {
+          setError('user.email' as any, {
+            type: 'unique',
+            message: 'Este email já se encontra em uso.',
+          })
+          notifications.show({
+            title: 'Erro',
+            color: 'red',
+            message: 'Este email já se encontra em uso.',
+            position: 'top-right',
+          })
+
+          return
+        }
+
+        // phone check (only when present)
+        if (phone) {
+          const existsPhoneInCandidates = await checkUnique(phone)
+          const existsPhoneInEmployees = await checkEmployeeUnique(phone)
+          if (existsPhoneInCandidates || existsPhoneInEmployees) {
+            setError('user.phoneNumber' as any, {
+              type: 'unique',
+              message: 'Este número já se encontra em uso',
+            })
+            notifications.show({
+              title: 'Erro',
+              color: 'red',
+              message: 'Este número já se encontra em uso',
+              position: 'top-right',
+            })
+
+            return
+          }
+        }
+      }
+
       startLoading()
       const result = await createCandidate(data)
 
@@ -178,6 +231,42 @@ export default function CreateCandidate(props: CreateCandidateProps) {
       if (result && typeof result === 'object' && !(result as any).id) {
         // Handle API validation errors
         const validationErrors = result as any
+        // If server returned a raw DB detail string (eg. duplicate key), map it
+        // to the correct field and clear the opposite field so we don't
+        // mis-attribute the error (eg. email showing when phone is duplicate).
+        if (validationErrors?.detail) {
+          const detail = String(validationErrors.detail || '').toLowerCase()
+          if (
+            /phone_number/i.test(detail) ||
+            /unique_user_phone/i.test(detail)
+          ) {
+            const m = detail.match(/\)=\((?:[^,]+),\s*([^)]+)\)/)
+            const phoneFound = m?.[1]?.trim()
+            const msg = phoneFound
+              ? `Este número ${phoneFound} já está associado a outro candidato.`
+              : 'Este número já se encontra em uso.'
+            // clear any stale email error
+            clearErrors && clearErrors('user.email')
+            setError('user.phoneNumber' as any, {
+              type: 'server',
+              message: msg,
+            })
+
+            return
+          }
+          if (/email/i.test(detail) || /unique_user_email/i.test(detail)) {
+            const m = detail.match(/\)=\((?:[^,]+),\s*([^)@\s]+@[^)\s]+)/)
+            const emailFound = m?.[1]?.trim()
+            const msg = emailFound
+              ? `Este email ${emailFound} já está associado a outro candidato.`
+              : 'Este email já se encontra em uso.'
+            // clear any stale phone error
+            clearErrors && clearErrors('user.phoneNumber')
+            setError('user.email' as any, { type: 'server', message: msg })
+
+            return
+          }
+        }
         if (validationErrors.user?.phone_number) {
           setError('user.phoneNumber', {
             type: 'server',
@@ -193,8 +282,11 @@ export default function CreateCandidate(props: CreateCandidateProps) {
               if (Array.isArray(errorMessages) && errorMessages.length > 0) {
                 // Translate common backend messages to user-friendly Portuguese
                 let msg = errorMessages[0]
-                if (userKey === 'email' && /already exists|in use|exists/i.test(msg)) {
-                  msg = 'Este email já se encontra em uso'
+                if (
+                  userKey === 'email' &&
+                  /already exists|in use|exists/i.test(msg)
+                ) {
+                  msg = 'Este email já se encontra em uso.'
                 }
 
                 setError(`user.${userKey}` as any, {

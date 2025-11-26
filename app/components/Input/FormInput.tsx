@@ -92,23 +92,30 @@ const FormInput = (props: FormInputProps) => {
     if (validation.pattern && !validation.pattern.test(stringValue)) {
       const src = validation.pattern.source
       if (src === validatorsPatterns.nif.source) return validatorsMessages.nif
-      if (src === validatorsPatterns.nationalId.source) return validatorsMessages.nationalId
+      if (src === validatorsPatterns.nationalId.source)
+        return validatorsMessages.nationalId
       if (src === validatorsPatterns.socialSecurity.source)
         return validatorsMessages.socialSecurity
-      if (src === validatorsPatterns.phone.source) return validatorsMessages.phone
-      if (src === validatorsPatterns.postalCode.source) return validatorsMessages.postalCode
+      if (src === validatorsPatterns.phone.source)
+        return validatorsMessages.phone
+      if (src === validatorsPatterns.postalCode.source)
+        return validatorsMessages.postalCode
       if (src === validatorsPatterns.ehic.source) return validatorsMessages.ehic
-      if (src === validatorsPatterns.email.source) return validatorsMessages.email
+      if (src === validatorsPatterns.email.source)
+        return validatorsMessages.email
+
       return 'Formato inválido'
     }
 
     // For extra checks (tel/email) when no pattern is provided
     if (inputType === 'tel') {
       const res = validatePhone(stringValue)
+
       return res === true ? null : res
     }
     if (inputType === 'email') {
       const res = validateEmail(stringValue)
+
       return res === true ? null : res
     }
 

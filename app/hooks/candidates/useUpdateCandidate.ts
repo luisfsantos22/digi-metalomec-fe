@@ -49,13 +49,21 @@ export function useUpdateCandidate() {
       return response.data
     } catch (err: any) {
       const validationErrors = err?.response?.data
+
+      if (validationErrors && Object.keys(validationErrors).length > 0) {
+        setError(validationErrors)
+
+        return validationErrors
+      }
+
       notifications.show({
         title: 'Erro',
         color: 'red',
         message: 'Falha ao editar o candidato. Tente novamente.',
         position: 'top-right',
       })
-      setError(validationErrors || 'Um erro ocorreu ao editar o candidato')
+      setError('Um erro ocorreu ao editar o candidato')
+
       return validationErrors
     } finally {
       setLoading(false)

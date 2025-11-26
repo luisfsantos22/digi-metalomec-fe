@@ -163,14 +163,67 @@ export default function EditEmployee() {
         // If API returned validation errors (returned from hook), map them
         if (result && typeof result === 'object' && !(result as any).id) {
           const validationErrors = result as any
-          const toCamel = (s: string) => s.replace(/_([a-z])/g, (m, p1) => p1.toUpperCase())
 
-          if (validationErrors.user && typeof validationErrors.user === 'object') {
+          // If server returned a raw DB constraint detail (e.g. duplicate key), try to map
+          // it to the correct field so the user sees a precise error message.
+          if (typeof validationErrors?.detail === 'string') {
+            const detail: string = validationErrors.detail
+            if (
+              /phone_number/i.test(detail) ||
+              /unique_user_phone/i.test(detail)
+            ) {
+              const m = detail.match(/\)=\((?:[^,]+),\s*([^)]+)\)/)
+              const phoneFound = m?.[1]?.trim()
+              const msg = phoneFound
+                ? `Este número já está associado a outro colaborador.`
+                : 'Este número já se encontra em uso.'
+
+              setError('user.phoneNumber' as any, {
+                type: 'server',
+                message: msg,
+              })
+              notifications.show({
+                title: 'Erro',
+                color: 'red',
+                message: msg,
+                position: 'top-right',
+              })
+
+              stopLoading()
+
+              return
+            }
+
+            if (/email/i.test(detail) || /unique_user_email/i.test(detail)) {
+              const msg = 'Este email já se encontra em uso.'
+              setError('user.email' as any, { type: 'server', message: msg })
+              notifications.show({
+                title: 'Erro',
+                color: 'red',
+                message: msg,
+                position: 'top-right',
+              })
+
+              stopLoading()
+
+              return
+            }
+          }
+          const toCamel = (s: string) =>
+            s.replace(/_([a-z])/g, (m, p1) => p1.toUpperCase())
+
+          if (
+            validationErrors.user &&
+            typeof validationErrors.user === 'object'
+          ) {
             Object.keys(validationErrors.user).forEach((userKey) => {
               const errorMessages = validationErrors.user[userKey]
               if (Array.isArray(errorMessages) && errorMessages.length > 0) {
                 const camel = toCamel(userKey)
-                setError(`user.${camel}` as any, { type: 'server', message: errorMessages[0] })
+                setError(`user.${camel}` as any, {
+                  type: 'server',
+                  message: errorMessages[0],
+                })
               }
             })
           }
@@ -184,6 +237,7 @@ export default function EditEmployee() {
           })
 
           stopLoading()
+
           return
         }
 
@@ -252,11 +306,11 @@ export default function EditEmployee() {
         {
           {
             1: (
-                <UserFormScreen
+              <UserFormScreen
                 formData={formData}
                 register={register}
                 setValue={setValue}
-                  setError={setError}
+                setError={setError}
                 errors={errors}
                 clearErrors={clearErrors}
                 action={'edit'}

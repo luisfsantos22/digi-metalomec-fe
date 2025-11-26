@@ -47,6 +47,13 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
       const validationErrors = err?.response?.data
       setError(validationErrors || 'Failed to create employee')
 
+      // If server provided structured validation errors (or detail), return them to the caller
+      // and let the UI determine the exact message to display (prevents generic toast for validation failures).
+      if (validationErrors && Object.keys(validationErrors).length > 0) {
+        return validationErrors
+      }
+
+      // Unknown/non-validation error -> show generic notification and return
       notifications.show({
         title: 'Erro',
         color: 'red',

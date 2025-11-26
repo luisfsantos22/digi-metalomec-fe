@@ -15,7 +15,11 @@ import Separator from '../Separator/Separator'
 import UploadImage from '../Upload/UploadImage'
 import useUploadImage from '@/app/hooks/useUploadImage'
 import useCheckUnique from '@/app/hooks/utils/useCheckUnique'
-import { patterns as validatorsPatterns, messages as validatorsMessages, cleanPhone } from '@/app/validators/validation'
+import {
+  patterns as validatorsPatterns,
+  messages as validatorsMessages,
+  cleanPhone,
+} from '@/app/validators/validation'
 type UserFormScreenProps = {
   formData: CreateEmployeeData
   register: UseFormRegister<CreateEmployeeData>
@@ -26,7 +30,15 @@ type UserFormScreenProps = {
   action: 'create' | 'edit'
 }
 const UserFormScreen = (props: UserFormScreenProps) => {
-  const { formData, register, setValue, errors, clearErrors, action, setError } = props
+  const {
+    formData,
+    register,
+    setValue,
+    errors,
+    clearErrors,
+    action,
+    setError,
+  } = props
   const {
     user: { email, firstName, lastName, phoneNumber, temporaryEmail } = {},
     nif,
@@ -150,7 +162,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
       </Row>
       <Separator />
       <Row title="Contatos">
-          <FormInput
+        <FormInput
           query={email}
           setQuery={(e) => {
             if (errors?.user?.email) clearErrors && clearErrors('user.email')
@@ -159,7 +171,9 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           onBlur={async () => {
             if (action === 'create' && email) {
               const existsInEmployees = await checkUnique(email as string)
-              const existsInCandidates = await checkCandidatesUnique(email as string)
+              const existsInCandidates = await checkCandidatesUnique(
+                email as string
+              )
               if (existsInEmployees || existsInCandidates) {
                 setError('user.email' as any, {
                   type: 'unique',
@@ -168,7 +182,10 @@ const UserFormScreen = (props: UserFormScreenProps) => {
               }
             }
           }}
-          error={errors.user?.email?.message ?? (errors.user?.email ? 'Email é obrigatório' : undefined)}
+          error={
+            errors.user?.email?.message ??
+            (errors.user?.email ? 'Email é obrigatório' : undefined)
+          }
           placeholder="jose.carlos@email.com"
           inputType="email"
           mandatory={true}
@@ -176,7 +193,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           labelStyles="text-digiblack1420-semibold flex gap-1"
           validation={{
             required: true,
-            pattern: validatorsPatterns.email
+            pattern: validatorsPatterns.email,
           }}
           {...register('user.email', { required: true })}
           width="lg:w-3/4 w-full"
@@ -185,7 +202,8 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         <FormInput
           query={phoneNumber ? phoneNumber : ''}
           setQuery={(v) => {
-            if (errors?.user?.phoneNumber) clearErrors && clearErrors('user.phoneNumber')
+            if (errors?.user?.phoneNumber)
+              clearErrors && clearErrors('user.phoneNumber')
             setValue('user.phoneNumber', v as unknown as string)
           }}
           onBlur={async () => {
@@ -208,17 +226,30 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           labelStyles="text-digiblack1420-semibold flex gap-1"
           validation={{
             required: true,
-            pattern: validatorsPatterns.phone
+            pattern: validatorsPatterns.phone,
           }}
           {...register('user.phoneNumber', {
             required: 'Número de telemóvel é obrigatório',
             validate: (value) => {
               if (!value) return true
-              const cleaned = value.toString().replace(/[\s\-\(\)\.]/g, '').replace(/^\+?351/, '')
-              const emergency = formData?.emergencyContact?.phone ? formData.emergencyContact.phone.toString().replace(/[\s\-\(\)\.]/g, '').replace(/^\+?351/, '') : ''
-              if (emergency && cleaned === emergency) return 'O número principal não pode ser o mesmo que o telemóvel de emergência'
-              return validatorsPatterns.phone.test(cleaned) || validatorsMessages.phone
-            }
+              const cleaned = value
+                .toString()
+                .replace(/[\s\-\(\)\.]/g, '')
+                .replace(/^\+?351/, '')
+              const emergency = formData?.emergencyContact?.phone
+                ? formData.emergencyContact.phone
+                    .toString()
+                    .replace(/[\s\-\(\)\.]/g, '')
+                    .replace(/^\+?351/, '')
+                : ''
+              if (emergency && cleaned === emergency)
+                return 'O número principal não pode ser o mesmo que o telemóvel de emergência'
+
+              return (
+                validatorsPatterns.phone.test(cleaned) ||
+                validatorsMessages.phone
+              )
+            },
           })}
           width="lg:w-1/4 w-full"
         />
@@ -244,11 +275,16 @@ const UserFormScreen = (props: UserFormScreenProps) => {
               const mainPhone = formData?.user?.phoneNumber
               if (value || phone || relationship) {
                 if (!value) return 'Preencha o nome do contato de emergência'
-                const cleanedName = value?.toString().replace(/[\s\-\(\)\.]/g, '')
-                const cleanedMain = mainPhone ? mainPhone.toString().replace(/[\s\-\(\)\.]/g, '') : ''
+                const cleanedName = value
+                  ?.toString()
+                  .replace(/[\s\-\(\)\.]/g, '')
+                const cleanedMain = mainPhone
+                  ? mainPhone.toString().replace(/[\s\-\(\)\.]/g, '')
+                  : ''
                 // keep validation minimal: only require the name if other emergency fields exist
                 return true
               }
+
               return true
             },
           })}
@@ -267,7 +303,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           mandatory={false}
           error={errors?.emergencyContact?.phone?.message}
           validation={{
-            pattern: validatorsPatterns.phone
+            pattern: validatorsPatterns.phone,
           }}
           {...register('emergencyContact.phone', {
             validate: (value) => {
@@ -275,13 +311,26 @@ const UserFormScreen = (props: UserFormScreenProps) => {
               const relationship = formData?.emergencyContact?.relationship
               if (value || name || relationship) {
                 if (!value) return 'Preencha o telemóvel de emergência'
-                const cleaned = value.toString().replace(/[\s\-\(\)\.]/g, '').replace(/^\+?351/, '')
-                const mainPhone = formData?.user?.phoneNumber ? formData.user.phoneNumber.toString().replace(/[\s\-\(\)\.]/g, '').replace(/^\+?351/, '') : ''
+                const cleaned = value
+                  .toString()
+                  .replace(/[\s\-\(\)\.]/g, '')
+                  .replace(/^\+?351/, '')
+                const mainPhone = formData?.user?.phoneNumber
+                  ? formData.user.phoneNumber
+                      .toString()
+                      .replace(/[\s\-\(\)\.]/g, '')
+                      .replace(/^\+?351/, '')
+                  : ''
                 if (mainPhone && cleaned === mainPhone) {
                   return 'O telemóvel de emergência não pode ser igual ao telemóvel principal'
                 }
-                return validatorsPatterns.phone.test(cleaned) || validatorsMessages.phone
+
+                return (
+                  validatorsPatterns.phone.test(cleaned) ||
+                  validatorsMessages.phone
+                )
               }
+
               return true
             },
           })}
@@ -368,13 +417,13 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           label="Código Postal"
           labelStyles="text-digiblack1420-semibold flex gap-1"
           validation={{
-            pattern: validatorsPatterns.postalCode
+            pattern: validatorsPatterns.postalCode,
           }}
           {...register('postalCode', {
             pattern: {
               value: validatorsPatterns.postalCode,
-              message: validatorsMessages.postalCode
-            }
+              message: validatorsMessages.postalCode,
+            },
           })}
         />
       </Row>
@@ -391,8 +440,8 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           {...register('nif', {
             pattern: {
               value: validatorsPatterns.nif,
-              message: validatorsMessages.nif
-            }
+              message: validatorsMessages.nif,
+            },
           })}
         />
         <FormInput
@@ -406,8 +455,8 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           {...register('nationalId', {
             pattern: {
               value: validatorsPatterns.nationalId,
-              message: validatorsMessages.nationalId
-            }
+              message: validatorsMessages.nationalId,
+            },
           })}
         />
         <FormInput
@@ -423,8 +472,8 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           {...register('socialSecurityNumber', {
             pattern: {
               value: validatorsPatterns.socialSecurity,
-              message: validatorsMessages.socialSecurity
-            }
+              message: validatorsMessages.socialSecurity,
+            },
           })}
         />
         <FormInput
@@ -440,8 +489,8 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           {...register('europeanHealthInsuranceCard', {
             pattern: {
               value: validatorsPatterns.ehic,
-              message: validatorsMessages.ehic
-            }
+              message: validatorsMessages.ehic,
+            },
           })}
         />
       </Row>

@@ -49,13 +49,24 @@ export function useEditEmployee() {
       return response.data
     } catch (err: any) {
       const validationErrors = err?.response?.data
+
+      // If server returned validation payloads or a detail string, return to page and let the UI decide
+      // how to display specific error messages (avoid generic toast for validation failures)
+      if (validationErrors && Object.keys(validationErrors).length > 0) {
+        setError(validationErrors)
+
+        return validationErrors
+      }
+
+      // Non-validation error -> show generic toast and set error
       notifications.show({
         title: 'Erro',
         color: 'red',
         message: 'Falha ao editar o colaborador. Tente novamente.',
         position: 'top-right',
       })
-      setError(validationErrors || 'Um erro ocorreu ao editar o colaborador')
+      setError('Um erro ocorreu ao editar o colaborador')
+
       return validationErrors
     } finally {
       setLoading(false)

@@ -116,14 +116,21 @@ export default function EditCandidate() {
 
         if (result && typeof result === 'object' && !(result as any).id) {
           const validationErrors = result as any
-          const toCamel = (s: string) => s.replace(/_([a-z])/g, (m, p1) => p1.toUpperCase())
+          const toCamel = (s: string) =>
+            s.replace(/_([a-z])/g, (m, p1) => p1.toUpperCase())
 
-          if (validationErrors.user && typeof validationErrors.user === 'object') {
+          if (
+            validationErrors.user &&
+            typeof validationErrors.user === 'object'
+          ) {
             Object.keys(validationErrors.user).forEach((userKey) => {
               const errorMessages = validationErrors.user[userKey]
               if (Array.isArray(errorMessages) && errorMessages.length > 0) {
                 const camel = toCamel(userKey)
-                setError(`user.${camel}` as any, { type: 'server', message: errorMessages[0] })
+                setError(`user.${camel}` as any, {
+                  type: 'server',
+                  message: errorMessages[0],
+                })
               }
             })
           }
@@ -137,6 +144,7 @@ export default function EditCandidate() {
           })
 
           stopLoading()
+
           return
         }
 

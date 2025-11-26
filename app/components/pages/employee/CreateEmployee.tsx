@@ -16,6 +16,8 @@ import {
 import { useGlobalLoading } from '@/app/hooks/utils/useGlobalLoading'
 import { useLanguagesQuery } from '@/app/hooks/utils/useLanguagesQuery'
 import useCreateEmployee from '@/app/hooks/employees/useCreateEmployee'
+import useCheckUnique from '@/app/hooks/utils/useCheckUnique'
+import { cleanPhone } from '@/app/validators/validation'
 import {
   CreateEmployeeData,
   EmployeeCertification,
@@ -142,6 +144,8 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
   } = useGetEducationalQualifications()
 
   const { createEmployee, loading, error } = useCreateEmployee()
+  const { checkUnique } = useCheckUnique('employees')
+  const { checkUnique: checkCandidatesUnique } = useCheckUnique('candidates')
   const { startLoading, stopLoading } = useGlobalLoading()
 
   // UseEffects
@@ -202,6 +206,51 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
           data.emergencyContact = undefined
         }
       }
+      // Re-check uniqueness at submit time to avoid accidental duplicates
+      if (data?.user) {
+        const email = data.user.email?.toString().trim().toLowerCase() || ''
+        const phoneRaw = data.user.phoneNumber?.toString() || ''
+        const phone = cleanPhone(phoneRaw)
+
+        if (email) {
+          const existsEmployees = await checkUnique(email)
+          const existsCandidates = await checkCandidatesUnique(email)
+          if (existsEmployees || existsCandidates) {
+            setError('user.email' as any, {
+              type: 'unique',
+              message: 'Este email já se encontra em uso.',
+            })
+            notifications.show({
+              title: 'Erro',
+              color: 'red',
+              message: 'Este email já se encontra em uso.',
+              position: 'top-right',
+            })
+
+            return
+          }
+        }
+
+        if (phone) {
+          const existsEmployees = await checkUnique(phone)
+          const existsCandidates = await checkCandidatesUnique(phone)
+          if (existsEmployees || existsCandidates) {
+            setError('user.phoneNumber' as any, {
+              type: 'unique',
+              message: 'Este número já se encontra em uso.',
+            })
+            notifications.show({
+              title: 'Erro',
+              color: 'red',
+              message: 'Este número já se encontra em uso.',
+              position: 'top-right',
+            })
+
+            return
+          }
+        }
+      }
+
       try {
         startLoading()
         const result = await createEmployee(data)
@@ -209,8 +258,67 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
         // If API returned validation errors, map them to form fields
         if (result && typeof result === 'object' && !(result as any).id) {
           const validationErrors = result as any
+
+          // If server returned a raw DB constraint detail (e.g. duplicate key), parse it
+          // and map to the correct field so users get a precise message.
+          if (typeof validationErrors?.detail === 'string') {
+            const detail: string = validationErrors.detail
+
+            // phone duplication (Postgres error shows phone_number in the constraint)
+            if (
+              /phone_number/i.test(detail) ||
+              /unique_user_phone/i.test(detail)
+            ) {
+              // attempt to extract the phone value from the detail
+              const m = detail.match(/\)=\((?:[^,]+),\s*([^)]+)\)/)
+              const phoneFound = m?.[1]?.trim()
+              const msg = phoneFound
+                ? `Este número ${phoneFound} já está associado a outro colaborador.`
+                : 'Este número já se encontra em uso.'
+
+              // Clear any potentially stale email errors that might have been set earlier
+              clearErrors && clearErrors('user.email')
+
+              setError('user.phoneNumber' as any, {
+                type: 'server',
+                message: msg,
+              })
+
+              notifications.show({
+                title: 'Erro',
+                color: 'red',
+                message: msg,
+                position: 'top-right',
+              })
+
+              stopLoading()
+
+              return
+            }
+
+            // email duplication fallback
+            if (/email/i.test(detail) || /unique_user_email/i.test(detail)) {
+              const msg = 'Este email já se encontra em uso.'
+              // clear any stale phone errors before setting email error
+              clearErrors && clearErrors('user.phoneNumber')
+              setError('user.email' as any, { type: 'server', message: msg })
+              notifications.show({
+                title: 'Erro',
+                color: 'red',
+                message: msg,
+                position: 'top-right',
+              })
+
+              stopLoading()
+
+              return
+            }
+          }
           // Map user-specific errors (e.g. phone/email)
-          if (validationErrors.user && typeof validationErrors.user === 'object') {
+          if (
+            validationErrors.user &&
+            typeof validationErrors.user === 'object'
+          ) {
             Object.keys(validationErrors.user).forEach((userKey) => {
               const messages = validationErrors.user[userKey]
               if (Array.isArray(messages) && messages.length > 0) {
@@ -219,11 +327,19 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
                 let msg = messages[0]
 
                 // Localize some common backend messages
-                if (userKey === 'email' && /already exists|in use|exists/i.test(msg)) {
-                  msg = 'Este email já se encontra em uso'
+                if (
+                  userKey === 'email' &&
+                  /already exists|in use|exists/i.test(msg)
+                ) {
+                  msg = 'Este email já se encontra em uso.'
                 }
-                if ((userKey === 'phone' || userKey === 'phone_number' || userKey === 'phoneNumber') && /already exists|in use|exists/i.test(msg)) {
-                  msg = 'Este número já se encontra em uso'
+                if (
+                  (userKey === 'phone' ||
+                    userKey === 'phone_number' ||
+                    userKey === 'phoneNumber') &&
+                  /already exists|in use|exists/i.test(msg)
+                ) {
+                  msg = 'Este número já se encontra em uso.'
                 }
 
                 setError(fieldName, { type: 'server', message: msg })

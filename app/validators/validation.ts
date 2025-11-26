@@ -24,8 +24,9 @@ export const messages = {
 export function cleanPhone(value?: string | number | null) {
   if (!value) return ''
   // keep numbers only, remove spaces, punctuation and +351 country code
-  let s = value.toString().replace(/[\s\-\(\)\.]/g, '')
+  let s = value.toString().replace(/[\s\-().]/g, '')
   s = s.replace(/^\+?351/, '')
+
   return s
 }
 
@@ -33,35 +34,44 @@ export function validatePhone(value?: string | number | null) {
   const cleaned = cleanPhone(value)
   if (!cleaned) return messages.required
   if (!patterns.phone.test(cleaned)) return messages.phone
+
   return true
 }
 
 export function validateNIF(value?: string | number | null) {
   if (!value || value.toString().trim() === '') return null
+
   return patterns.nif.test(value.toString()) ? true : messages.nif
 }
 
 export function validateNationalId(value?: string | number | null) {
   if (!value || value.toString().trim() === '') return null
+
   return patterns.nationalId.test(value.toString()) ? true : messages.nationalId
 }
 
 export function validateSocialSecurity(value?: string | number | null) {
   if (!value || value.toString().trim() === '') return null
-  return patterns.socialSecurity.test(value.toString()) ? true : messages.socialSecurity
+
+  return patterns.socialSecurity.test(value.toString())
+    ? true
+    : messages.socialSecurity
 }
 
 export function validateEHIC(value?: string | number | null) {
   if (!value || value.toString().trim() === '') return null
+
   return patterns.ehic.test(value.toString()) ? true : messages.ehic
 }
 
 export function validatePostalCode(value?: string | number | null) {
   if (!value || value.toString().trim() === '') return null
+
   return patterns.postalCode.test(value.toString()) ? true : messages.postalCode
 }
 
 export function validateEmail(value?: string | number | null) {
   if (!value || value.toString().trim() === '') return null
+
   return patterns.email.test(value.toString()) ? true : messages.email
 }
