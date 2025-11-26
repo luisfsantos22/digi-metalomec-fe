@@ -33,7 +33,9 @@ export default function CreateCandidate(props: CreateCandidateProps) {
     setValue,
     formState: { errors },
     clearErrors,
+    setError,
   } = useForm<CreateCandidateData>({
+    mode: 'onBlur', // Validate on blur to show errors as user fills form
     defaultValues: {
       user: {
         username: '',
@@ -103,6 +105,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
       formData?.user?.email,
       formData?.user?.firstName,
       formData?.user?.lastName,
+      formData?.user?.phoneNumber,
       formData?.user?.role,
       formData?.user?.company,
     ]
@@ -111,27 +114,96 @@ export default function CreateCandidate(props: CreateCandidateProps) {
       (field) => field !== '' && field !== undefined && field !== null
     )
 
-    setCanSubmit(isEmployeeDataValid && isUserDataValid)
-  }, [formData])
+    setCanSubmit(
+      isEmployeeDataValid && isUserDataValid && Object.keys(errors).length === 0
+    )
+  }, [formData, errors])
 
   //functions
   const formSubmit = async (data: CreateCandidateData) => {
-    if (Object.keys(errors).length > 0) {
+    // Custom validation for fields not handled by react-hook-form
+    let hasErrors = false
+
+    // Validate jobTitles
+    if (!data.jobTitles || data.jobTitles.length === 0) {
+      setError('jobTitles', {
+        type: 'required',
+        message: 'Cargo/Função é obrigatório',
+      })
+      hasErrors = true
+    }
+
+    // Validate geographic location
+    if (!data.geographicLocation?.city) {
+      setError('geographicLocation.city', {
+        type: 'required',
+        message: 'Cidade é obrigatória',
+      })
+      hasErrors = true
+    }
+
+    if (!data.geographicLocation?.municipality) {
+      setError('geographicLocation.municipality', {
+        type: 'required',
+        message: 'Concelho é obrigatório',
+      })
+      hasErrors = true
+    }
+
+    // Validate availability status
+    if (!data.availabilityStatus) {
+      setError('availabilityStatus', {
+        type: 'required',
+        message: 'Disponibilidade é obrigatória',
+      })
+      hasErrors = true
+    }
+
+    if (Object.keys(errors).length > 0 || hasErrors) {
       notifications.show({
         title: 'Erro',
         color: 'red',
         message: 'Preencha todos os campos obrigatórios antes de submeter.',
         position: 'top-right',
       })
-    } else {
-      try {
-        startLoading()
-        await createCandidate(data)
-      } catch (err) {
-        console.log(err)
-      } finally {
-        stopLoading()
+
+      return
+    }
+
+    try {
+      startLoading()
+      const result = await createCandidate(data)
+
+      // If result contains validation errors from API
+      if (result && typeof result === 'object' && !(result as any).id) {
+        // Handle API validation errors
+        const validationErrors = result as any
+        if (validationErrors.user?.phone_number) {
+          setError('user.phoneNumber', {
+            type: 'server',
+            message: validationErrors.user.phone_number[0],
+          })
+        }
+
+        // Handle other potential validation errors
+        Object.keys(validationErrors).forEach((key) => {
+          if (key === 'user' && typeof validationErrors[key] === 'object') {
+            Object.keys(validationErrors[key]).forEach((userKey) => {
+              const errorMessages = validationErrors[key][userKey]
+              if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+                setError(`user.${userKey}` as any, {
+                  type: 'server',
+                  message: errorMessages[0],
+                })
+              }
+            })
+          }
+        })
       }
+    } catch (err) {
+      console.log(err)
+    } finally {
+      stopLoading()
     }
   }
 
@@ -187,7 +259,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
             text={'Criar'}
             type="submit"
             size={'medium'}
-            disabled={Object.keys(errors).length > 0 || !canSubmit}
+            disabled={!canSubmit}
             id="btn-repair-action"
             textDisabled="Preencha todos os campos obrigatórios"
           />

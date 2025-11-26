@@ -65,6 +65,8 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
     }
   }, [jobTitles])
 
+  console.log(errors)
+
   return (
     <>
       <ContainerCard
@@ -74,27 +76,47 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
         <Row title="Informação Básica">
           <FormInput
             query={firstName}
-            setQuery={(e) => setValue('user.firstName', e as unknown as string)}
-            error={errors.user?.firstName ? 'Nome é obrigatório' : undefined}
+            setQuery={(e) =>
+              setValue('user.firstName', e as unknown as string, {
+                shouldValidate: true,
+              })
+            }
+            error={errors.user?.firstName?.message}
             placeholder="José"
             inputType="text"
             mandatory={true}
             width="lg:w-1/4 w-full"
             label="Nome"
             labelStyles="text-digiblack1420-semibold flex gap-1"
-            {...register('user.firstName', { required: true })}
+            {...register('user.firstName', {
+              required: 'Nome é obrigatório',
+              minLength: {
+                value: 2,
+                message: 'Nome deve ter pelo menos 2 caracteres',
+              },
+            })}
           />
           <FormInput
             query={lastName}
-            setQuery={(e) => setValue('user.lastName', e as unknown as string)}
-            error={errors.user?.lastName ? 'Apelido é obrigatório' : undefined}
+            setQuery={(e) =>
+              setValue('user.lastName', e as unknown as string, {
+                shouldValidate: true,
+              })
+            }
+            error={errors.user?.lastName?.message}
             placeholder="Silva"
             inputType="text"
             mandatory={true}
             label="Apelido"
             width="lg:w-1/4 w-full"
             labelStyles="text-digiblack1420-semibold flex gap-1"
-            {...register('user.lastName', { required: true })}
+            {...register('user.lastName', {
+              required: 'Apelido é obrigatório',
+              minLength: {
+                value: 2,
+                message: 'Apelido deve ter pelo menos 2 caracteres',
+              },
+            })}
           />
           <FormInput
             query={formData.nationality}
@@ -113,7 +135,8 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             dataIsLoading={jobTitlesLoading}
             error={
               jobTitlesError ??
-              (errors.jobTitles ? 'Cargo/Função é obrigatório' : undefined)
+              (errors.jobTitles?.message ||
+                (errors.jobTitles && 'Cargo/Função é obrigatório'))
             }
             label="Cargo/Função"
             labelStyles="text-digiblack1420-semibold flex gap-1"
@@ -123,16 +146,18 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             setValue={(id) => {
               const found = searchedJobTitles.find((jt) => jt.id === id)
               if (found) {
-                setValue('jobTitles', [found])
+                setValue('jobTitles', [found], { shouldValidate: true })
                 setSelectedJobTitle(found)
+                clearErrors?.('jobTitles')
               }
             }}
             setSelectedObj={(obj) => {
               if (obj) {
-                setValue('jobTitles', [obj])
+                setValue('jobTitles', [obj], { shouldValidate: true })
                 setSelectedJobTitle(obj)
+                clearErrors?.('jobTitles')
               } else {
-                setValue('jobTitles', [])
+                setValue('jobTitles', [], { shouldValidate: true })
                 setSelectedJobTitle(null)
                 setSearch('')
               }
@@ -149,26 +174,44 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
         <Row title="Contatos">
           <FormInput
             query={email}
-            setQuery={(e) => setValue('user.email', e as unknown as string)}
-            error={errors.user?.email ? 'Email é obrigatório' : undefined}
+            setQuery={(e) =>
+              setValue('user.email', e as unknown as string, {
+                shouldValidate: true,
+              })
+            }
+            error={errors.user?.email?.message}
             placeholder="jose.carlos@email.com"
             inputType="email"
             mandatory={true}
             label="Email"
             labelStyles="text-digiblack1420-semibold flex gap-1"
-            {...register('user.email', { required: true })}
+            {...register('user.email', {
+              required: 'Email é obrigatório',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'Email inválido',
+              },
+            })}
             width="lg:w-3/4 w-full"
             disabled={action === 'edit'}
           />
           <FormInput
             query={phoneNumber ? phoneNumber : ''}
-            setQuery={(e) => setValue('user.phoneNumber', e as string)}
+            setQuery={(e) =>
+              setValue('user.phoneNumber', e as string, {
+                shouldValidate: true,
+              })
+            }
             placeholder="912 345 678"
             inputType="tel"
             mandatory={true}
             label="Número de Telemóvel"
             labelStyles="text-digiblack1420-semibold flex gap-1"
             width="lg:w-1/4 w-full"
+            error={errors.user?.phoneNumber?.message}
+            {...register('user.phoneNumber', {
+              required: 'Número de telemóvel é obrigatório',
+            })}
           />
         </Row>
         <Separator />
@@ -200,14 +243,13 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             choices={AVAILABILITY_STATUS}
             placeholder="Selecione a sua disponibilidade"
             selectedValue={availabilityStatus ?? ''}
-            setSelectedValue={(e) =>
-              setValue('availabilityStatus', e as unknown as string)
-            }
-            error={
-              errors.availabilityStatus
-                ? 'Disponibilidade é obrigatória'
-                : undefined
-            }
+            setSelectedValue={(e) => {
+              setValue('availabilityStatus', e as unknown as string, {
+                shouldValidate: true,
+              })
+              clearErrors?.('availabilityStatus')
+            }}
+            error={errors.availabilityStatus?.message}
             mandatory={true}
             labelStyles="text-digiblack1420-semibold flex gap-1"
             width="lg:w-1/3 w-full"

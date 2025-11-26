@@ -43,8 +43,10 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
       router.push(`/employee/details/${id}/`)
 
       return id
-    } catch {
-      setError('Failed to create employee')
+    } catch (err: any) {
+      const validationErrors = err?.response?.data
+      setError(validationErrors || 'Failed to create employee')
+
       notifications.show({
         title: 'Erro',
         color: 'red',
@@ -52,7 +54,7 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
         position: 'top-right',
       })
 
-      return null
+      return validationErrors
     } finally {
       setLoading(false)
     }

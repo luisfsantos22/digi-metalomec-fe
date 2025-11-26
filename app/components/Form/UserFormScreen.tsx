@@ -154,6 +154,10 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           mandatory={true}
           label="Email"
           labelStyles="text-digiblack1420-semibold flex gap-1"
+          validation={{
+            required: true,
+            pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+          }}
           {...register('user.email', { required: true })}
           width="lg:w-3/4 w-full"
           disabled={action === 'edit'}
@@ -166,6 +170,20 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           mandatory={true}
           label="Número de Telemóvel"
           labelStyles="text-digiblack1420-semibold flex gap-1"
+          validation={{
+            required: true,
+            pattern: /^9\d{8}$/
+          }}
+          {...register('user.phoneNumber', {
+            required: 'Número de telemóvel é obrigatório',
+            validate: (value) => {
+              if (!value) return true // Let required handle this
+              // Clean the phone number like the FormInput validation does
+              const cleaned = value.toString().replace(/[\s\-\(\)\.]/g, '')
+                .replace(/^\+?351/, '') // Remove country code
+              return /^9\d{8}$/.test(cleaned) || 'Deve começar com 9 e ter 9 dígitos'
+            }
+          })}
           width="lg:w-1/4 w-full"
         />
       </Row>
@@ -208,14 +226,20 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           inputType="tel"
           mandatory={false}
           error={errors?.emergencyContact?.phone?.message}
+          validation={{
+            pattern: /^9\d{8}$/
+          }}
           {...register('emergencyContact.phone', {
             validate: (value) => {
               const name = formData?.emergencyContact?.name
               const relationship = formData?.emergencyContact?.relationship
               if (value || name || relationship) {
-                return value ? true : 'Preencha o telemóvel de emergência'
+                if (!value) return 'Preencha o telemóvel de emergência'
+                // Clean the phone number like the FormInput validation does
+                const cleaned = value.toString().replace(/[\s\-\(\)\.]/g, '')
+                  .replace(/^\+?351/, '') // Remove country code
+                return /^9\d{8}$/.test(cleaned) || 'Deve começar com 9 e ter 9 dígitos'
               }
-
               return true
             },
           })}
@@ -301,7 +325,15 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           width="lg:w-40 w-full"
           label="Código Postal"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('postalCode', { required: false })}
+          validation={{
+            pattern: /^\d{4}-\d{3}$/
+          }}
+          {...register('postalCode', {
+            pattern: {
+              value: /^\d{4}-\d{3}$/,
+              message: 'Deve ter formato XXXX-XXX'
+            }
+          })}
         />
       </Row>
       <Separator />
@@ -313,38 +345,70 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           inputType="number"
           label="NIF"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('nif', { required: false })}
+          validation={{
+            pattern: /^\d{9}$/
+          }}
+          {...register('nif', {
+            pattern: {
+              value: /^\d{9}$/,
+              message: 'Deve ter exatamente 9 dígitos'
+            }
+          })}
         />
         <FormInput
           query={nationalId}
           setQuery={(e) => setValue('nationalId', e as unknown as string)}
-          placeholder="123456789"
+          placeholder="12345678"
           inputType="number"
           label="Número de Identificação Nacional (CC)"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('nationalId', { required: false })}
+          validation={{
+            pattern: /^\d{8}$/
+          }}
+          {...register('nationalId', {
+            pattern: {
+              value: /^\d{8}$/,
+              message: 'Deve ter exatamente 8 dígitos'
+            }
+          })}
         />
         <FormInput
           query={socialSecurityNumber}
           setQuery={(e) =>
             setValue('socialSecurityNumber', e as unknown as string)
           }
-          placeholder="123456789"
+          placeholder="12345678901"
           inputType="number"
           label="Número de Segurança Social"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('socialSecurityNumber', { required: false })}
+          validation={{
+            pattern: /^\d{11}$/
+          }}
+          {...register('socialSecurityNumber', {
+            pattern: {
+              value: /^\d{11}$/,
+              message: 'Deve ter exatamente 11 dígitos'
+            }
+          })}
         />
         <FormInput
           query={formData?.europeanHealthInsuranceCard}
           setQuery={(e) =>
             setValue('europeanHealthInsuranceCard', e as unknown as string)
           }
-          placeholder="123456789"
+          placeholder="12345678901234567890"
           inputType="number"
           label="Cartão Europeu de Seguro de Doença"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('europeanHealthInsuranceCard', { required: false })}
+          validation={{
+            pattern: /^\d{20}$/
+          }}
+          {...register('europeanHealthInsuranceCard', {
+            pattern: {
+              value: /^\d{20}$/,
+              message: 'Deve ter exatamente 20 dígitos'
+            }
+          })}
         />
       </Row>
     </ContainerCard>

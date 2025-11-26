@@ -43,8 +43,10 @@ const useCreateCandidate = (): UseCreateCandidateResult => {
       router.push(`/candidate/details/${id}/`)
 
       return id
-    } catch {
-      setError('Failed to create candidate')
+    } catch (err: any) {
+      const validationErrors = err?.response?.data
+      setError(validationErrors || 'Failed to create candidate')
+
       notifications.show({
         title: 'Erro',
         color: 'red',
@@ -52,7 +54,7 @@ const useCreateCandidate = (): UseCreateCandidateResult => {
         position: 'top-right',
       })
 
-      return null
+      return validationErrors
     } finally {
       setLoading(false)
     }
