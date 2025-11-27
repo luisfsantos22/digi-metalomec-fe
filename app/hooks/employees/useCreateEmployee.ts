@@ -43,8 +43,17 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
       router.push(`/employee/details/${id}/`)
 
       return id
-    } catch {
-      setError('Failed to create employee')
+    } catch (err: any) {
+      const validationErrors = err?.response?.data
+      setError(validationErrors || 'Failed to create employee')
+
+      // If server provided structured validation errors (or detail), return them to the caller
+      // and let the UI determine the exact message to display (prevents generic toast for validation failures).
+      if (validationErrors && Object.keys(validationErrors).length > 0) {
+        return validationErrors
+      }
+
+      // Unknown/non-validation error -> show generic notification and return
       notifications.show({
         title: 'Erro',
         color: 'red',
@@ -52,7 +61,7 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
         position: 'top-right',
       })
 
-      return null
+      return validationErrors
     } finally {
       setLoading(false)
     }

@@ -15,6 +15,8 @@ import { useForm } from 'react-hook-form'
 import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
 import useCreateCandidate from '@/app/hooks/candidates/useCreateEmployee'
+import useCheckUnique from '@/app/hooks/utils/useCheckUnique'
+import { cleanPhone } from '@/app/validators/validation'
 import CandidateFormScreen from '../../Form/CandidateFormScreen'
 import { CreateCandidateData } from '@/app/types/candidate/candidate'
 
@@ -33,7 +35,9 @@ export default function CreateCandidate(props: CreateCandidateProps) {
     setValue,
     formState: { errors },
     clearErrors,
+    setError,
   } = useForm<CreateCandidateData>({
+    mode: 'onChange', // Validate on change for immediate feedback
     defaultValues: {
       user: {
         username: '',
@@ -73,6 +77,8 @@ export default function CreateCandidate(props: CreateCandidateProps) {
   ] = useState(false)
 
   const { createCandidate, loading, error } = useCreateCandidate()
+  const { checkUnique } = useCheckUnique('candidates')
+  const { checkUnique: checkEmployeeUnique } = useCheckUnique('employees')
   const { startLoading, stopLoading } = useGlobalLoading()
 
   // UseEffects
@@ -103,6 +109,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
       formData?.user?.email,
       formData?.user?.firstName,
       formData?.user?.lastName,
+      formData?.user?.phoneNumber,
       formData?.user?.role,
       formData?.user?.company,
     ]
@@ -111,27 +118,190 @@ export default function CreateCandidate(props: CreateCandidateProps) {
       (field) => field !== '' && field !== undefined && field !== null
     )
 
-    setCanSubmit(isEmployeeDataValid && isUserDataValid)
-  }, [formData])
+    setCanSubmit(
+      isEmployeeDataValid && isUserDataValid && Object.keys(errors).length === 0
+    )
+  }, [formData, errors])
 
   //functions
   const formSubmit = async (data: CreateCandidateData) => {
-    if (Object.keys(errors).length > 0) {
+    // Custom validation for fields not handled by react-hook-form
+    let hasErrors = false
+
+    // Validate jobTitles
+    if (!data.jobTitles || data.jobTitles.length === 0) {
+      setError('jobTitles', {
+        type: 'required',
+        message: 'Cargo/Função é obrigatório',
+      })
+      hasErrors = true
+    }
+
+    // Validate geographic location
+    if (!data.geographicLocation?.city) {
+      setError('geographicLocation.city', {
+        type: 'required',
+        message: 'Cidade é obrigatória',
+      })
+      hasErrors = true
+    }
+
+    if (!data.geographicLocation?.municipality) {
+      setError('geographicLocation.municipality', {
+        type: 'required',
+        message: 'Concelho é obrigatório',
+      })
+      hasErrors = true
+    }
+
+    // Validate availability status
+    if (!data.availabilityStatus) {
+      setError('availabilityStatus', {
+        type: 'required',
+        message: 'Disponibilidade é obrigatória',
+      })
+      hasErrors = true
+    }
+
+    if (Object.keys(errors).length > 0 || hasErrors) {
       notifications.show({
         title: 'Erro',
         color: 'red',
         message: 'Preencha todos os campos obrigatórios antes de submeter.',
         position: 'top-right',
       })
-    } else {
-      try {
-        startLoading()
-        await createCandidate(data)
-      } catch (err) {
-        console.log(err)
-      } finally {
-        stopLoading()
+
+      return
+    }
+
+    try {
+      // Re-check uniqueness on submit (normalize inputs first). This is a final client-side check
+      // to avoid accidental duplicate submissions; the server is still authoritative.
+      if (data?.user) {
+        const email = data.user.email?.toString().trim().toLowerCase() || ''
+        const phoneRaw = data.user.phoneNumber?.toString() || ''
+        const phone = cleanPhone(phoneRaw)
+
+        // check both candidates & employees to ensure cross-entity uniqueness
+        const existsInCandidates = email ? await checkUnique(email) : false
+        const existsInEmployees = email
+          ? await checkEmployeeUnique(email)
+          : false
+
+        if (existsInCandidates || existsInEmployees) {
+          setError('user.email' as any, {
+            type: 'unique',
+            message: 'Este email já se encontra em uso.',
+          })
+          notifications.show({
+            title: 'Erro',
+            color: 'red',
+            message: 'Este email já se encontra em uso.',
+            position: 'top-right',
+          })
+
+          return
+        }
+
+        // phone check (only when present)
+        if (phone) {
+          const existsPhoneInCandidates = await checkUnique(phone)
+          const existsPhoneInEmployees = await checkEmployeeUnique(phone)
+          if (existsPhoneInCandidates || existsPhoneInEmployees) {
+            setError('user.phoneNumber' as any, {
+              type: 'unique',
+              message: 'Este número já se encontra em uso',
+            })
+            notifications.show({
+              title: 'Erro',
+              color: 'red',
+              message: 'Este número já se encontra em uso',
+              position: 'top-right',
+            })
+
+            return
+          }
+        }
       }
+
+      startLoading()
+      const result = await createCandidate(data)
+
+      // If result contains validation errors from API
+      if (result && typeof result === 'object' && !(result as any).id) {
+        // Handle API validation errors
+        const validationErrors = result as any
+        // If server returned a raw DB detail string (eg. duplicate key), map it
+        // to the correct field and clear the opposite field so we don't
+        // mis-attribute the error (eg. email showing when phone is duplicate).
+        if (validationErrors?.detail) {
+          const detail = String(validationErrors.detail || '').toLowerCase()
+          if (
+            /phone_number/i.test(detail) ||
+            /unique_user_phone/i.test(detail)
+          ) {
+            const m = detail.match(/\)=\((?:[^,]+),\s*([^)]+)\)/)
+            const phoneFound = m?.[1]?.trim()
+            const msg = phoneFound
+              ? `Este número já está associado a outro candidato.`
+              : 'Este número já se encontra em uso.'
+            // clear any stale email error
+            clearErrors && clearErrors('user.email')
+            setError('user.phoneNumber' as any, {
+              type: 'server',
+              message: msg,
+            })
+
+            return
+          }
+          if (/email/i.test(detail) || /unique_user_email/i.test(detail)) {
+            const m = detail.match(/\)=\((?:[^,]+),\s*([^)@\s]+@[^)\s]+)/)
+            const emailFound = m?.[1]?.trim()
+            const msg = emailFound
+              ? `Este email já está associado a outro candidato.`
+              : 'Este email já se encontra em uso.'
+            // clear any stale phone error
+            clearErrors && clearErrors('user.phoneNumber')
+            setError('user.email' as any, { type: 'server', message: msg })
+
+            return
+          }
+        }
+        if (validationErrors.user?.phone_number) {
+          setError('user.phoneNumber', {
+            type: 'server',
+            message: validationErrors.user.phone_number[0],
+          })
+        }
+
+        // Handle other potential validation errors
+        Object.keys(validationErrors).forEach((key) => {
+          if (key === 'user' && typeof validationErrors[key] === 'object') {
+            Object.keys(validationErrors[key]).forEach((userKey) => {
+              const errorMessages = validationErrors[key][userKey]
+              if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+                // Translate common backend messages to user-friendly Portuguese
+                let msg = errorMessages[0]
+                if (
+                  userKey === 'email' &&
+                  /already exists|in use|exists/i.test(msg)
+                ) {
+                  msg = 'Este email já se encontra em uso.'
+                }
+
+                setError(`user.${userKey}` as any, {
+                  type: 'server',
+                  message: msg,
+                })
+              }
+            })
+          }
+        })
+      }
+    } catch (err) {
+      console.log(err)
+    } finally {
+      stopLoading()
     }
   }
 
@@ -169,6 +339,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
           formData={formData}
           register={register}
           setValue={setValue}
+          setError={setError}
           errors={errors}
           clearErrors={clearErrors}
           watch={watch}
@@ -187,7 +358,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
             text={'Criar'}
             type="submit"
             size={'medium'}
-            disabled={Object.keys(errors).length > 0 || !canSubmit}
+            disabled={!canSubmit}
             id="btn-repair-action"
             textDisabled="Preencha todos os campos obrigatórios"
           />

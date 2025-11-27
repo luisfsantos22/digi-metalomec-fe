@@ -56,11 +56,7 @@ const FormCheckbox: React.FC<FormCheckboxProps> = ({
     >
       <Text
         text={label}
-        styles={
-          internalErrorStyles && error
-            ? 'text-digired1624-semibold'
-            : labelStyles
-        }
+        styles={labelStyles}
         required={mandatory}
       />
       <div className="flex flex-col gap-0.5 w-full">
