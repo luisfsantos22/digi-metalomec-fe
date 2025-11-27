@@ -243,7 +243,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
             const m = detail.match(/\)=\((?:[^,]+),\s*([^)]+)\)/)
             const phoneFound = m?.[1]?.trim()
             const msg = phoneFound
-              ? `Este número ${phoneFound} já está associado a outro candidato.`
+              ? `Este número já está associado a outro candidato.`
               : 'Este número já se encontra em uso.'
             // clear any stale email error
             clearErrors && clearErrors('user.email')
@@ -258,7 +258,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
             const m = detail.match(/\)=\((?:[^,]+),\s*([^)@\s]+@[^)\s]+)/)
             const emailFound = m?.[1]?.trim()
             const msg = emailFound
-              ? `Este email ${emailFound} já está associado a outro candidato.`
+              ? `Este email já está associado a outro candidato.`
               : 'Este email já se encontra em uso.'
             // clear any stale phone error
             clearErrors && clearErrors('user.phoneNumber')

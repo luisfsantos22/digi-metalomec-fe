@@ -300,7 +300,7 @@ export default function EditCandidate() {
           }}
           onConfirm={() => {
             // Redirect to dashboard or previous page
-            window.location.href = '/dashboard?module=candidates'
+            router.back()
           }}
           title="Sair da Edição de um Candidato"
           message="Tem a certeza que pretende sair?"

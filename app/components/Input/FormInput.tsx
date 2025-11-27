@@ -160,11 +160,7 @@ const FormInput = (props: FormInputProps) => {
     >
       <Text
         text={label}
-        styles={
-          (internalErrorStyles && error) || realTimeError
-            ? 'text-digired1420-semibold'
-            : labelStyles
-        }
+        styles={labelStyles}
         required={mandatory}
       />
       <div className="flex flex-col gap-0.5 w-full">

@@ -465,7 +465,7 @@ export default function EditEmployee() {
           }}
           onConfirm={() => {
             // Redirect to dashboard or previous page
-            window.location.href = '/dashboard?module=employees'
+            router.back()
           }}
           title="Sair da Edição de um Colaborador"
           message="Tem a certeza que pretende sair?"
