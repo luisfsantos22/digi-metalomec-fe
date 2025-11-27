@@ -236,12 +236,14 @@ const FormInput = (props: FormInputProps) => {
             </button>
           )}
         </div>
-        {(internalErrorStyles && error) || realTimeError ? (
-          <Text
-            text={error || realTimeError || ''}
-            styles="text-digired1212-normal"
-          />
-        ) : null}
+        <div className="min-h-[16px] flex items-start">
+          {(internalErrorStyles && error) || realTimeError ? (
+            <Text
+              text={error || realTimeError || ''}
+              styles="text-digired1212-normal"
+            />
+          ) : null}
+        </div>
       </div>
     </div>
   )

@@ -27,7 +27,7 @@ export const messages = {
   nationalId: 'Deve ter exatamente 8 dígitos',
   socialSecurity: 'Deve ter exatamente 11 dígitos',
   ehic: 'Deve ter exatamente 20 dígitos',
-  postalCode: 'Deve ter formato XXXX-XXX',
+  postalCode: 'Deve formatar: XXXX-XXX',
   email: 'Deve ter formato válido de email',
 }
 
