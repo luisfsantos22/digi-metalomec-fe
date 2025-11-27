@@ -114,8 +114,75 @@ export default function EditCandidate() {
         startLoading()
         const result = await editCandidate(candidateId, data)
 
+        // If API returned validation errors (returned from hook), map them
         if (result && typeof result === 'object' && !(result as any).id) {
           const validationErrors = result as any
+
+          // If server returned a raw DB constraint 'detail' or 'error' string
+          // (duplicate key / unique constraint), try to map it to the correct
+          // field so we show a focused inline error and a notification.
+          const rawDetail =
+            (typeof validationErrors?.detail === 'string' &&
+              validationErrors.detail) ||
+            (typeof validationErrors?.error === 'string' &&
+              validationErrors.error) ||
+            ''
+
+          if (rawDetail && rawDetail.length > 0) {
+            const detail = String(rawDetail).toLowerCase()
+
+            if (
+              /phone_number/i.test(detail) ||
+              /unique_user_phone/i.test(detail)
+            ) {
+              // attempt to extract the phone value from the message
+              const m = detail.match(/\)=\((?:[^,]+),\s*([^)]+)\)/)
+              const phoneFound = m?.[1]?.trim()
+              const msg = phoneFound
+                ? `Este número já está associado a outro candidato.`
+                : 'Este número já se encontra em uso.'
+
+              // Clear any stale email error that might be present
+              clearErrors && clearErrors('user.email')
+
+              setError('user.phoneNumber' as any, {
+                type: 'server',
+                message: msg,
+              })
+              notifications.show({
+                title: 'Erro',
+                color: 'red',
+                message: msg,
+                position: 'top-right',
+              })
+
+              stopLoading()
+
+              return
+            }
+
+            if (/email/i.test(detail) || /unique_user_email/i.test(detail)) {
+              const m = detail.match(/\)=\((?:[^,]+),\s*([^)@\s]+@[^)\s]+)/)
+              const emailFound = m?.[1]?.trim()
+              const msg = emailFound
+                ? `Este email já está associado a outro candidato.`
+                : 'Este email já se encontra em uso.'
+
+              // Clear any stale phone error
+              clearErrors && clearErrors('user.phoneNumber')
+              setError('user.email' as any, { type: 'server', message: msg })
+              notifications.show({
+                title: 'Erro',
+                color: 'red',
+                message: msg,
+                position: 'top-right',
+              })
+
+              stopLoading()
+
+              return
+            }
+          }
           const toCamel = (s: string) =>
             s.replace(/_([a-z])/g, (m, p1) => p1.toUpperCase())
 
@@ -190,7 +257,7 @@ export default function EditCandidate() {
         </div>
         <Text
           header="h1"
-          text={`Editar Colaborador - ${formData?.internalIdentifier}`}
+          text={`Editar Candidato - ${formData?.internalIdentifier}`}
           styles="lg:w-1/3 w-full lg:text-[32px] text-[20px] lg:leading-[40px] leading-[25px] font-semibold text-digiblack self-center text-center"
         />
         <div className="lg:w-1/3 lg:block hidden"></div>

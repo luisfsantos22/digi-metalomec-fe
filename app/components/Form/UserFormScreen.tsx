@@ -20,6 +20,7 @@ import {
   messages as validatorsMessages,
   cleanPhone,
 } from '@/app/validators/validation'
+
 type UserFormScreenProps = {
   formData: CreateEmployeeData
   register: UseFormRegister<CreateEmployeeData>
@@ -69,27 +70,47 @@ const UserFormScreen = (props: UserFormScreenProps) => {
       <Row title="Informação Básica">
         <FormInput
           query={firstName}
-          setQuery={(e) => setValue('user.firstName', e as unknown as string)}
-          error={errors.user?.firstName ? 'Nome é obrigatório' : undefined}
+          setQuery={(e) =>
+            setValue('user.firstName', e as unknown as string, {
+              shouldValidate: true,
+            })
+          }
+          error={errors.user?.firstName?.message}
           placeholder="José"
           inputType="text"
           mandatory={true}
+          width="lg:w-1/4 w-full"
           label="Nome"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          width="lg:w-1/4 w-full"
-          {...register('user.firstName', { required: true })}
+          {...register('user.firstName', {
+            required: validatorsMessages.firstNameReq,
+            pattern: {
+              value: validatorsPatterns.firstName,
+              message: validatorsMessages.firstName,
+            },
+          })}
         />
         <FormInput
           query={lastName}
-          setQuery={(e) => setValue('user.lastName', e as unknown as string)}
-          error={errors.user?.lastName ? 'Apelido é obrigatório' : undefined}
+          setQuery={(e) =>
+            setValue('user.lastName', e as unknown as string, {
+              shouldValidate: true,
+            })
+          }
+          error={errors.user?.lastName?.message}
           placeholder="Silva"
           inputType="text"
           mandatory={true}
           label="Apelido"
-          labelStyles="text-digiblack1420-semibold flex gap-1"
           width="lg:w-1/4 w-full"
-          {...register('user.lastName', { required: true })}
+          labelStyles="text-digiblack1420-semibold flex gap-1"
+          {...register('user.lastName', {
+            required: validatorsMessages.lastNameReq,
+            pattern: {
+              value: validatorsPatterns.lastName,
+              message: validatorsMessages.lastName,
+            },
+          })}
         />
         <FormInput
           query={nationality}
@@ -110,7 +131,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           label="Username (gerado automaticamente)"
           labelStyles="text-digiblack1420-semibold flex gap-1"
           width="lg:w-1/4 w-full"
-          additionalText={temporaryEmail ? 'Email Temporário' : undefined}
+          //additionalText={temporaryEmail ? 'Email Temporário' : undefined}
         />
       </Row>
       <Row>
@@ -165,65 +186,42 @@ const UserFormScreen = (props: UserFormScreenProps) => {
         <FormInput
           query={email}
           setQuery={(e) => {
-            if (errors?.user?.email) clearErrors && clearErrors('user.email')
-            setValue('user.email', e as unknown as string)
+            clearErrors && clearErrors('user.email')
+            setValue('user.email', e as unknown as string, {
+              shouldValidate: true,
+            })
           }}
-          onBlur={async () => {
-            if (action === 'create' && email) {
-              const existsInEmployees = await checkUnique(email as string)
-              const existsInCandidates = await checkCandidatesUnique(
-                email as string
-              )
-              if (existsInEmployees || existsInCandidates) {
-                setError('user.email' as any, {
-                  type: 'unique',
-                  message: 'Este email já se encontra em uso',
-                })
-              }
-            }
-          }}
-          error={
-            errors.user?.email?.message ??
-            (errors.user?.email ? 'Email é obrigatório' : undefined)
-          }
+          error={errors.user?.email?.message}
           placeholder="jose.carlos@email.com"
           inputType="email"
           mandatory={true}
           label="Email"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          validation={{
-            required: true,
-            pattern: validatorsPatterns.email,
-          }}
-          {...register('user.email', { required: true })}
+          {...register('user.email', {
+            required: 'Email é obrigatório',
+            pattern: {
+              value: validatorsPatterns.email,
+              message: validatorsMessages.email,
+            },
+          })}
           width="lg:w-3/4 w-full"
           disabled={action === 'edit'}
         />
         <FormInput
           query={phoneNumber ? phoneNumber : ''}
           setQuery={(v) => {
-            if (errors?.user?.phoneNumber)
-              clearErrors && clearErrors('user.phoneNumber')
-            setValue('user.phoneNumber', v as unknown as string)
-          }}
-          onBlur={async () => {
-            if (action === 'create' && phoneNumber) {
-              const cleaned = cleanPhone(phoneNumber as string)
-              const existsInEmployees = await checkUnique(cleaned)
-              const existsInCandidates = await checkCandidatesUnique(cleaned)
-              if (existsInEmployees || existsInCandidates) {
-                setError('user.phoneNumber' as any, {
-                  type: 'unique',
-                  message: 'Este número já se encontra em uso',
-                })
-              }
-            }
+            clearErrors && clearErrors('user.phoneNumber')
+            setValue('user.phoneNumber', v as string, {
+              shouldValidate: true,
+            })
           }}
           placeholder="912 345 678"
           inputType="tel"
           mandatory={true}
           label="Número de Telemóvel"
           labelStyles="text-digiblack1420-semibold flex gap-1"
+          width="lg:w-1/4 w-full"
+          error={errors?.user?.phoneNumber?.message}
           validation={{
             required: true,
             pattern: validatorsPatterns.phone,
@@ -234,12 +232,12 @@ const UserFormScreen = (props: UserFormScreenProps) => {
               if (!value) return true
               const cleaned = value
                 .toString()
-                .replace(/[\s\-\(\)\.]/g, '')
+                .replace(/[\s\-()).]/g, '')
                 .replace(/^\+?351/, '')
               const emergency = formData?.emergencyContact?.phone
                 ? formData.emergencyContact.phone
                     .toString()
-                    .replace(/[\s\-\(\)\.]/g, '')
+                    .replace(/[\s\-()).]/g, '')
                     .replace(/^\+?351/, '')
                 : ''
               if (emergency && cleaned === emergency)
@@ -251,7 +249,6 @@ const UserFormScreen = (props: UserFormScreenProps) => {
               )
             },
           })}
-          width="lg:w-1/4 w-full"
         />
       </Row>
       <Row>
@@ -275,12 +272,11 @@ const UserFormScreen = (props: UserFormScreenProps) => {
               const mainPhone = formData?.user?.phoneNumber
               if (value || phone || relationship) {
                 if (!value) return 'Preencha o nome do contato de emergência'
-                const cleanedName = value
-                  ?.toString()
-                  .replace(/[\s\-\(\)\.]/g, '')
+                const cleanedName = value?.toString().replace(/[\s\-().]/g, '')
                 const cleanedMain = mainPhone
-                  ? mainPhone.toString().replace(/[\s\-\(\)\.]/g, '')
+                  ? mainPhone.toString().replace(/[\s\-().]/g, '')
                   : ''
+
                 // keep validation minimal: only require the name if other emergency fields exist
                 return true
               }
@@ -313,12 +309,12 @@ const UserFormScreen = (props: UserFormScreenProps) => {
                 if (!value) return 'Preencha o telemóvel de emergência'
                 const cleaned = value
                   .toString()
-                  .replace(/[\s\-\(\)\.]/g, '')
+                  .replace(/[\s\-().]/g, '')
                   .replace(/^\+?351/, '')
                 const mainPhone = formData?.user?.phoneNumber
                   ? formData.user.phoneNumber
                       .toString()
-                      .replace(/[\s\-\(\)\.]/g, '')
+                      .replace(/[\s\-().]/g, '')
                       .replace(/^\+?351/, '')
                   : ''
                 if (mainPhone && cleaned === mainPhone) {

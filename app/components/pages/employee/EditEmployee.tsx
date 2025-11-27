@@ -164,19 +164,32 @@ export default function EditEmployee() {
         if (result && typeof result === 'object' && !(result as any).id) {
           const validationErrors = result as any
 
-          // If server returned a raw DB constraint detail (e.g. duplicate key), try to map
-          // it to the correct field so the user sees a precise error message.
-          if (typeof validationErrors?.detail === 'string') {
-            const detail: string = validationErrors.detail
+          // If server returned a raw DB constraint 'detail' or 'error' string
+          // (duplicate key / unique constraint), try to map it to the correct
+          // field so we show a focused inline error and a notification.
+          const rawDetail =
+            (typeof validationErrors?.detail === 'string' &&
+              validationErrors.detail) ||
+            (typeof validationErrors?.error === 'string' &&
+              validationErrors.error) ||
+            ''
+
+          if (rawDetail && rawDetail.length > 0) {
+            const detail = String(rawDetail).toLowerCase()
+
             if (
               /phone_number/i.test(detail) ||
               /unique_user_phone/i.test(detail)
             ) {
+              // attempt to extract the phone value from the message
               const m = detail.match(/\)=\((?:[^,]+),\s*([^)]+)\)/)
               const phoneFound = m?.[1]?.trim()
               const msg = phoneFound
                 ? `Este número já está associado a outro colaborador.`
                 : 'Este número já se encontra em uso.'
+
+              // Clear any stale email error that might be present
+              clearErrors && clearErrors('user.email')
 
               setError('user.phoneNumber' as any, {
                 type: 'server',
@@ -195,7 +208,14 @@ export default function EditEmployee() {
             }
 
             if (/email/i.test(detail) || /unique_user_email/i.test(detail)) {
-              const msg = 'Este email já se encontra em uso.'
+              const m = detail.match(/\)=\((?:[^,]+),\s*([^)@\s]+@[^)\s]+)/)
+              const emailFound = m?.[1]?.trim()
+              const msg = emailFound
+                ? `Este email já está associado a outro colaborador.`
+                : 'Este email já se encontra em uso.'
+
+              // Clear any stale phone error
+              clearErrors && clearErrors('user.phoneNumber')
               setError('user.email' as any, { type: 'server', message: msg })
               notifications.show({
                 title: 'Erro',

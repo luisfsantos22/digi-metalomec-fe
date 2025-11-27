@@ -80,9 +80,6 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
       setSelectedJobTitle(jobTitles[0])
     }
   }, [jobTitles])
-
-  // errors are shown in the form UI via the `errors` prop — avoid noisy console logging
-
   const { checkUnique } = useCheckUnique('candidates')
   const { checkUnique: checkEmployeeUnique } = useCheckUnique('employees')
 
@@ -108,10 +105,10 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             label="Nome"
             labelStyles="text-digiblack1420-semibold flex gap-1"
             {...register('user.firstName', {
-              required: 'Nome é obrigatório',
-              minLength: {
-                value: 2,
-                message: 'Nome deve ter pelo menos 2 caracteres',
+              required: validatorsMessages.firstNameReq,
+              pattern: {
+                value: validatorsPatterns.firstName,
+                message: validatorsMessages.firstName,
               },
             })}
           />
@@ -130,10 +127,10 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             width="lg:w-1/4 w-full"
             labelStyles="text-digiblack1420-semibold flex gap-1"
             {...register('user.lastName', {
-              required: 'Apelido é obrigatório',
-              minLength: {
-                value: 2,
-                message: 'Apelido deve ter pelo menos 2 caracteres',
+              required: validatorsMessages.lastNameReq,
+              pattern: {
+                value: validatorsPatterns.lastName,
+                message: validatorsMessages.lastName,
               },
             })}
           />
@@ -199,21 +196,6 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
                 shouldValidate: true,
               })
             }}
-            onBlur={async () => {
-              if (action === 'create' && email) {
-                const exists = await checkUnique(email as string)
-                // also check employees to make email/phone unique across both
-                const existsInEmployees = await checkEmployeeUnique(
-                  email as string
-                )
-                if (exists || existsInEmployees) {
-                  setError('user.email' as any, {
-                    type: 'unique',
-                    message: 'Este email já se encontra em uso',
-                  })
-                }
-              }
-            }}
             error={errors.user?.email?.message}
             placeholder="jose.carlos@email.com"
             inputType="email"
@@ -246,23 +228,8 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
             width="lg:w-1/4 w-full"
             error={errors.user?.phoneNumber?.message}
             validation={{ required: true, pattern: validatorsPatterns.phone }}
-            onBlur={async () => {
-              if (action === 'create' && phoneNumber) {
-                const cleanedPhone = cleanPhone(phoneNumber as string)
-                const exists = await checkUnique(cleanedPhone)
-                const existsInEmployees =
-                  await checkEmployeeUnique(cleanedPhone)
-                if (exists || existsInEmployees) {
-                  setError('user.phoneNumber' as any, {
-                    type: 'unique',
-                    message: 'Este número já se encontra em uso',
-                  })
-                }
-              }
-            }}
             {...register('user.phoneNumber', {
               required: 'Número de telemóvel é obrigatório',
-              // pattern removed: use custom `validate` which normalizes input before checking
               validate: (value) => {
                 if (!value) return true
                 const cleaned = value
