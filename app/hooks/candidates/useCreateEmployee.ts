@@ -7,7 +7,7 @@ import { CANDIDATE_ENDPOINTS, EMPLOYEE_ENDPOINTS } from '../api/endpoints'
 import snakecaseKeys from 'snakecase-keys'
 
 interface UseCreateCandidateResult {
-  createCandidate: (candidateData: any) => Promise<string | null>
+  createCandidate: (candidateData: any) => Promise<string | null | any>
   loading: boolean
   error: string | null
 }
@@ -33,31 +33,33 @@ const useCreateCandidate = (): UseCreateCandidateResult => {
           },
         }
       )
+      
+      // Check if response is actually an error string (backend returns 200 with error text)
+      if (typeof response?.data === 'string' && response.data.includes('duplicate key')) {
+        const validationErrors = {
+          detail: response.data
+        }
+        return validationErrors
+      }
+      
       const id = response?.data?.id || null
-      notifications.show({
-        title: 'Sucesso',
-        color: 'green',
-        message: 'Candidato criado com sucesso!',
-        position: 'top-right',
-      })
-      router.push(`/candidate/details/${id}/`)
+      
+      if (id) {
+        notifications.show({
+          title: 'Sucesso',
+          color: 'green',
+          message: 'Candidato criado com sucesso!',
+          position: 'top-right',
+        })
+        router.push(`/candidate/details/${id}/`)
+      }
 
       return id
     } catch (err: any) {
       const validationErrors = err?.response?.data
       setError(validationErrors || 'Failed to create candidate')
 
-      if (validationErrors && Object.keys(validationErrors).length > 0) {
-        return validationErrors
-      }
-
-      notifications.show({
-        title: 'Erro',
-        color: 'red',
-        message: 'Falha ao criar o candidato. Tente novamente.',
-        position: 'top-right',
-      })
-
+      // Return validation errors to be handled by the component
       return validationErrors
     } finally {
       setLoading(false)

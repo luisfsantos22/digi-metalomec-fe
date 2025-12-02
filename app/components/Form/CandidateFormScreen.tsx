@@ -18,7 +18,6 @@ import {
   messages as validatorsMessages,
   cleanPhone,
 } from '@/app/validators/validation'
-import useCheckUnique from '@/app/hooks/utils/useCheckUnique'
 import useJobTitlesSearchQuery from '@/app/hooks/employees/useJobTitlesSearchQuery'
 import { useEffect, useState } from 'react'
 import { GenericJobTitle } from '@/app/types/utils/job-title'
@@ -80,8 +79,6 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
       setSelectedJobTitle(jobTitles[0])
     }
   }, [jobTitles])
-  const { checkUnique } = useCheckUnique('candidates')
-  const { checkUnique: checkEmployeeUnique } = useCheckUnique('employees')
 
   return (
     <>

@@ -198,10 +198,9 @@ export default function EditEmployee() {
               notifications.show({
                 title: 'Erro',
                 color: 'red',
-                message: msg,
+                message: 'Erro ao editar colaborador.',
                 position: 'top-right',
               })
-
               stopLoading()
 
               return
@@ -220,10 +219,9 @@ export default function EditEmployee() {
               notifications.show({
                 title: 'Erro',
                 color: 'red',
-                message: msg,
+                message: 'Erro ao editar colaborador.',
                 position: 'top-right',
               })
-
               stopLoading()
 
               return
@@ -266,7 +264,6 @@ export default function EditEmployee() {
         }
         stopLoading()
       } catch (err) {
-        console.log(err)
         stopLoading()
       }
     }

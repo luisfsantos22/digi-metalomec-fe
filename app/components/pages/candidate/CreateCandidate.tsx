@@ -15,7 +15,6 @@ import { useForm } from 'react-hook-form'
 import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
 import useCreateCandidate from '@/app/hooks/candidates/useCreateEmployee'
-import useCheckUnique from '@/app/hooks/utils/useCheckUnique'
 import { cleanPhone } from '@/app/validators/validation'
 import CandidateFormScreen from '../../Form/CandidateFormScreen'
 import { CreateCandidateData } from '@/app/types/candidate/candidate'
@@ -77,8 +76,6 @@ export default function CreateCandidate(props: CreateCandidateProps) {
   ] = useState(false)
 
   const { createCandidate, loading, error } = useCreateCandidate()
-  const { checkUnique } = useCheckUnique('candidates')
-  const { checkUnique: checkEmployeeUnique } = useCheckUnique('employees')
   const { startLoading, stopLoading } = useGlobalLoading()
 
   // UseEffects
@@ -167,7 +164,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
       notifications.show({
         title: 'Erro',
         color: 'red',
-        message: 'Preencha todos os campos obrigatórios antes de submeter.',
+        message: 'Falha ao criar o colaborador. Tente novamente.',
         position: 'top-right',
       })
 
@@ -175,55 +172,6 @@ export default function CreateCandidate(props: CreateCandidateProps) {
     }
 
     try {
-      // Re-check uniqueness on submit (normalize inputs first). This is a final client-side check
-      // to avoid accidental duplicate submissions; the server is still authoritative.
-      if (data?.user) {
-        const email = data.user.email?.toString().trim().toLowerCase() || ''
-        const phoneRaw = data.user.phoneNumber?.toString() || ''
-        const phone = cleanPhone(phoneRaw)
-
-        // check both candidates & employees to ensure cross-entity uniqueness
-        const existsInCandidates = email ? await checkUnique(email) : false
-        const existsInEmployees = email
-          ? await checkEmployeeUnique(email)
-          : false
-
-        if (existsInCandidates || existsInEmployees) {
-          setError('user.email' as any, {
-            type: 'unique',
-            message: 'Este email já se encontra em uso.',
-          })
-          notifications.show({
-            title: 'Erro',
-            color: 'red',
-            message: 'Este email já se encontra em uso.',
-            position: 'top-right',
-          })
-
-          return
-        }
-
-        // phone check (only when present)
-        if (phone) {
-          const existsPhoneInCandidates = await checkUnique(phone)
-          const existsPhoneInEmployees = await checkEmployeeUnique(phone)
-          if (existsPhoneInCandidates || existsPhoneInEmployees) {
-            setError('user.phoneNumber' as any, {
-              type: 'unique',
-              message: 'Este número já se encontra em uso',
-            })
-            notifications.show({
-              title: 'Erro',
-              color: 'red',
-              message: 'Este número já se encontra em uso',
-              position: 'top-right',
-            })
-
-            return
-          }
-        }
-      }
-
       startLoading()
       const result = await createCandidate(data)
 
@@ -251,6 +199,12 @@ export default function CreateCandidate(props: CreateCandidateProps) {
               type: 'server',
               message: msg,
             })
+            notifications.show({
+              title: 'Erro',
+              color: 'red',
+              message: 'Erro ao criar candidato.',
+              position: 'top-right',
+            })
 
             return
           }
@@ -263,6 +217,12 @@ export default function CreateCandidate(props: CreateCandidateProps) {
             // clear any stale phone error
             clearErrors && clearErrors('user.phoneNumber')
             setError('user.email' as any, { type: 'server', message: msg })
+            notifications.show({
+              title: 'Erro',
+              color: 'red',
+              message: 'Erro ao criar candidato.',
+              position: 'top-right',
+            })
 
             return
           }
@@ -297,9 +257,12 @@ export default function CreateCandidate(props: CreateCandidateProps) {
             })
           }
         })
+        
+        stopLoading()
+        return
       }
     } catch (err) {
-      console.log(err)
+      stopLoading()
     } finally {
       stopLoading()
     }

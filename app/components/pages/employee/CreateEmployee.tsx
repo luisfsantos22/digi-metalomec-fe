@@ -16,7 +16,6 @@ import {
 import { useGlobalLoading } from '@/app/hooks/utils/useGlobalLoading'
 import { useLanguagesQuery } from '@/app/hooks/utils/useLanguagesQuery'
 import useCreateEmployee from '@/app/hooks/employees/useCreateEmployee'
-import useCheckUnique from '@/app/hooks/utils/useCheckUnique'
 import { cleanPhone } from '@/app/validators/validation'
 import {
   CreateEmployeeData,
@@ -144,8 +143,6 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
   } = useGetEducationalQualifications()
 
   const { createEmployee, loading, error } = useCreateEmployee()
-  const { checkUnique } = useCheckUnique('employees')
-  const { checkUnique: checkCandidatesUnique } = useCheckUnique('candidates')
   const { startLoading, stopLoading } = useGlobalLoading()
 
   // UseEffects
@@ -191,7 +188,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
       notifications.show({
         title: 'Erro',
         color: 'red',
-        message: 'Preencha todos os campos obrigatórios antes de submeter.',
+        message: 'Falha ao criar o colaborador. Tente novamente.',
         position: 'top-right',
       })
     } else {
@@ -206,50 +203,6 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
           data.emergencyContact = undefined
         }
       }
-      // Re-check uniqueness at submit time to avoid accidental duplicates
-      if (data?.user) {
-        const email = data.user.email?.toString().trim().toLowerCase() || ''
-        const phoneRaw = data.user.phoneNumber?.toString() || ''
-        const phone = cleanPhone(phoneRaw)
-
-        if (email) {
-          const existsEmployees = await checkUnique(email)
-          const existsCandidates = await checkCandidatesUnique(email)
-          if (existsEmployees || existsCandidates) {
-            setError('user.email' as any, {
-              type: 'unique',
-              message: 'Este email já se encontra em uso.',
-            })
-            notifications.show({
-              title: 'Erro',
-              color: 'red',
-              message: 'Este email já se encontra em uso.',
-              position: 'top-right',
-            })
-
-            return
-          }
-        }
-
-        if (phone) {
-          const existsEmployees = await checkUnique(phone)
-          const existsCandidates = await checkCandidatesUnique(phone)
-          if (existsEmployees || existsCandidates) {
-            setError('user.phoneNumber' as any, {
-              type: 'unique',
-              message: 'Este número já se encontra em uso.',
-            })
-            notifications.show({
-              title: 'Erro',
-              color: 'red',
-              message: 'Este número já se encontra em uso.',
-              position: 'top-right',
-            })
-
-            return
-          }
-        }
-      }
 
       try {
         startLoading()
@@ -262,58 +215,55 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
           // If server returned a raw DB constraint detail (e.g. duplicate key), parse it
           // and map to the correct field so users get a precise message.
           if (typeof validationErrors?.detail === 'string') {
-            const detail: string = validationErrors.detail
+            const detail = String(validationErrors.detail).toLowerCase()
 
-            // phone duplication (Postgres error shows phone_number in the constraint)
             if (
               /phone_number/i.test(detail) ||
               /unique_user_phone/i.test(detail)
             ) {
-              // attempt to extract the phone value from the detail
               const m = detail.match(/\)=\((?:[^,]+),\s*([^)]+)\)/)
               const phoneFound = m?.[1]?.trim()
               const msg = phoneFound
-                ? `Este número ${phoneFound} já está associado a outro colaborador.`
+                ? `Este número já está associado a outro colaborador.`
                 : 'Este número já se encontra em uso.'
 
-              // Clear any potentially stale email errors that might have been set earlier
               clearErrors && clearErrors('user.email')
-
               setError('user.phoneNumber' as any, {
                 type: 'server',
                 message: msg,
               })
-
               notifications.show({
                 title: 'Erro',
                 color: 'red',
-                message: msg,
+                message: 'Erro ao criar colaborador.',
                 position: 'top-right',
               })
-
               stopLoading()
 
               return
             }
 
-            // email duplication fallback
             if (/email/i.test(detail) || /unique_user_email/i.test(detail)) {
-              const msg = 'Este email já se encontra em uso.'
-              // clear any stale phone errors before setting email error
+              const m = detail.match(/\)=\((?:[^,]+),\s*([^)@\s]+@[^)\s]+)/)
+              const emailFound = m?.[1]?.trim()
+              const msg = emailFound
+                ? `Este email já está associado a outro colaborador.`
+                : 'Este email já se encontra em uso.'
+
               clearErrors && clearErrors('user.phoneNumber')
               setError('user.email' as any, { type: 'server', message: msg })
               notifications.show({
                 title: 'Erro',
                 color: 'red',
-                message: msg,
+                message: 'Erro ao criar colaborador.',
                 position: 'top-right',
               })
-
               stopLoading()
 
               return
             }
           }
+
           // Map user-specific errors (e.g. phone/email)
           if (
             validationErrors.user &&
@@ -343,6 +293,12 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
                 }
 
                 setError(fieldName, { type: 'server', message: msg })
+                notifications.show({
+                  title: 'Erro',
+                  color: 'red',
+                  message: 'Erro ao criar colaborador.',
+                  position: 'top-right',
+                })
               }
             })
           }
@@ -356,9 +312,12 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
               }
             }
           })
+          
+          stopLoading()
+          return
         }
       } catch (err) {
-        console.log(err)
+        stopLoading()
       } finally {
         stopLoading()
       }

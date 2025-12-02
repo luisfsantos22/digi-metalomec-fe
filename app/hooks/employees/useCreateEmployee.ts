@@ -7,7 +7,7 @@ import { EMPLOYEE_ENDPOINTS } from '../api/endpoints'
 import snakecaseKeys from 'snakecase-keys'
 
 interface UseCreateEmployeeResult {
-  createEmployee: (employeeData: any) => Promise<string | null>
+  createEmployee: (employeeData: any) => Promise<string | null | any>
   loading: boolean
   error: string | null
 }
@@ -24,6 +24,7 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
 
     const payload = snakecaseKeys(employeeData, { deep: true })
     try {
+      console.log('Starting createEmployee request...')
       const response = await axiosInstance.post(
         EMPLOYEE_ENDPOINTS.employees,
         JSON.stringify(payload),
@@ -33,34 +34,42 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
           },
         }
       )
+      console.log('Request successful, response:', response)
+      
+      // Check if response is actually an error string (backend returns 200 with error text)
+      if (typeof response?.data === 'string' && response.data.includes('duplicate key')) {
+        console.log('Detected error string in 200 response')
+        const validationErrors = {
+          detail: response.data
+        }
+        console.log('Returning validationErrors:', validationErrors)
+        return validationErrors
+      }
+      
       const id = response?.data?.id || null
-      notifications.show({
-        title: 'Sucesso',
-        color: 'green',
-        message: 'Colaborador criado com sucesso!',
-        position: 'top-right',
-      })
-      router.push(`/employee/details/${id}/`)
+      
+      if (id) {
+        notifications.show({
+          title: 'Sucesso',
+          color: 'green',
+          message: 'Colaborador criado com sucesso!',
+          position: 'top-right',
+        })
+        router.push(`/employee/details/${id}/`)
+      }
 
+      console.log('Returning id:', id)
       return id
     } catch (err: any) {
+      console.log('useCreateEmployee catch block:', err)
+      console.log('err.response:', err?.response)
+      console.log('err.response.data:', err?.response?.data)
+      
       const validationErrors = err?.response?.data
       setError(validationErrors || 'Failed to create employee')
 
-      // If server provided structured validation errors (or detail), return them to the caller
-      // and let the UI determine the exact message to display (prevents generic toast for validation failures).
-      if (validationErrors && Object.keys(validationErrors).length > 0) {
-        return validationErrors
-      }
-
-      // Unknown/non-validation error -> show generic notification and return
-      notifications.show({
-        title: 'Erro',
-        color: 'red',
-        message: 'Falha ao criar o colaborador. Tente novamente.',
-        position: 'top-right',
-      })
-
+      console.log('Returning validationErrors:', validationErrors)
+      // Return validation errors to be handled by the component
       return validationErrors
     } finally {
       setLoading(false)

@@ -236,7 +236,7 @@ const FormInput = (props: FormInputProps) => {
             </button>
           )}
         </div>
-        <div className="min-h-[16px] flex items-start">
+        <div className="min-h-4 flex items-start">
           {(internalErrorStyles && error) || realTimeError ? (
             <Text
               text={error || realTimeError || ''}

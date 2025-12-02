@@ -152,10 +152,9 @@ export default function EditCandidate() {
               notifications.show({
                 title: 'Erro',
                 color: 'red',
-                message: msg,
+                message: 'Erro ao editar candidato.',
                 position: 'top-right',
               })
-
               stopLoading()
 
               return
@@ -174,7 +173,7 @@ export default function EditCandidate() {
               notifications.show({
                 title: 'Erro',
                 color: 'red',
-                message: msg,
+                message: 'Erro ao editar candidato.',
                 position: 'top-right',
               })
 
@@ -220,7 +219,6 @@ export default function EditCandidate() {
         }
         stopLoading()
       } catch (err) {
-        console.log(err)
         stopLoading()
       }
     }

@@ -14,7 +14,6 @@ import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from '@/app/constants'
 import Separator from '../Separator/Separator'
 import UploadImage from '../Upload/UploadImage'
 import useUploadImage from '@/app/hooks/useUploadImage'
-import useCheckUnique from '@/app/hooks/utils/useCheckUnique'
 import {
   patterns as validatorsPatterns,
   messages as validatorsMessages,
@@ -59,8 +58,6 @@ const UserFormScreen = (props: UserFormScreenProps) => {
   } = formData
 
   const { uploadImage, loading, error } = useUploadImage()
-  const { checkUnique } = useCheckUnique('employees')
-  const { checkUnique: checkCandidatesUnique } = useCheckUnique('candidates')
 
   return (
     <ContainerCard
@@ -131,7 +128,6 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           label="Username (gerado automaticamente)"
           labelStyles="text-digiblack1420-semibold flex gap-1"
           width="lg:w-1/4 w-full"
-          //additionalText={temporaryEmail ? 'Email Temporário' : undefined}
         />
       </Row>
       <Row>
