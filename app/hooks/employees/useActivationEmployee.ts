@@ -35,6 +35,8 @@ export function useActivationEmployee() {
           message: `Colaborador ${toActivate ? 'ativado' : 'desativado'} com sucesso!`,
           position: 'top-right',
         })
+
+        return true
       } else {
         notifications.show({
           title: 'Erro',

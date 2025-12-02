@@ -2,12 +2,10 @@ import { useState } from 'react'
 import axiosInstance from '../axiosInstance'
 import { CANDIDATE_ENDPOINTS } from '../api/endpoints'
 import { notifications } from '@mantine/notifications'
-import { useRouter } from 'next/navigation'
 
 export function useActivationCandidate() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
 
   const activationCandidate = async (
     id: string | undefined,
@@ -15,7 +13,7 @@ export function useActivationCandidate() {
     accessToken: string
   ) => {
     if (!id) {
-      return
+      return false
     }
     setLoading(true)
     setError(null)
@@ -37,7 +35,8 @@ export function useActivationCandidate() {
           message: `Candidato ${toActivate ? 'ativado' : 'desativado'} com sucesso!`,
           position: 'top-right',
         })
-        router.push('/employee/details/' + id)
+
+        return true
       } else {
         notifications.show({
           title: 'Erro',
@@ -48,6 +47,8 @@ export function useActivationCandidate() {
         setError(
           `Um erro ocorreu ao ${toActivate ? 'ativar' : 'desativar'} o candidato`
         )
+
+        return false
       }
     } catch {
       notifications.show({
@@ -57,6 +58,8 @@ export function useActivationCandidate() {
         position: 'top-right',
       })
       setError('Um erro ocorreu ao eliminar o candidato')
+
+      return false
     } finally {
       setLoading(false)
     }
