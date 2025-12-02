@@ -204,13 +204,15 @@ const SearchInput = (props: SearchInputProps) => {
             )}
           </div>
           {/* Error message */}
-          {error && (
-            <Text
-              text={error}
-              styles="text-red-500"
-              id="error-message"
-            />
-          )}
+          <div className="min-h-4 flex items-start">
+            {error && (
+              <Text
+                text={error}
+                styles="text-red-500"
+                id="error-message"
+              />
+            )}
+          </div>
         </div>
         {/* Helper text */}
         {helperText && (
