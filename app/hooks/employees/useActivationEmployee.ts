@@ -13,7 +13,7 @@ export function useActivationEmployee() {
     accessToken: string
   ) => {
     if (!id) {
-      return
+      return false
     }
     setLoading(true)
     setError(null)
@@ -47,6 +47,8 @@ export function useActivationEmployee() {
         setError(
           `Um erro ocorreu ao ${toActivate ? 'ativar' : 'desativar'} o colaborador`
         )
+
+        return false
       }
     } catch {
       notifications.show({
@@ -56,6 +58,8 @@ export function useActivationEmployee() {
         position: 'top-right',
       })
       setError('Um erro ocorreu ao eliminar o colaborador')
+
+      return false
     } finally {
       setLoading(false)
     }
