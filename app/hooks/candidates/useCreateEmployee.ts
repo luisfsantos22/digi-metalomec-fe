@@ -33,17 +33,20 @@ const useCreateCandidate = (): UseCreateCandidateResult => {
           },
         }
       )
-      
+
       // Check if response is actually an error string (backend returns 200 with error text)
-      if (typeof response?.data === 'string' && response.data.includes('duplicate key')) {
+      if (
+        typeof response?.data === 'string' &&
+        response.data.includes('duplicate key')
+      ) {
         const validationErrors = {
-          detail: response.data
+          detail: response.data,
         }
         return validationErrors
       }
-      
+
       const id = response?.data?.id || null
-      
+
       if (id) {
         notifications.show({
           title: 'Sucesso',

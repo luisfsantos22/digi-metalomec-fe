@@ -16,6 +16,7 @@ import {
 import { useGlobalLoading } from '@/app/hooks/utils/useGlobalLoading'
 import { useLanguagesQuery } from '@/app/hooks/utils/useLanguagesQuery'
 import useCreateEmployee from '@/app/hooks/employees/useCreateEmployee'
+import { parseDuplicateError, mapUserValidationErrors } from '@/app/utils/errorHandlers'
 import { cleanPhone } from '@/app/validators/validation'
 import {
   CreateEmployeeData,
@@ -211,99 +212,38 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
         // If API returned validation errors, map them to form fields
         if (result && typeof result === 'object' && !(result as any).id) {
           const validationErrors = result as any
-
-          // If server returned a raw DB constraint detail (e.g. duplicate key), parse it
-          // and map to the correct field so users get a precise message.
-          if (typeof validationErrors?.detail === 'string') {
-            const detail = String(validationErrors.detail).toLowerCase()
-
-            if (
-              /phone_number/i.test(detail) ||
-              /unique_user_phone/i.test(detail)
-            ) {
-              const m = detail.match(/\)=\((?:[^,]+),\s*([^)]+)\)/)
-              const phoneFound = m?.[1]?.trim()
-              const msg = phoneFound
-                ? `Este número já está associado a outro colaborador.`
-                : 'Este número já se encontra em uso.'
-
-              clearErrors && clearErrors('user.email')
-              setError('user.phoneNumber' as any, {
-                type: 'server',
-                message: msg,
-              })
-              notifications.show({
-                title: 'Erro',
-                color: 'red',
-                message: 'Erro ao criar colaborador.',
-                position: 'top-right',
-              })
-              stopLoading()
-
-              return
+          
+          // Try to parse duplicate error (phone or email)
+          const duplicateError = parseDuplicateError(validationErrors, 'colaborador')
+          
+          if (duplicateError) {
+            // Clear opposite field error to avoid confusion
+            if (duplicateError.field === 'phoneNumber') {
+              clearErrors?.('user.email')
+            } else {
+              clearErrors?.('user.phoneNumber')
             }
-
-            if (/email/i.test(detail) || /unique_user_email/i.test(detail)) {
-              const m = detail.match(/\)=\((?:[^,]+),\s*([^)@\s]+@[^)\s]+)/)
-              const emailFound = m?.[1]?.trim()
-              const msg = emailFound
-                ? `Este email já está associado a outro colaborador.`
-                : 'Este email já se encontra em uso.'
-
-              clearErrors && clearErrors('user.phoneNumber')
-              setError('user.email' as any, { type: 'server', message: msg })
-              notifications.show({
-                title: 'Erro',
-                color: 'red',
-                message: 'Erro ao criar colaborador.',
-                position: 'top-right',
-              })
-              stopLoading()
-
-              return
-            }
-          }
-
-          // Map user-specific errors (e.g. phone/email)
-          if (
-            validationErrors.user &&
-            typeof validationErrors.user === 'object'
-          ) {
-            Object.keys(validationErrors.user).forEach((userKey) => {
-              const messages = validationErrors.user[userKey]
-              if (Array.isArray(messages) && messages.length > 0) {
-                // register field path name
-                const fieldName = `user.${userKey}` as any
-                let msg = messages[0]
-
-                // Localize some common backend messages
-                if (
-                  userKey === 'email' &&
-                  /already exists|in use|exists/i.test(msg)
-                ) {
-                  msg = 'Este email já se encontra em uso.'
-                }
-                if (
-                  (userKey === 'phone' ||
-                    userKey === 'phone_number' ||
-                    userKey === 'phoneNumber') &&
-                  /already exists|in use|exists/i.test(msg)
-                ) {
-                  msg = 'Este número já se encontra em uso.'
-                }
-
-                setError(fieldName, { type: 'server', message: msg })
-                notifications.show({
-                  title: 'Erro',
-                  color: 'red',
-                  message: 'Erro ao criar colaborador.',
-                  position: 'top-right',
-                })
-              }
+            
+            setError(`user.${duplicateError.field}` as any, {
+              type: 'server',
+              message: duplicateError.message,
             })
+            
+            notifications.show({
+              title: 'Erro',
+              color: 'red',
+              message: 'Erro ao criar colaborador.',
+              position: 'top-right',
+            })
+            
+            stopLoading()
+            return
           }
-
-          // Generic mapping for other top-level errors
+          
+          // Map any other user validation errors
+          mapUserValidationErrors(validationErrors, setError)
+          
+          // Map other top-level errors
           Object.keys(validationErrors).forEach((key) => {
             if (key !== 'user') {
               const msgs = validationErrors[key]

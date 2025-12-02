@@ -16,6 +16,7 @@ import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
 import useCreateCandidate from '@/app/hooks/candidates/useCreateEmployee'
 import { cleanPhone } from '@/app/validators/validation'
+import { parseDuplicateError, mapUserValidationErrors } from '@/app/utils/errorHandlers'
 import CandidateFormScreen from '../../Form/CandidateFormScreen'
 import { CreateCandidateData } from '@/app/types/candidate/candidate'
 
@@ -177,86 +178,37 @@ export default function CreateCandidate(props: CreateCandidateProps) {
 
       // If result contains validation errors from API
       if (result && typeof result === 'object' && !(result as any).id) {
-        // Handle API validation errors
         const validationErrors = result as any
-        // If server returned a raw DB detail string (eg. duplicate key), map it
-        // to the correct field and clear the opposite field so we don't
-        // mis-attribute the error (eg. email showing when phone is duplicate).
-        if (validationErrors?.detail) {
-          const detail = String(validationErrors.detail || '').toLowerCase()
-          if (
-            /phone_number/i.test(detail) ||
-            /unique_user_phone/i.test(detail)
-          ) {
-            const m = detail.match(/\)=\((?:[^,]+),\s*([^)]+)\)/)
-            const phoneFound = m?.[1]?.trim()
-            const msg = phoneFound
-              ? `Este número já está associado a outro candidato.`
-              : 'Este número já se encontra em uso.'
-            // clear any stale email error
-            clearErrors && clearErrors('user.email')
-            setError('user.phoneNumber' as any, {
-              type: 'server',
-              message: msg,
-            })
-            notifications.show({
-              title: 'Erro',
-              color: 'red',
-              message: 'Erro ao criar candidato.',
-              position: 'top-right',
-            })
-
-            return
+        
+        // Try to parse duplicate error (phone or email)
+        const duplicateError = parseDuplicateError(validationErrors, 'candidato')
+        
+        if (duplicateError) {
+          // Clear opposite field error to avoid confusion
+          if (duplicateError.field === 'phoneNumber') {
+            clearErrors?.('user.email')
+          } else {
+            clearErrors?.('user.phoneNumber')
           }
-          if (/email/i.test(detail) || /unique_user_email/i.test(detail)) {
-            const m = detail.match(/\)=\((?:[^,]+),\s*([^)@\s]+@[^)\s]+)/)
-            const emailFound = m?.[1]?.trim()
-            const msg = emailFound
-              ? `Este email já está associado a outro candidato.`
-              : 'Este email já se encontra em uso.'
-            // clear any stale phone error
-            clearErrors && clearErrors('user.phoneNumber')
-            setError('user.email' as any, { type: 'server', message: msg })
-            notifications.show({
-              title: 'Erro',
-              color: 'red',
-              message: 'Erro ao criar candidato.',
-              position: 'top-right',
-            })
-
-            return
-          }
-        }
-        if (validationErrors.user?.phone_number) {
-          setError('user.phoneNumber', {
+          
+          setError(`user.${duplicateError.field}` as any, {
             type: 'server',
-            message: validationErrors.user.phone_number[0],
+            message: duplicateError.message,
           })
+          
+          notifications.show({
+            title: 'Erro',
+            color: 'red',
+            message: 'Erro ao criar candidato.',
+            position: 'top-right',
+          })
+          
+          stopLoading()
+          return
         }
-
-        // Handle other potential validation errors
-        Object.keys(validationErrors).forEach((key) => {
-          if (key === 'user' && typeof validationErrors[key] === 'object') {
-            Object.keys(validationErrors[key]).forEach((userKey) => {
-              const errorMessages = validationErrors[key][userKey]
-              if (Array.isArray(errorMessages) && errorMessages.length > 0) {
-                // Translate common backend messages to user-friendly Portuguese
-                let msg = errorMessages[0]
-                if (
-                  userKey === 'email' &&
-                  /already exists|in use|exists/i.test(msg)
-                ) {
-                  msg = 'Este email já se encontra em uso.'
-                }
-
-                setError(`user.${userKey}` as any, {
-                  type: 'server',
-                  message: msg,
-                })
-              }
-            })
-          }
-        })
+        
+        // Map any other user validation errors
+        mapUserValidationErrors(validationErrors, setError)
         
         stopLoading()
         return
