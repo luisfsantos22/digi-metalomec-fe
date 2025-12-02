@@ -18,15 +18,22 @@ export function parseDuplicateError(
   validationErrors: any,
   entityType: 'candidato' | 'colaborador'
 ): ParsedError | null {
-  const detail = validationErrors?.detail?.toLowerCase() || ''
+  // Support multiple backend response shapes (detail, error, message)
+  const rawDetail =
+    validationErrors?.detail ||
+    validationErrors?.error ||
+    validationErrors?.message ||
+    ''
+  const detail = rawDetail.toLowerCase()
   const userErrors = validationErrors?.user || {}
 
   // Helper to get error message from structured errors
-  const getErrorMsg = (field: any) => 
+  const getErrorMsg = (field: any) =>
     field ? (Array.isArray(field) ? field[0] : field) : ''
 
   // Helper to check if error is duplicate-related
-  const isDuplicateError = (msg: string) => /already exists|in use|exists/i.test(msg)
+  const isDuplicateError = (msg: string) =>
+    /already exists|in use|exists/i.test(msg)
 
   // Define field configurations
   const fields = [
@@ -36,7 +43,8 @@ export function parseDuplicateError(
       userField: userErrors.phone_number,
       extractRegex: /\)=\((?:[^,]+),\s*([^)]+)\)/,
       messages: {
-        withValue: (val: string) => `Este número já está associado a outro ${entityType}.`,
+        withValue: (val: string) =>
+          `Este número já está associado a outro ${entityType}.`,
         generic: 'Este número já se encontra em uso.',
       },
     },
@@ -46,7 +54,8 @@ export function parseDuplicateError(
       userField: userErrors.email,
       extractRegex: /\)=\((?:[^,]+),\s*([^)@\s]+@[^)\s]+)/,
       messages: {
-        withValue: (val: string) => `Este email já está associado a outro ${entityType}.`,
+        withValue: (val: string) =>
+          `Este email já está associado a outro ${entityType}.`,
         generic: 'Este email já se encontra em uso.',
       },
     },
@@ -85,12 +94,13 @@ export function mapUserValidationErrors(
   const userErrors = validationErrors?.user
   if (!userErrors || typeof userErrors !== 'object') return
 
-  const toCamel = (s: string) => s.replace(/_([a-z])/g, (_, p1) => p1.toUpperCase())
-  
+  const toCamel = (s: string) =>
+    s.replace(/_([a-z])/g, (_, p1) => p1.toUpperCase())
+
   const translateMessage = (key: string, msg: string): string => {
     const isDuplicate = /already exists|in use|exists/i.test(msg)
     if (!isDuplicate) return msg
-    
+
     if (key === 'email') return 'Este email já se encontra em uso.'
     if (['phone', 'phone_number', 'phoneNumber'].includes(key)) {
       return 'Este número já se encontra em uso.'
