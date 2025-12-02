@@ -16,11 +16,7 @@ import {
 import { useGlobalLoading } from '@/app/hooks/utils/useGlobalLoading'
 import { useLanguagesQuery } from '@/app/hooks/utils/useLanguagesQuery'
 import useCreateEmployee from '@/app/hooks/employees/useCreateEmployee'
-import {
-  parseDuplicateError,
-  mapUserValidationErrors,
-} from '@/app/utils/errorHandlers'
-import { cleanPhone } from '@/app/validators/validation'
+import { applyValidationErrorsToForm } from '@/app/utils/errorHandlers'
 import {
   CreateEmployeeData,
   EmployeeCertification,
@@ -216,25 +212,15 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
         if (result && typeof result === 'object' && !(result as any).id) {
           const validationErrors = result as any
 
-          // Try to parse duplicate error (phone or email)
-          const duplicateError = parseDuplicateError(
+          // Centralized handling: duplicate, user, and top-level errors
+          const handled = applyValidationErrorsToForm(
             validationErrors,
+            setError,
+            clearErrors,
             'colaborador'
           )
 
-          if (duplicateError) {
-            // Clear opposite field error to avoid confusion
-            if (duplicateError.field === 'phoneNumber') {
-              clearErrors?.('user.email')
-            } else {
-              clearErrors?.('user.phoneNumber')
-            }
-
-            setError(`user.${duplicateError.field}` as any, {
-              type: 'server',
-              message: duplicateError.message,
-            })
-
+          if (handled) {
             notifications.show({
               title: 'Erro',
               color: 'red',
@@ -243,26 +229,8 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
             })
 
             stopLoading()
-
             return
           }
-
-          // Map any other user validation errors
-          mapUserValidationErrors(validationErrors, setError)
-
-          // Map other top-level errors
-          Object.keys(validationErrors).forEach((key) => {
-            if (key !== 'user') {
-              const msgs = validationErrors[key]
-              if (Array.isArray(msgs) && msgs.length > 0) {
-                setError(key as any, { type: 'server', message: msgs[0] })
-              }
-            }
-          })
-
-          stopLoading()
-
-          return
         }
       } catch (err) {
         stopLoading()

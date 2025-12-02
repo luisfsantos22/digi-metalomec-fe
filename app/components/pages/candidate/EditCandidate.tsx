@@ -17,6 +17,7 @@ import CandidateFormScreen from '../../Form/CandidateFormScreen'
 import { useUpdateCandidate } from '@/app/hooks/candidates/useUpdateCandidate'
 import useGetCandidate from '@/app/hooks/candidates/useGetCandidate'
 import { CreateCandidateData } from '@/app/types/candidate/candidate'
+import { applyValidationErrorsToForm } from '@/app/utils/errorHandlers'
 
 export default function EditCandidate() {
   const searchParams = useSearchParams()
@@ -118,100 +119,26 @@ export default function EditCandidate() {
         if (result && typeof result === 'object' && !(result as any).id) {
           const validationErrors = result as any
 
-          // If server returned a raw DB constraint 'detail' or 'error' string
-          // (duplicate key / unique constraint), try to map it to the correct
-          // field so we show a focused inline error and a notification.
-          const rawDetail =
-            (typeof validationErrors?.detail === 'string' &&
-              validationErrors.detail) ||
-            (typeof validationErrors?.error === 'string' &&
-              validationErrors.error) ||
-            ''
+          // Centralized handling: duplicate, user, and top-level errors
+          const handled = applyValidationErrorsToForm(
+            validationErrors,
+            setError,
+            clearErrors,
+            'candidato'
+          )
 
-          if (rawDetail && rawDetail.length > 0) {
-            const detail = String(rawDetail).toLowerCase()
-
-            if (
-              /phone_number/i.test(detail) ||
-              /unique_user_phone/i.test(detail)
-            ) {
-              // attempt to extract the phone value from the message
-              const m = detail.match(/\)=\((?:[^,]+),\s*([^)]+)\)/)
-              const phoneFound = m?.[1]?.trim()
-              const msg = phoneFound
-                ? `Este número já está associado a outro candidato.`
-                : 'Este número já se encontra em uso.'
-
-              // Clear any stale email error that might be present
-              clearErrors && clearErrors('user.email')
-
-              setError('user.phoneNumber' as any, {
-                type: 'server',
-                message: msg,
-              })
-              notifications.show({
-                title: 'Erro',
-                color: 'red',
-                message: 'Erro ao editar candidato.',
-                position: 'top-right',
-              })
-              stopLoading()
-
-              return
-            }
-
-            if (/email/i.test(detail) || /unique_user_email/i.test(detail)) {
-              const m = detail.match(/\)=\((?:[^,]+),\s*([^)@\s]+@[^)\s]+)/)
-              const emailFound = m?.[1]?.trim()
-              const msg = emailFound
-                ? `Este email já está associado a outro candidato.`
-                : 'Este email já se encontra em uso.'
-
-              // Clear any stale phone error
-              clearErrors && clearErrors('user.phoneNumber')
-              setError('user.email' as any, { type: 'server', message: msg })
-              notifications.show({
-                title: 'Erro',
-                color: 'red',
-                message: 'Erro ao editar candidato.',
-                position: 'top-right',
-              })
-
-              stopLoading()
-
-              return
-            }
-          }
-          const toCamel = (s: string) =>
-            s.replace(/_([a-z])/g, (m, p1) => p1.toUpperCase())
-
-          if (
-            validationErrors.user &&
-            typeof validationErrors.user === 'object'
-          ) {
-            Object.keys(validationErrors.user).forEach((userKey) => {
-              const errorMessages = validationErrors.user[userKey]
-              if (Array.isArray(errorMessages) && errorMessages.length > 0) {
-                const camel = toCamel(userKey)
-                setError(`user.${camel}` as any, {
-                  type: 'server',
-                  message: errorMessages[0],
-                })
-              }
+          if (handled) {
+            notifications.show({
+              title: 'Erro',
+              color: 'red',
+              message: 'Erro ao editar candidato.',
+              position: 'top-right',
             })
+
+            stopLoading()
+
+            return
           }
-
-          Object.keys(validationErrors).forEach((key) => {
-            if (key === 'user') return
-            const msgs = validationErrors[key]
-            if (Array.isArray(msgs) && msgs.length > 0) {
-              setError(key as any, { type: 'server', message: msgs[0] })
-            }
-          })
-
-          stopLoading()
-
-          return
         }
 
         if (result?.id) {

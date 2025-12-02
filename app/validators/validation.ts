@@ -1,9 +1,5 @@
 // Centralized validators for forms
 
-import { findSourceMap } from 'module'
-import { getFirstDynamicReason } from 'next/dist/server/app-render/dynamic-rendering'
-import { mergeDomains } from 'recharts/types/state/selectors/axisSelectors'
-
 export const patterns = {
   firstName: /^.{2,}$/, // at least 2 characters
   lastName: /^.{2,}$/, // at least 2 characters

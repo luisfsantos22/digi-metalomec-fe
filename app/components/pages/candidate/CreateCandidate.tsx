@@ -15,11 +15,7 @@ import { useForm } from 'react-hook-form'
 import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
 import useCreateCandidate from '@/app/hooks/candidates/useCreateEmployee'
-import { cleanPhone } from '@/app/validators/validation'
-import {
-  parseDuplicateError,
-  mapUserValidationErrors,
-} from '@/app/utils/errorHandlers'
+import { applyValidationErrorsToForm } from '@/app/utils/errorHandlers'
 import CandidateFormScreen from '../../Form/CandidateFormScreen'
 import { CreateCandidateData } from '@/app/types/candidate/candidate'
 
@@ -175,52 +171,36 @@ export default function CreateCandidate(props: CreateCandidateProps) {
       return
     }
 
-    try {
-      startLoading()
-      const result = await createCandidate(data)
+      try {
+        startLoading()
+        const result = await createCandidate(data)
 
-      // If result contains validation errors from API
-      if (result && typeof result === 'object' && !(result as any).id) {
-        const validationErrors = result as any
+        // If result contains validation errors from API
+        if (result && typeof result === 'object' && !(result as any).id) {
+          const validationErrors = result as any
 
-        // Try to parse duplicate error (phone or email)
-        const duplicateError = parseDuplicateError(
-          validationErrors,
-          'candidato'
-        )
+          // Centralized handling: duplicate, user, and top-level errors
+          const handled = applyValidationErrorsToForm(
+            validationErrors,
+            setError,
+            clearErrors,
+            'candidato'
+          )
 
-        if (duplicateError) {
-          // Clear opposite field error to avoid confusion
-          if (duplicateError.field === 'phoneNumber') {
-            clearErrors?.('user.email')
-          } else {
-            clearErrors?.('user.phoneNumber')
+          if (handled) {
+            // Caller shows notification and stops loading
+            notifications.show({
+              title: 'Erro',
+              color: 'red',
+              message: 'Erro ao criar candidato.',
+              position: 'top-right',
+            })
+
+            stopLoading()
+
+            return
           }
-
-          setError(`user.${duplicateError.field}` as any, {
-            type: 'server',
-            message: duplicateError.message,
-          })
-
-          notifications.show({
-            title: 'Erro',
-            color: 'red',
-            message: 'Erro ao criar candidato.',
-            position: 'top-right',
-          })
-
-          stopLoading()
-
-          return
         }
-
-        // Map any other user validation errors
-        mapUserValidationErrors(validationErrors, setError)
-
-        stopLoading()
-
-        return
-      }
     } catch (err) {
       stopLoading()
     } finally {
