@@ -144,12 +144,14 @@ const FormDropdownMultiple = (props: FormDropdownMultipleProps) => {
             ))}
           </div>
         </div>
-        {error && (
-          <Text
-            text={error}
-            styles="text-digired1212-normal"
-          />
-        )}
+        <div className="min-h-4 flex items-start">
+          {error && (
+            <Text
+              text={error}
+              styles="text-digired1212-normal"
+            />
+          )}
+        </div>
       </div>
     </div>
   )

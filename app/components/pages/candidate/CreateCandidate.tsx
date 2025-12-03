@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form'
 import { useAtom } from 'jotai'
 import { mainPageActiveTab } from '@/app/atoms'
 import useCreateCandidate from '@/app/hooks/candidates/useCreateEmployee'
+import { applyValidationErrorsToForm } from '@/app/utils/errorHandlers'
 import CandidateFormScreen from '../../Form/CandidateFormScreen'
 import { CreateCandidateData } from '@/app/types/candidate/candidate'
 
@@ -33,7 +34,9 @@ export default function CreateCandidate(props: CreateCandidateProps) {
     setValue,
     formState: { errors },
     clearErrors,
+    setError,
   } = useForm<CreateCandidateData>({
+    mode: 'onChange', // Validate on change for immediate feedback
     defaultValues: {
       user: {
         username: '',
@@ -103,6 +106,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
       formData?.user?.email,
       formData?.user?.firstName,
       formData?.user?.lastName,
+      formData?.user?.phoneNumber,
       formData?.user?.role,
       formData?.user?.company,
     ]
@@ -111,27 +115,96 @@ export default function CreateCandidate(props: CreateCandidateProps) {
       (field) => field !== '' && field !== undefined && field !== null
     )
 
-    setCanSubmit(isEmployeeDataValid && isUserDataValid)
-  }, [formData])
+    setCanSubmit(
+      isEmployeeDataValid && isUserDataValid && Object.keys(errors).length === 0
+    )
+  }, [formData, errors])
 
   //functions
   const formSubmit = async (data: CreateCandidateData) => {
-    if (Object.keys(errors).length > 0) {
+    // Custom validation for fields not handled by react-hook-form
+    let hasErrors = false
+
+    // Validate jobTitles
+    if (!data.jobTitles || data.jobTitles.length === 0) {
+      setError('jobTitles', {
+        type: 'required',
+        message: 'Cargo/Função é obrigatório',
+      })
+      hasErrors = true
+    }
+
+    // Validate geographic location
+    if (!data.geographicLocation?.city) {
+      setError('geographicLocation.city', {
+        type: 'required',
+        message: 'Cidade é obrigatória',
+      })
+      hasErrors = true
+    }
+
+    if (!data.geographicLocation?.municipality) {
+      setError('geographicLocation.municipality', {
+        type: 'required',
+        message: 'Concelho é obrigatório',
+      })
+      hasErrors = true
+    }
+
+    // Validate availability status
+    if (!data.availabilityStatus) {
+      setError('availabilityStatus', {
+        type: 'required',
+        message: 'Disponibilidade é obrigatória',
+      })
+      hasErrors = true
+    }
+
+    if (Object.keys(errors).length > 0 || hasErrors) {
       notifications.show({
         title: 'Erro',
         color: 'red',
-        message: 'Preencha todos os campos obrigatórios antes de submeter.',
+        message: 'Falha ao criar o candidato. Tente novamente.',
         position: 'top-right',
       })
-    } else {
-      try {
-        startLoading()
-        await createCandidate(data)
-      } catch (err) {
-        console.log(err)
-      } finally {
-        stopLoading()
+
+      return
+    }
+
+    try {
+      startLoading()
+      const result = await createCandidate(data)
+
+      // If result contains validation errors from API
+      if (result && typeof result === 'object' && !(result as any).id) {
+        const validationErrors = result as any
+
+        // Centralized handling: duplicate, user, and top-level errors
+        const handled = applyValidationErrorsToForm(
+          validationErrors,
+          setError,
+          clearErrors,
+          'candidato'
+        )
+
+        if (handled) {
+          // Caller shows notification and stops loading
+          notifications.show({
+            title: 'Erro',
+            color: 'red',
+            message: 'Erro ao criar candidato.',
+            position: 'top-right',
+          })
+
+          stopLoading()
+
+          return
+        }
       }
+    } catch (err) {
+      stopLoading()
+    } finally {
+      stopLoading()
     }
   }
 
@@ -169,6 +242,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
           formData={formData}
           register={register}
           setValue={setValue}
+          setError={setError}
           errors={errors}
           clearErrors={clearErrors}
           watch={watch}
@@ -187,7 +261,7 @@ export default function CreateCandidate(props: CreateCandidateProps) {
             text={'Criar'}
             type="submit"
             size={'medium'}
-            disabled={Object.keys(errors).length > 0 || !canSubmit}
+            disabled={!canSubmit}
             id="btn-repair-action"
             textDisabled="Preencha todos os campos obrigatórios"
           />

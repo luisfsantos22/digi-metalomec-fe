@@ -7,7 +7,7 @@ import { EMPLOYEE_ENDPOINTS } from '../api/endpoints'
 import snakecaseKeys from 'snakecase-keys'
 
 interface UseCreateEmployeeResult {
-  createEmployee: (employeeData: any) => Promise<string | null>
+  createEmployee: (employeeData: any) => Promise<string | null | any>
   loading: boolean
   error: string | null
 }
@@ -33,26 +33,33 @@ const useCreateEmployee = (): UseCreateEmployeeResult => {
           },
         }
       )
+
+      // Check if response is actually an error string (backend returns 200 with error text)
+      if (
+        typeof response?.data === 'string' &&
+        response.data.includes('duplicate key')
+      ) {
+        return { detail: response.data }
+      }
+
       const id = response?.data?.id || null
-      notifications.show({
-        title: 'Sucesso',
-        color: 'green',
-        message: 'Colaborador criado com sucesso!',
-        position: 'top-right',
-      })
-      router.push(`/employee/details/${id}/`)
+
+      if (id) {
+        notifications.show({
+          title: 'Sucesso',
+          color: 'green',
+          message: 'Colaborador criado com sucesso!',
+          position: 'top-right',
+        })
+        router.push(`/employee/details/${id}/`)
+      }
 
       return id
-    } catch {
-      setError('Failed to create employee')
-      notifications.show({
-        title: 'Erro',
-        color: 'red',
-        message: 'Falha ao criar o colaborador. Tente novamente.',
-        position: 'top-right',
-      })
+    } catch (err: any) {
+      const validationErrors = err?.response?.data
+      setError(validationErrors || 'Failed to create employee')
 
-      return null
+      return validationErrors
     } finally {
       setLoading(false)
     }

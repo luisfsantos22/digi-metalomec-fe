@@ -14,16 +14,31 @@ import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from '@/app/constants'
 import Separator from '../Separator/Separator'
 import UploadImage from '../Upload/UploadImage'
 import useUploadImage from '@/app/hooks/useUploadImage'
+import {
+  patterns as validatorsPatterns,
+  messages as validatorsMessages,
+  cleanPhone,
+} from '@/app/validators/validation'
+
 type UserFormScreenProps = {
   formData: CreateEmployeeData
   register: UseFormRegister<CreateEmployeeData>
   setValue: UseFormSetValue<CreateEmployeeData>
   errors: FieldErrors<CreateEmployeeData>
+  setError: UseFormSetError<CreateEmployeeData>
   clearErrors?: UseFormClearErrors<CreateEmployeeData>
   action: 'create' | 'edit'
 }
 const UserFormScreen = (props: UserFormScreenProps) => {
-  const { formData, register, setValue, errors, clearErrors, action } = props
+  const {
+    formData,
+    register,
+    setValue,
+    errors,
+    clearErrors,
+    action,
+    setError,
+  } = props
   const {
     user: { email, firstName, lastName, phoneNumber, temporaryEmail } = {},
     nif,
@@ -52,27 +67,47 @@ const UserFormScreen = (props: UserFormScreenProps) => {
       <Row title="Informação Básica">
         <FormInput
           query={firstName}
-          setQuery={(e) => setValue('user.firstName', e as unknown as string)}
-          error={errors.user?.firstName ? 'Nome é obrigatório' : undefined}
+          setQuery={(e) =>
+            setValue('user.firstName', e as unknown as string, {
+              shouldValidate: true,
+            })
+          }
+          error={errors.user?.firstName?.message}
           placeholder="José"
           inputType="text"
           mandatory={true}
+          width="lg:w-1/4 w-full"
           label="Nome"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          width="lg:w-1/4 w-full"
-          {...register('user.firstName', { required: true })}
+          {...register('user.firstName', {
+            required: validatorsMessages.firstNameReq,
+            pattern: {
+              value: validatorsPatterns.firstName,
+              message: validatorsMessages.firstName,
+            },
+          })}
         />
         <FormInput
           query={lastName}
-          setQuery={(e) => setValue('user.lastName', e as unknown as string)}
-          error={errors.user?.lastName ? 'Apelido é obrigatório' : undefined}
+          setQuery={(e) =>
+            setValue('user.lastName', e as unknown as string, {
+              shouldValidate: true,
+            })
+          }
+          error={errors.user?.lastName?.message}
           placeholder="Silva"
           inputType="text"
           mandatory={true}
           label="Apelido"
-          labelStyles="text-digiblack1420-semibold flex gap-1"
           width="lg:w-1/4 w-full"
-          {...register('user.lastName', { required: true })}
+          labelStyles="text-digiblack1420-semibold flex gap-1"
+          {...register('user.lastName', {
+            required: validatorsMessages.lastNameReq,
+            pattern: {
+              value: validatorsPatterns.lastName,
+              message: validatorsMessages.lastName,
+            },
+          })}
         />
         <FormInput
           query={nationality}
@@ -93,7 +128,6 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           label="Username (gerado automaticamente)"
           labelStyles="text-digiblack1420-semibold flex gap-1"
           width="lg:w-1/4 w-full"
-          additionalText={temporaryEmail ? 'Email Temporário' : undefined}
         />
       </Row>
       <Row>
@@ -147,26 +181,62 @@ const UserFormScreen = (props: UserFormScreenProps) => {
       <Row title="Contatos">
         <FormInput
           query={email}
-          setQuery={(e) => setValue('user.email', e as unknown as string)}
-          error={errors.user?.email ? 'Email é obrigatório' : undefined}
+          setQuery={(e) => {
+            clearErrors && clearErrors('user.email')
+            setValue('user.email', e as unknown as string, {
+              shouldValidate: true,
+            })
+          }}
+          error={errors.user?.email?.message}
           placeholder="jose.carlos@email.com"
           inputType="email"
           mandatory={true}
           label="Email"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('user.email', { required: true })}
+          {...register('user.email', {
+            required: 'Email é obrigatório',
+            pattern: {
+              value: validatorsPatterns.email,
+              message: validatorsMessages.email,
+            },
+          })}
           width="lg:w-3/4 w-full"
           disabled={action === 'edit'}
         />
         <FormInput
           query={phoneNumber ? phoneNumber : ''}
-          setQuery={setValue.bind(null, 'user.phoneNumber')}
+          setQuery={(v) => {
+            clearErrors && clearErrors('user.phoneNumber')
+            setValue('user.phoneNumber', v as string, {
+              shouldValidate: true,
+            })
+          }}
           placeholder="912 345 678"
           inputType="tel"
           mandatory={true}
           label="Número de Telemóvel"
           labelStyles="text-digiblack1420-semibold flex gap-1"
           width="lg:w-1/4 w-full"
+          error={errors?.user?.phoneNumber?.message}
+          validation={{
+            required: true,
+            pattern: validatorsPatterns.phone,
+          }}
+          {...register('user.phoneNumber', {
+            required: 'Número de telemóvel é obrigatório',
+            validate: (value) => {
+              if (!value) return true
+              const cleaned = cleanPhone(value)
+              const emergency = cleanPhone(formData?.emergencyContact?.phone)
+              if (emergency && cleaned === emergency)
+                return 'O número principal não pode ser o mesmo que o telemóvel de emergência'
+
+              return (
+                validatorsPatterns.phone.test(cleaned) ||
+                validatorsMessages.phone
+              )
+            },
+          })}
         />
       </Row>
       <Row>
@@ -187,8 +257,16 @@ const UserFormScreen = (props: UserFormScreenProps) => {
             validate: (value) => {
               const phone = formData?.emergencyContact?.phone
               const relationship = formData?.emergencyContact?.relationship
+              const mainPhone = formData?.user?.phoneNumber
               if (value || phone || relationship) {
-                return value ? true : 'Preencha o nome do contato de emergência'
+                if (!value) return 'Preencha o nome do contato de emergência'
+                const cleanedName = value?.toString().replace(/[\s\-().]/g, '')
+                const cleanedMain = mainPhone
+                  ? mainPhone.toString().replace(/[\s\-().]/g, '')
+                  : ''
+
+                // keep validation minimal: only require the name if other emergency fields exist
+                return true
               }
 
               return true
@@ -208,12 +286,25 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           inputType="tel"
           mandatory={false}
           error={errors?.emergencyContact?.phone?.message}
+          validation={{
+            pattern: validatorsPatterns.phone,
+          }}
           {...register('emergencyContact.phone', {
             validate: (value) => {
               const name = formData?.emergencyContact?.name
               const relationship = formData?.emergencyContact?.relationship
               if (value || name || relationship) {
-                return value ? true : 'Preencha o telemóvel de emergência'
+                if (!value) return 'Preencha o telemóvel de emergência'
+                const cleaned = cleanPhone(value)
+                const mainPhone = cleanPhone(formData?.user?.phoneNumber)
+                if (mainPhone && cleaned === mainPhone) {
+                  return 'O telemóvel de emergência não pode ser igual ao telemóvel principal'
+                }
+
+                return (
+                  validatorsPatterns.phone.test(cleaned) ||
+                  validatorsMessages.phone
+                )
               }
 
               return true
@@ -301,7 +392,15 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           width="lg:w-40 w-full"
           label="Código Postal"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('postalCode', { required: false })}
+          validation={{
+            pattern: validatorsPatterns.postalCode,
+          }}
+          {...register('postalCode', {
+            pattern: {
+              value: validatorsPatterns.postalCode,
+              message: validatorsMessages.postalCode,
+            },
+          })}
         />
       </Row>
       <Separator />
@@ -313,38 +412,62 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           inputType="number"
           label="NIF"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('nif', { required: false })}
+          validation={{ pattern: validatorsPatterns.nif }}
+          {...register('nif', {
+            pattern: {
+              value: validatorsPatterns.nif,
+              message: validatorsMessages.nif,
+            },
+          })}
         />
         <FormInput
           query={nationalId}
           setQuery={(e) => setValue('nationalId', e as unknown as string)}
-          placeholder="123456789"
+          placeholder="12345678"
           inputType="number"
           label="Número de Identificação Nacional (CC)"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('nationalId', { required: false })}
+          validation={{ pattern: validatorsPatterns.nationalId }}
+          {...register('nationalId', {
+            pattern: {
+              value: validatorsPatterns.nationalId,
+              message: validatorsMessages.nationalId,
+            },
+          })}
         />
         <FormInput
           query={socialSecurityNumber}
           setQuery={(e) =>
             setValue('socialSecurityNumber', e as unknown as string)
           }
-          placeholder="123456789"
+          placeholder="12345678901"
           inputType="number"
           label="Número de Segurança Social"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('socialSecurityNumber', { required: false })}
+          validation={{ pattern: validatorsPatterns.socialSecurity }}
+          {...register('socialSecurityNumber', {
+            pattern: {
+              value: validatorsPatterns.socialSecurity,
+              message: validatorsMessages.socialSecurity,
+            },
+          })}
         />
         <FormInput
           query={formData?.europeanHealthInsuranceCard}
           setQuery={(e) =>
             setValue('europeanHealthInsuranceCard', e as unknown as string)
           }
-          placeholder="123456789"
+          placeholder="12345678901234567890"
           inputType="number"
           label="Cartão Europeu de Seguro de Doença"
           labelStyles="text-digiblack1420-semibold flex gap-1"
-          {...register('europeanHealthInsuranceCard', { required: false })}
+          validation={{ pattern: validatorsPatterns.ehic }}
+          {...register('europeanHealthInsuranceCard', {
+            pattern: {
+              value: validatorsPatterns.ehic,
+              message: validatorsMessages.ehic,
+            },
+          })}
         />
       </Row>
     </ContainerCard>
