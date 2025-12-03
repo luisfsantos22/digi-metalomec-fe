@@ -97,9 +97,18 @@ export default function DetailsEmployee(props: DetailsEmployeeProps) {
     isActive: boolean,
     token: string
   ) => {
-    await activationEmployee(id, isActive, token)
+    const success = await activationEmployee(id, isActive, token)
     setAreYouSureToActivateOpen(false)
-    setActivationTrigger((prev) => prev + 1)
+
+    if (success) {
+      // Desativar colaborador (isActive=false) → move to candidates
+      if (!isActive) {
+        router.push(`/candidate/details/${id}`)
+      } else {
+        // Ativar → stays as employee, just refresh
+        setActivationTrigger((prev) => prev + 1)
+      }
+    }
   }
 
   return (
