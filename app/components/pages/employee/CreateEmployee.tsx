@@ -231,6 +231,8 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
             return
           }
         }
+      } catch (err) {
+        //Error handling(stopLoading is called in finally)
       } finally {
         stopLoading()
       }
