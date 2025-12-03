@@ -27,6 +27,7 @@ import { mainPageActiveTab } from '@/app/atoms'
 import useGetEmployee from '@/app/hooks/employees/useGetEmployee'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEditEmployee } from '@/app/hooks/employees/useUpdateEmployee'
+import { applyValidationErrorsToForm } from '@/app/utils/errorHandlers'
 
 export default function EditEmployee() {
   const searchParams = useSearchParams()
@@ -89,6 +90,7 @@ export default function EditEmployee() {
     handleSubmit,
     setValue,
     formState: { errors },
+    setError,
     clearErrors,
     reset,
   } = useForm<CreateEmployeeData>({
@@ -159,12 +161,37 @@ export default function EditEmployee() {
         startLoading()
         const result = await editEmployee(employeeId, data)
 
+        // If API returned validation errors (returned from hook), map them
+        if (result && typeof result === 'object' && !(result as any).id) {
+          const validationErrors = result as any
+
+          // Centralized handling: duplicate, user, and top-level errors
+          const handled = applyValidationErrorsToForm(
+            validationErrors,
+            setError,
+            clearErrors,
+            'colaborador'
+          )
+
+          if (handled) {
+            notifications.show({
+              title: 'Erro',
+              color: 'red',
+              message: 'Erro ao editar colaborador.',
+              position: 'top-right',
+            })
+
+            stopLoading()
+
+            return
+          }
+        }
+
         if (result?.id) {
           router.push(`/employee/details/${result.id}/`)
         }
         stopLoading()
       } catch (err) {
-        console.log(err)
         stopLoading()
       }
     }
@@ -228,6 +255,7 @@ export default function EditEmployee() {
                 formData={formData}
                 register={register}
                 setValue={setValue}
+                setError={setError}
                 errors={errors}
                 clearErrors={clearErrors}
                 action={'edit'}
@@ -362,7 +390,7 @@ export default function EditEmployee() {
           }}
           onConfirm={() => {
             // Redirect to dashboard or previous page
-            window.location.href = '/dashboard?module=employees'
+            router.back()
           }}
           title="Sair da Edição de um Colaborador"
           message="Tem a certeza que pretende sair?"

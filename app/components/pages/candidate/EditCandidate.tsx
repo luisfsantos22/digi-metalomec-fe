@@ -17,6 +17,7 @@ import CandidateFormScreen from '../../Form/CandidateFormScreen'
 import { useUpdateCandidate } from '@/app/hooks/candidates/useUpdateCandidate'
 import useGetCandidate from '@/app/hooks/candidates/useGetCandidate'
 import { CreateCandidateData } from '@/app/types/candidate/candidate'
+import { applyValidationErrorsToForm } from '@/app/utils/errorHandlers'
 
 export default function EditCandidate() {
   const searchParams = useSearchParams()
@@ -52,6 +53,7 @@ export default function EditCandidate() {
     handleSubmit,
     setValue,
     formState: { errors },
+    setError,
     clearErrors,
     reset,
   } = useForm<CreateCandidateData>({
@@ -113,12 +115,37 @@ export default function EditCandidate() {
         startLoading()
         const result = await editCandidate(candidateId, data)
 
+        // If API returned validation errors (returned from hook), map them
+        if (result && typeof result === 'object' && !(result as any).id) {
+          const validationErrors = result as any
+
+          // Centralized handling: duplicate, user, and top-level errors
+          const handled = applyValidationErrorsToForm(
+            validationErrors,
+            setError,
+            clearErrors,
+            'candidato'
+          )
+
+          if (handled) {
+            notifications.show({
+              title: 'Erro',
+              color: 'red',
+              message: 'Erro ao editar candidato.',
+              position: 'top-right',
+            })
+
+            stopLoading()
+
+            return
+          }
+        }
+
         if (result?.id) {
           router.push(`/candidate/details/${result.id}/`)
         }
         stopLoading()
       } catch (err) {
-        console.log(err)
         stopLoading()
       }
     }
@@ -155,7 +182,7 @@ export default function EditCandidate() {
         </div>
         <Text
           header="h1"
-          text={`Editar Colaborador - ${formData?.internalIdentifier}`}
+          text={`Editar Candidato - ${formData?.internalIdentifier}`}
           styles="lg:w-1/3 w-full lg:text-[32px] text-[20px] lg:leading-[40px] leading-[25px] font-semibold text-digiblack self-center text-center"
         />
         <div className="lg:w-1/3 lg:block hidden"></div>
@@ -168,6 +195,7 @@ export default function EditCandidate() {
           formData={formData}
           register={register}
           setValue={setValue}
+          setError={setError}
           errors={errors}
           watch={watch}
           action={'edit'}
@@ -197,7 +225,7 @@ export default function EditCandidate() {
           }}
           onConfirm={() => {
             // Redirect to dashboard or previous page
-            window.location.href = '/dashboard?module=candidates'
+            router.back()
           }}
           title="Sair da Edição de um Candidato"
           message="Tem a certeza que pretende sair?"

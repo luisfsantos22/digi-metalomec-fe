@@ -16,6 +16,7 @@ import {
 import { useGlobalLoading } from '@/app/hooks/utils/useGlobalLoading'
 import { useLanguagesQuery } from '@/app/hooks/utils/useLanguagesQuery'
 import useCreateEmployee from '@/app/hooks/employees/useCreateEmployee'
+import { applyValidationErrorsToForm } from '@/app/utils/errorHandlers'
 import {
   CreateEmployeeData,
   EmployeeCertification,
@@ -48,6 +49,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
     setValue,
     formState: { errors },
     clearErrors,
+    setError,
   } = useForm<CreateEmployeeData>({
     defaultValues: {
       user: {
@@ -97,6 +99,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
       district: '',
       country: '',
     },
+    mode: 'onChange',
   })
 
   const formData = watch()
@@ -185,7 +188,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
       notifications.show({
         title: 'Erro',
         color: 'red',
-        message: 'Preencha todos os campos obrigatórios antes de submeter.',
+        message: 'Falha ao criar o colaborador. Tente novamente.',
         position: 'top-right',
       })
     } else {
@@ -200,11 +203,36 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
           data.emergencyContact = undefined
         }
       }
+
       try {
         startLoading()
-        await createEmployee(data)
+        const result = await createEmployee(data)
+
+        // If API returned validation errors, map them to form fields
+        if (result && typeof result === 'object' && !(result as any).id) {
+          const validationErrors = result as any
+
+          // Centralized handling: duplicate, user, and top-level errors
+          const handled = applyValidationErrorsToForm(
+            validationErrors,
+            setError,
+            clearErrors,
+            'colaborador'
+          )
+
+          if (handled) {
+            notifications.show({
+              title: 'Erro',
+              color: 'red',
+              message: 'Erro ao criar colaborador.',
+              position: 'top-right',
+            })
+
+            return
+          }
+        }
       } catch (err) {
-        console.log(err)
+        //Error handling(stopLoading is called in finally)
       } finally {
         stopLoading()
       }
@@ -260,6 +288,7 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
                   register={register}
                   setValue={setValue}
                   errors={errors}
+                  setError={setError}
                   clearErrors={clearErrors}
                   action={'create'}
                 />
