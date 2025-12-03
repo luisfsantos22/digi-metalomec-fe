@@ -226,16 +226,8 @@ const UserFormScreen = (props: UserFormScreenProps) => {
             required: 'Número de telemóvel é obrigatório',
             validate: (value) => {
               if (!value) return true
-              const cleaned = value
-                .toString()
-                .replace(/[\s\-()).]/g, '')
-                .replace(/^\+?351/, '')
-              const emergency = formData?.emergencyContact?.phone
-                ? formData.emergencyContact.phone
-                    .toString()
-                    .replace(/[\s\-()).]/g, '')
-                    .replace(/^\+?351/, '')
-                : ''
+              const cleaned = cleanPhone(value)
+              const emergency = cleanPhone(formData?.emergencyContact?.phone)
               if (emergency && cleaned === emergency)
                 return 'O número principal não pode ser o mesmo que o telemóvel de emergência'
 
@@ -303,16 +295,8 @@ const UserFormScreen = (props: UserFormScreenProps) => {
               const relationship = formData?.emergencyContact?.relationship
               if (value || name || relationship) {
                 if (!value) return 'Preencha o telemóvel de emergência'
-                const cleaned = value
-                  .toString()
-                  .replace(/[\s\-().]/g, '')
-                  .replace(/^\+?351/, '')
-                const mainPhone = formData?.user?.phoneNumber
-                  ? formData.user.phoneNumber
-                      .toString()
-                      .replace(/[\s\-().]/g, '')
-                      .replace(/^\+?351/, '')
-                  : ''
+                const cleaned = cleanPhone(value)
+                const mainPhone = cleanPhone(formData?.user?.phoneNumber)
                 if (mainPhone && cleaned === mainPhone) {
                   return 'O telemóvel de emergência não pode ser igual ao telemóvel principal'
                 }

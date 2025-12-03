@@ -164,43 +164,43 @@ export default function CreateCandidate(props: CreateCandidateProps) {
       notifications.show({
         title: 'Erro',
         color: 'red',
-        message: 'Falha ao criar o colaborador. Tente novamente.',
+        message: 'Falha ao criar o candidato. Tente novamente.',
         position: 'top-right',
       })
 
       return
     }
 
-      try {
-        startLoading()
-        const result = await createCandidate(data)
+    try {
+      startLoading()
+      const result = await createCandidate(data)
 
-        // If result contains validation errors from API
-        if (result && typeof result === 'object' && !(result as any).id) {
-          const validationErrors = result as any
+      // If result contains validation errors from API
+      if (result && typeof result === 'object' && !(result as any).id) {
+        const validationErrors = result as any
 
-          // Centralized handling: duplicate, user, and top-level errors
-          const handled = applyValidationErrorsToForm(
-            validationErrors,
-            setError,
-            clearErrors,
-            'candidato'
-          )
+        // Centralized handling: duplicate, user, and top-level errors
+        const handled = applyValidationErrorsToForm(
+          validationErrors,
+          setError,
+          clearErrors,
+          'candidato'
+        )
 
-          if (handled) {
-            // Caller shows notification and stops loading
-            notifications.show({
-              title: 'Erro',
-              color: 'red',
-              message: 'Erro ao criar candidato.',
-              position: 'top-right',
-            })
+        if (handled) {
+          // Caller shows notification and stops loading
+          notifications.show({
+            title: 'Erro',
+            color: 'red',
+            message: 'Erro ao criar candidato.',
+            position: 'top-right',
+          })
 
-            stopLoading()
+          stopLoading()
 
-            return
-          }
+          return
         }
+      }
     } catch (err) {
       stopLoading()
     } finally {

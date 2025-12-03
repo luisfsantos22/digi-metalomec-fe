@@ -228,12 +228,9 @@ export default function CreateEmployee(props: CreateEmployeeProps) {
               position: 'top-right',
             })
 
-            stopLoading()
             return
           }
         }
-      } catch (err) {
-        stopLoading()
       } finally {
         stopLoading()
       }

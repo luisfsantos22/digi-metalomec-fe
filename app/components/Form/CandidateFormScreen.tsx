@@ -229,10 +229,7 @@ const CandidateFormScreen = (props: CandidateFormScreenProps) => {
               required: 'Número de telemóvel é obrigatório',
               validate: (value) => {
                 if (!value) return true
-                const cleaned = value
-                  .toString()
-                  .replace(/[\s\-().]/g, '')
-                  .replace(/^\+?351/, '')
+                const cleaned = cleanPhone(value)
 
                 return (
                   /^9\d{8}$/.test(cleaned) ||
