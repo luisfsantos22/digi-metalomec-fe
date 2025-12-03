@@ -260,6 +260,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           placeholder="João Silva"
           inputType="text"
           mandatory={false}
+          labelStyles="text-digiblack1420-semibold flex gap-1"
           error={errors?.emergencyContact?.name?.message}
           {...register('emergencyContact.name', {
             validate: (value) => {
@@ -293,6 +294,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           placeholder="912 345 678"
           inputType="tel"
           mandatory={false}
+          labelStyles="text-digiblack1420-semibold flex gap-1"
           error={errors?.emergencyContact?.phone?.message}
           validation={{
             pattern: validatorsPatterns.phone,
@@ -339,6 +341,7 @@ const UserFormScreen = (props: UserFormScreenProps) => {
           placeholder="Pai"
           inputType="text"
           mandatory={false}
+          labelStyles="text-digiblack1420-semibold flex gap-1"
           error={errors?.emergencyContact?.relationship?.message}
           {...register('emergencyContact.relationship', {
             validate: (value) => {
